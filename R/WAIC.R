@@ -4,17 +4,18 @@
 #'
 #' @description The function computes widely applicable information criterion (WAIC) and efficient approximate leave-one-out cross-validation (LOO) from fitted  regression model objects of class \code{`flexreg`}.
 #'
-#' @param model an object (or a list of objects) of class \code{`flexreg`}.
+#' @param model an object (or a list of objects) of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
 #' @param ... additional arguments.
 #'
-#' @details This function takes advantage of the \code{loo} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for object of class \code{`flexreg`}.
-#' If two or more objects of class \code{`flexreg`} are provided by a list, the function compares them
+#' @details This function takes advantage of the \code{loo} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for objects of class \code{`flexreg`}.
+#' If a list of two or more objects of class \code{`flexreg`} is provided, the function returns the difference in their expected predictive accuracy (see \code{loo::loo_compare} for further details).
 #'
-#' @examples{
+#' @examples
+#' \dontrun{
 #' data("Reading")
 #' FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
 #' WAIC(FB)
-#' }
+#'}
 #'
 #' @references {
 #' Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. Statistics and Computing. \bold{27}(5), 1413–1432. doi:10.1007/s11222-016-9696-4 \cr

@@ -15,14 +15,14 @@
 )
 }
 \arguments{
-\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}}.}
+\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
 
 \item{newdata}{an optional data frame containing variables with which to predict. If omitted, the fitted values are used.}
 
-\item{cluster}{if the model is \code{"FB"}, \code{cluster = T} returns the cluster means. By default, \code{cluster = F}.}
+\item{cluster}{logical. If the model is \code{"FB"} or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default, \code{cluster = F}.}
 
-\item{type}{a character indicating the type of predictions. Available options are the  fitted means of response (\code{response}), the linear predictor (\code{link}),
-the fitted precision parameter phi (\code{precision}), and the fitted variances of the response (\code{variance}).}
+\item{type}{a character indicating the type of predictions. Available options are the  fitted means of response/relative response (\code{response}), the linear predictor (\code{link}),
+the fitted precision parameter phi (\code{precision}), the fitted overdispersion parameter theta (\code{overdispersion}), and the fitted variances of the response (\code{variance}).}
 
 \item{estimate}{the type of estimate: \code{mean} (default), \code{median} or \code{quantile}.}
 
@@ -31,7 +31,7 @@ the fitted precision parameter phi (\code{precision}), and the fitted variances 
 \item{...}{additional arguments. Currently not used.}
 }
 \description{
-Method that computes various types of prediction from objects of class \code{`flexreg`}. If the model type is \code{FB} and \code{cluster = T}, the function returns also cluster means.
+Method that computes various types of prediction from objects of class \code{`flexreg`}. If the model type is \code{FB} or \code{FBB} and \code{cluster = T}, the function returns also cluster means.
 }
 \examples{
 {
@@ -40,4 +40,11 @@ FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
 predict(FB, type="response", cluster=TRUE)
 }
 
+}
+\references{
+{
+Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
+\cr
+Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+}
 }

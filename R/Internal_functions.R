@@ -76,3 +76,22 @@ phi.chain.nd <- function(posterior, newdata, link.phi){
     }
   return(phi.chain)
 }
+
+
+#' @title theta.chain.nd
+#' @export
+#' @keywords internal
+#'
+theta.chain.nd <- function(posterior, newdata, link.theta){
+  if(is.null(link.theta)) {
+    theta.chain <- rstan::extract(posterior, pars="theta", permuted=T)[[1]]
+    } else {
+      psi.chain <- rstan::extract(posterior, pars="psi", permuted=T)[[1]]
+      eta.chain <- psi.chain %*% t(newdata)
+      if(link.theta == "logit") theta.chain <- apply(eta.chain,c(1,2), function(x) 1/(1+exp(-x))) else
+        if(link.theta == "probit") theta.chain <- apply(eta.chain,c(1,2), function(x) pnorm(x)) else
+          if(link.theta == "cloglog") theta.chain <- apply(eta.chain,c(1,2), function(x) 1-exp(-exp(x))) else
+            if(link.theta == "loglog") theta.chain <- apply(eta.chain,c(1,2), function(x) exp(-exp(x)))
+    }
+  return(theta.chain)
+}

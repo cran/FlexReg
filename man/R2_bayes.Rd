@@ -7,10 +7,10 @@
 R2_bayes(model)
 }
 \arguments{
-\item{model}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}}.}
+\item{model}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
 }
 \description{
-Bayesian version of R-squared for flexible regression models for proportions
+Bayesian version of R-squared for flexible regression models for continuous bounded or binomial data.
 }
 \details{
 The function provides a Bayesian version of the R-squared measure, defined as the variance of the predicted values divided by itself plus the expected variance of the errors.

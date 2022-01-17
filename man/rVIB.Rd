@@ -7,11 +7,11 @@
 rVIB(n, mu, phi, p, k)
 }
 \arguments{
-\item{n}{the number of observations. If length(n) > 1, the length is taken to be the number required.}
+\item{n}{the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.}
 
-\item{mu}{the mean parameter of the Variance-Inflated distribution. It must lie in (0, 1).}
+\item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter of the Variance-Inflated distribution. It must be a positive real value.}
+\item{phi}{the precision parameter. It must be a positive real value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 

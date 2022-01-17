@@ -136,10 +136,11 @@ extract.pars <- function(posterior){
   pars.full <- names(posterior)
     pars <- c()
     pars <- c(pars, pars.full[grep("beta",pars.full)])
-    pars <- c(pars, pars.full[grep("psi",pars.full)])#if model.phi is TRUE
-    pars <- c(pars, pars.full[which(pars.full=="phi")])#if model.phi is FALSE
-    pars <- c(pars, pars.full[which(pars.full=="p")])#if type is FB or VIB
-    pars <- c(pars, pars.full[which(pars.full=="w")])#if type is FB
+    pars <- c(pars, pars.full[grep("psi",pars.full)])#if model.phi is TRUE or if model.theta is TRUE
+    pars <- c(pars, pars.full[which(pars.full=="phi")])#if model.phi or model.theta is FALSE
+    pars <- c(pars, pars.full[which(pars.full=="theta")])#if model.theta is FALSE
+    pars <- c(pars, pars.full[which(pars.full=="p")])#if type is FB, VIB, or FBB
+    pars <- c(pars, pars.full[which(pars.full=="w")])#if type is FB or FBB
     pars <- c(pars, pars.full[which(pars.full=="k")])#if type is VIB
   return(pars)
 }
@@ -180,7 +181,7 @@ rate_plot <- function(chains, pars, n.warmup = n.warmup )
 #' The function returns some diagnostics to check for convergence to the equilibrium distribution of the Markov Chain(s).
 #' Moreover, it prints the number (and percentage) of iterations that ended with a divergence and that saturated the max treedepth, and the E-BFMI values for each chain for which E-BFMI is less than 0.2.
 #'
-#' @param model an object of class flexreg.
+#' @param model an object of class \code{`flexreg`}.
 #' @param diagnostics  an optional character vector of diagnostics names. The default is to compute \code{all} diagnostics, otherwise one can specify a selection of diagnostics among \code{Rhat}, \code{geweke}, \code{gaftery}, \code{heidel}, and \code{gelman}.
 #' @param pars an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression model are evaluated.
 #' @param additional.args a list containing additional arguments (see details)

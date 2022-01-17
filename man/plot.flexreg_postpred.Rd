@@ -7,25 +7,27 @@
 \method{plot}{flexreg_postpred}(x, prob = 0.9, p_mean = F, response = NULL, ...)
 }
 \arguments{
-\item{x}{an object of class \code{`flexreg_postpred`} containing the simulated posterior predictives.}
+\item{x}{an object of class \code{`flexreg_postpred`} containing the simulated posterior predictives, usually the result of \code{\link{posterior_predict}}.}
 
 \item{prob}{the interval probability for the posterior predictives (default is 0.9).}
 
 \item{p_mean}{a logical value indicating whether the posterior predictives' mean should be plotted.}
 
-\item{response}{a numerical vector containing the response variable to be added to the plot. if \code{NULL}, response values are omitted.}
+\item{response}{a numerical vector containing the response (o relative response, in the case of binomial data) to be added to the plot. If \code{NULL}, observed values are not plotted.}
 
 \item{...}{additional arguments. Currently not used.}
 }
 \description{
-A method for plotting the simulated posterior predictive distribution. It takes an object of class \code{`flexreg_postpred`} (i.e., the output of \code{posterior_predictive.flexreg}) and plots the posterior predictive interval for each statistical unit.
-Additionally, the mean of the posterior predictives and the value of the response variable can be added.
+Method for plotting the simulated posterior predictive distribution from an object of class \code{`flexreg_postpred`}. The plot shows the posterior predictive interval for each statistical unit.
+Additionally, the mean of the posterior predictives and the values of the observed response (or relative response, in case of binomial data) can be added.
 }
 \examples{
+\dontrun{
 data("Reading")
 dataset <- Reading
 FB <- flexreg(accuracy ~ iq, dataset, n.iter=1000)
 pp <- posterior_predict(FB)
 plot(pp)
+}
 
 }

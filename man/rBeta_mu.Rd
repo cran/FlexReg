@@ -7,11 +7,11 @@
 rBeta_mu(n, mu, phi)
 }
 \arguments{
-\item{n}{the number of observations. If length(n) > 1, the length is taken to be the number required.}
+\item{n}{the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.}
 
-\item{mu}{the mean parameter of the beta distribution. It must lie in (0, 1).}
+\item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter of the Beta distribution. It must be a positive real value.}
+\item{phi}{the precision parameter. It must be a positive real value.}
 }
 \value{
 A vector of length \code{n}.

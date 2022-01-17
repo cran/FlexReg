@@ -4,18 +4,18 @@
 \alias{Election}
 \title{Italian Election Results}
 \format{
-A data frame containing 232 observations on 13 variables.
+A data frame containing 232 observations on the following 13 variables.
 \describe{
 \item{\code{NVotes}}{the number of valid votes.}
-\item{\code{FI}}{the percentage of votes got by `Forza Italia` party.}
-\item{\code{FDI}}{the percentage of votes got by `Fratelli d'Italia` party.}
-\item{\code{LEGA}}{the percentage of votes got by `Lega` party.}
-\item{\code{LEU}}{the percentage of votes got by `Liberi e Uguali` party.}
-\item{\code{M5S}}{the percentage of votes got by `Movimento 5 Stelle` party.}
-\item{\code{PD}}{the percentage of votes got by `Partito Democratico` party.}
+\item{\code{FI}}{the percentage of votes got by `Forza Italia' party.}
+\item{\code{FDI}}{the percentage of votes got by `Fratelli d'Italia' party.}
+\item{\code{LEGA}}{the percentage of votes got by `Lega' party.}
+\item{\code{LEU}}{the percentage of votes got by `Liberi e Uguali' party.}
+\item{\code{M5S}}{the percentage of votes got by `Movimento 5 Stelle' party.}
+\item{\code{PD}}{the percentage of votes got by `Partito Democratico' party.}
 \item{\code{Other}}{the percentage of votes got by other parties, including blank ballots.}
 \item{\code{AgeInd}}{the age index, defined as the ratio of the number of elderly persons (aged 65 and over) to the number of young persons (from 0 to 14), multiplied by 100.}
-\item{\code{PopDens}}{the number of inhabitants per km2.}
+\item{\code{PopDens}}{the number of inhabitants per square km.}
 \item{\code{ER}}{the employment rate, defined as the ratio of the number of employed persons (aged 15-64) to the number of persons (aged 15-64).}
 \item{\code{Illiteracy}}{the illiteracy rate, defined as the ratio of the number of persons without a qualification (aged 15 and over) to the total number of persons aged 15 and over.}
 \item{\code{Foreign}}{the number of foreigners per 1000 inhabitants.}

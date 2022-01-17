@@ -1,6 +1,6 @@
-#' The 'FlexReg' package.
+#' The `FlexReg' package.
 #'
-#' @description This package provides functions and methods to implement several types of regression models for bounded responses such as proportions and rates.
+#' @description This package provides functions and methods to implement several types of regression models for continuous bounded responses (e.g., proportions and rates) and binomial data.
 #' Inferential statistical analysis is dealt with by Bayesian estimation based on the Hamiltonian Monte Carlo (HMC) algorithm through the \code{`rstan`} package.
 #'
 #' @docType package
@@ -13,6 +13,8 @@
 #'
 #' @references
 #' Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
+#' \cr
+#' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
 #' \cr
 #' Di Brisco, A. M., Migliorati, S., Ongaro, A. (2020) Robustness against outliers: A new variance inflated regression model for proportions. Statistical Modelling, \bold{20}(3), 274--309. doi:10.1177/1471082X18821213 \cr
 #' \cr

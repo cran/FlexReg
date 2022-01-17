@@ -7,7 +7,7 @@
 \method{plot}{flexreg}(x, name.x, additional.cov.default = NA, ...)
 }
 \arguments{
-\item{x}{an object of class flexreg, usually the result of \code{\link{flexreg}}.}
+\item{x}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
 
 \item{name.x}{a character containing the name of the covariate to be plotted on the x-axis of the scatterplot.}
 
@@ -19,13 +19,14 @@
 Method for plotting regression curves for the mean from fitted regression model objects of class \code{`flexreg`}.
 }
 \details{
-The function produces a scatterplot of the covariate specified in \code{name.x} and the response \code{y}. Any other variable involved in the formula must be set to a default through the \code{additional.cov.default} argument.
-If the regression model is of \code{FB} type the function returns a scatterplot with three curves, one corresponding to the overall mean and two corresponding to the component means of the FB distribution, i.e., \eqn{\lambda_1} and \eqn{\lambda_1}.
+The function produces a scatterplot of the covariate specified in \code{name.x} and \code{y} or \code{y/n} if the response is continuous bounded or binomial, respectively. Any other variable involved in the formula must be set to a default through the \code{additional.cov.default} argument.
+If the regression model is of \code{FB} or \code{FBB} type the function returns a scatterplot with three curves, one corresponding to the overall mean and two corresponding to the component means of the FB distribution, i.e., \eqn{\lambda_1} and \eqn{\lambda_2}.
 }
 \examples{
+\dontrun{
 data("Reading")
 FB <- flexreg(accuracy ~ iq+dyslexia, Reading, n.iter=800)
 plot(FB, name.x="iq", additional.cov.default = list("dyslexia"=1))
-
+}
 
 }

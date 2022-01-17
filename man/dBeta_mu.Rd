@@ -9,9 +9,9 @@ dBeta_mu(x, mu, phi)
 \arguments{
 \item{x}{a vector of quantiles.}
 
-\item{mu}{the mean parameter of the beta distribution. It must lie in (0, 1).}
+\item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter of the Beta distribution. It must be a positive real value.}
+\item{phi}{the precision parameter. It must be a positive real value.}
 }
 \value{
 A vector with the same length as \code{x}.

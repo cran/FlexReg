@@ -9,9 +9,9 @@ dVIB(x, mu, phi, p, k)
 \arguments{
 \item{x}{a vector of quantiles.}
 
-\item{mu}{the mean parameter of the variance-inflated beta distribution. It must lie in (0, 1).}
+\item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter of the Variance-Inflated distribution. It must be a positive real value.}
+\item{phi}{the precision parameter. It must be a positive real value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 

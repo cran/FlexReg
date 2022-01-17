@@ -1,9 +1,9 @@
 #' Random generator from the beta distribution
 #'
 #' The function randomly generates values from the beta distribution with a mean-precision parameterization.
-#' @param n the number of observations. If length(n) > 1, the length is taken to be the number required.
-#' @param mu the mean parameter of the beta distribution. It must lie in (0, 1).
-#' @param phi the precision parameter of the Beta distribution. It must be a positive real value.
+#' @param n the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param phi the precision parameter. It must be a positive real value.
 #'
 #' @return A vector of length \code{n}.
 #'
@@ -31,9 +31,9 @@ rBeta_mu <- function(n, mu, phi){
 #' Random generator from the flexible beta distribution
 #'
 #' The function randomly generates values from the flexible beta distribution.
-#' @param n the number of observations. If length(n) > 1, the length is taken to be the number required.
-#' @param mu the mean parameter of the flexible beta distribution. It must lie in (0, 1).
-#' @param phi the precision parameter of the Flexible Beta distribution. It must be a positive real value.
+#' @param n the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param phi the precision parameter. It must be a positive real value.
 #' @param p the mixing weight. It must lie in (0, 1).
 #' @param w the normalized distance among clusters. It must lie in (0, 1).
 #'
@@ -71,9 +71,9 @@ rFB <- function(n, mu, phi, p, w){
 #' Random generation from the variance-inflated beta distribution
 #'
 #' The function randomly generates values from the variance-inflated beta distribution.
-#' @param n the number of observations. If length(n) > 1, the length is taken to be the number required.
-#' @param mu the mean parameter of the Variance-Inflated distribution. It must lie in (0, 1).
-#' @param phi the precision parameter of the Variance-Inflated distribution. It must be a positive real value.
+#' @param n the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param phi the precision parameter. It must be a positive real value.
 #' @param p the mixing weight. It must lie in (0, 1).
 #' @param k the extent of the variance inflation. It must lie in (0, 1).
 #'
@@ -104,3 +104,105 @@ rVIB <- function(n, mu, phi, p, k){
   return(x)
 }
 
+
+
+
+#' Random generator from the beta-binomial distribution
+#'
+#' The function randomly generates values from the beta-binomial distribution.
+#' @param n the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.
+#' @param size the total number of trials.
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param theta the overdispersion parameter. It must  lie in (0, 1).
+#' @param phi the precision parameter. It is an alternative way to specify the \code{theta} parameter. It must be a positive real value.
+#'
+#' @return A vector of length \code{n}.
+#'
+#' @examples
+#' rBetaBin(n=100, size=40, mu = 0.5, theta = 0.4)
+#' rBetaBin(n=100, size=40, mu = 0.5, phi = 1.5)
+#'
+#' @references{
+#' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005
+#' }
+#'
+#' @import stats
+#'
+#' @export
+#'
+
+rBetaBin <- function(n, size=NULL, mu=NULL, theta=NULL, phi=NULL){
+  if (length(n)>1) n <- length(n)
+  if (any(is.null(mu) | mu < 0 | mu > 1)) stop("Parameter mu has to be between 0 and 1")
+  if (any(is.null(size) | size < 0 | size != as.integer(size))) stop("size must be a non-negative integer")
+
+  if (!is.null(theta) & !is.null(phi)) {
+    if(theta != 1/(phi+1)) stop("Please specify 'theta' or 'phi' but not both") else
+      warning("In dFBB() specify 'theta' or 'phi' but not both")
+  } else if (is.null(theta) & is.null(phi)) {
+    stop("Pleasy specify 'theta' or 'phi' (but not both)")
+  } else if (is.null(theta) & !is.null(phi)) {
+    if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
+  } else {
+    if (any(theta < 0 | theta > 1)) stop("Parameter theta must lie in (0,1)")
+    phi <- (1-theta)/theta
+  }
+
+  probs <- rBeta_mu(n, mu = mu, phi = phi)
+  return(rbinom(n, size=size, prob = probs))
+}
+
+#' Random generator from the flexible beta-binomial distribution
+#'
+#' The function randomly generates values from the flexible beta-binomial distribution.
+#' @param n the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.
+#' @param size the total number of trials.
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param theta the overdispersion parameter. It must lie in (0, 1).
+#' @param phi the precision parameter. It is an alternative way to specify the \code{theta} parameter. It must be a positive real value.
+#' @param p the mixing weight. It must lie in (0, 1).
+#' @param w the normalized distance among clusters. It must lie in (0, 1).
+#'
+#' @return A vector of length  \code{n}.
+#'
+#' @examples
+#' rFBB(n = 100, size = 40, mu = 0.5, theta = .4, p = 0.3, w = 0.6)
+#' rFBB(n = 100, size = 40, mu = 0.5, phi = 1.5, p = 0.3, w = 0.6)
+#'
+#' @references {
+#' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005
+#' }
+#'
+#' @import stats
+#'
+#' @export
+
+rFBB <- function(n, size=NULL, mu, theta=NULL, phi=NULL, p, w){
+  if (length(n)>1) n <- length(n)
+  if (any(is.null(mu) | mu < 0 | mu > 1)) stop("Parameter mu has to be between 0 and 1")
+  if (any(is.null(p) | p < 0 | p > 1)) stop("Parameter p has to be between 0 and 1")
+  if (any(is.null(w) | w < 0 | w > 1)) stop("Parameter w has to be between 0 and 1")
+  if (any(is.null(size) | size < 0 | size != as.integer(size))) stop("size must be a non-negative integer")
+
+  if (!is.null(theta) & !is.null(phi)) {
+    if(theta != 1/(phi+1)) stop("Please specify 'theta' or 'phi' but not both") else
+      warning("In dFBB() specify 'theta' or 'phi' but not both")
+  } else if (is.null(theta) & is.null(phi)) {
+    stop("Pleasy specify 'theta' or 'phi' (but not both)")
+  } else if (is.null(theta) & !is.null(phi)) {
+    if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
+  } else {
+    if (any(theta < 0 | theta > 1)) stop("Parameter theta must lie in (0,1)")
+    phi <- (1-theta)/theta
+  }
+
+  n <- floor(n)
+  wtilde <- w*min(mu/p, (1-mu)/(1-p))
+  lambda1 <- mu + (1-p)*wtilde
+  lambda2 <- mu-p*wtilde
+  v <- rbinom(n,1,prob=p)
+  x <- vector(mode="numeric", length = n)
+  x[v==1] <- rBetaBin(n=length(which(v==1)), size=size, mu = lambda1, phi=phi)
+  x[v==0] <- rBetaBin(n=length(which(v==0)), size=size, mu = lambda2, phi=phi)
+  return(x)
+}

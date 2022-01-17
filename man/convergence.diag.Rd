@@ -12,7 +12,7 @@ convergence.diag(
 )
 }
 \arguments{
-\item{model}{an object of class flexreg.}
+\item{model}{an object of class \code{`flexreg`}.}
 
 \item{diagnostics}{an optional character vector of diagnostics names. The default is to compute \code{all} diagnostics, otherwise one can specify a selection of diagnostics among \code{Rhat}, \code{geweke}, \code{gaftery}, \code{heidel}, and \code{gelman}.}
 

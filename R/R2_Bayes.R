@@ -1,15 +1,13 @@
 #' @title Bayesian R-squared for flexreg Objects
 #'
-#' @description Bayesian version of R-squared for flexible regression models for proportions
+#' @description Bayesian version of R-squared for flexible regression models for continuous bounded or binomial data.
 #'
-#' @param model an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}}.
+#' @param model an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
 #'
 #' @details  The function provides a Bayesian version of the R-squared measure, defined as the variance of the predicted values divided by itself plus the expected variance of the errors.
 #' @references {
 #' Andrew Gelman, Ben Goodrich, Jonah Gabry & Aki Vehtari (2019) R-squared for Bayesian Regression Models, The American Statistician, 73:3, 307-309, DOI: 10.1080/00031305.2018.1549100
 #' }
-#'
-#' @import rstan
 #'
 #' @examples
 #' data("Reading")
@@ -17,6 +15,8 @@
 #' hist(R2_bayes(FB))
 #'
 #' @export
+#'
+#' @import rstantools
 #'
 
 R2_bayes <- function(model){

@@ -27,7 +27,7 @@ flexreg(
 \arguments{
 \item{formula}{an object of class \code{`formula`}: a symbolic description of the model to be fitted (of type \code{y ~ x} or \code{y ~ x | z}).}
 
-\item{data}{an optional data frame, list, or object coercible to a data frame through \code{base::as.data.frame} containing the variables in the model. If not found in data, the variables in formula are taken from the environment from which the function flexreg is called.}
+\item{data}{an optional data frame, list, or object that is coercible to a data frame through \code{base::as.data.frame} containing the variables in the model. If not found in data, the variables in formula are taken from the environment from which the function flexreg is called.}
 
 \item{type}{a character specifying the type of regression model. Current options are the flexible beta regression model \code{"FB"} (default), the variance inflated beta \code{"VIB"}, and the beta one \code{"Beta"}.}
 
@@ -35,21 +35,21 @@ flexreg(
 
 \item{prior.beta}{a character specifying the prior distribution for the \code{beta} regression coefficients of the mean model. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.beta}{a numeric (vector of length 1) specifying the hyperprior parameter for the prior distribution of \code{beta} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
+\item{hyperparam.beta}{a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{beta} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
 
 \item{link.phi}{a character specifying the link function for the precision model (phi). Currently, \code{"identity"} (default), \code{"log"} and \code{"sqrt"} are supported.}
 
 \item{prior.phi}{a character specifying the prior distribution for precision parameter \code{phi} if \code{link.phi = "identity"}. Currently, \code{"gamma"} (default) and \code{"unif"} are supported.}
 
-\item{hyperparam.phi}{a numeric (vector of length 1) specifying the hyperprior parameter for the prior distribution of \code{phi}. A value of 0.001 is suggested if the prior is \code{"gamma"}. If the prior is \code{"uniform"} the hyperparameter must be specified to define the upper limit of the support of \code{phi}.}
+\item{hyperparam.phi}{a positive numeric (vector of length 1) specifying the hyperprior parameter for the prior distribution of \code{phi}. If the prior is \code{"gamma"}, the value identifies the shape and rate parameters (a value of 0.001 is suggested). If the prior is \code{"uniform"} the hyperparameter must be specified to define the upper limit of the support of \code{phi}.}
 
 \item{prior.psi}{a character specifying the prior distribution for \code{psi} regression coefficients of the precision model (not supported if link.phi is \code{"identity"}). Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.psi}{a numeric (vector of length 1) specifying the hyperprior parameter for the prior distribution of \code{psi} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
+\item{hyperparam.psi}{a positive numeric (vector of length 1) specifying the hyperprior standaerd deviation parameter for the prior distribution of \code{psi} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
 
 \item{n.iter}{a positive integer specifying the number of iterations for each chain (including warmup). The default is 5000.}
 
-\item{burnin.perc}{the percentage of iterations (out of \code{n.iter}) per chain to discard.}
+\item{burnin.perc}{the percentage of iterations per chain to discard.}
 
 \item{n.chain}{a positive integer specifying the number of Markov chains. The default is 1.}
 
@@ -71,7 +71,7 @@ The \code{flexreg} function returns an object of class \code{`flexreg`}, i.e. a 
 \item{\code{design.Z}}{the design matrix for the precision model (if defined).}
 }
 \description{
-The function fits some flexible regression models for proportions via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
+The function fits some flexible regression models for continuous bounded responses (e.g., proportions and rates) via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
 Available regression models are the flexible beta regression model (\code{type="FB"}, default), the variance inflated beta (\code{type="VIB"}), and the beta one (\code{type="Beta"}).
 }
 \details{
@@ -88,9 +88,10 @@ for the mean and covariates on the right of ("|") are included in the regression
 If the second part is omitted, i.e., \eqn{y \sim x_1 + x_2}, the precision is assumed constant for each observation.
 }
 \examples{
+\dontrun{
 data("Reading")
 FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
-
+}
 }
 \references{
 {

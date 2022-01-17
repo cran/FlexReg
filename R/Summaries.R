@@ -2,11 +2,11 @@
 #'
 #' @description Methods for extracting information from fitted  regression model objects of class \code{`flexreg`}.
 #'
-#' @param object an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}}.
+#' @param object an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
 #' @param digits an integer indicating the number of decimal places. Default equal to 4.
 #' @param ... additional arguments.
 #'
-#' @details  The \code{summary.flexreg} method summarizes the results of \code{\link{flexreg}}, adding also information from the functions
+#' @details  The \code{summary.flexreg} method summarizes the results of \code{\link{flexreg}} and \code{\link{flexreg_binom}} functions, adding also information from the functions
 #' \code{\link{residuals.flexreg}} and \code{\link{WAIC}}. The \code{summary.flexreg} method returns an object of class \code{`summary.flexreg`} containing the relevant summary statistics which can subsequently be
 #' printed using the associated \code{print} method.
 #'
@@ -16,7 +16,7 @@
 #' FB <- flexreg(accuracy ~ iq, dataset, n.iter = 1000)
 #' summary(FB)
 #'
-#' @import rstan
+#'
 #' @method summary flexreg
 #' @export
 #'
@@ -25,50 +25,125 @@ summary.flexreg <- function(object, ..., digits=4){
   x <- object
   call <- x$call
   model.name <- x$model@model_name
-  link.mu <- x$link.mu
-  link.phi <- x$link.phi
-  formula <- x$formula
+  if(model.name %in% c("Beta", "Beta_phi", "FB", "FB_phi", "VIB", "VIB_phi")){
+    link.mu <- x$link.mu
+    link.phi <- x$link.phi
+    formula <- x$formula
 
-  covariate.names.mu <- colnames(x$design.X)
-  covariate.names.phi <- colnames(x$design.Z)
+    covariate.names.mu <- colnames(x$design.X)
+    covariate.names.phi <- colnames(x$design.Z)
 
-  posterior <- x$model
-  pars <- extract.pars(posterior = posterior)
-  n.pars <- length(pars)
-  pp <- rstan::extract(posterior, pars)
-  summa <- lapply(pp, function(x) c(mean(x), sd(x),quantile(x, probs = c(.025,.5,.975))))
-  summa.mat <- round(matrix(unlist(summa), ncol=5, byrow = T ),digits)
-  colnames(summa.mat) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
-  rownames(summa.mat) <- pars
+    posterior <- x$model
+    pars <- extract.pars(posterior = posterior)
+    n.pars <- length(pars)
+    pp <- rstan::extract(posterior, pars)
+    summa <- lapply(pp, function(x) c(mean(x), sd(x),quantile(x, probs = c(.025,.5,.975))))
+    summa.mat <- round(matrix(unlist(summa), ncol=5, byrow = T ),digits)
+    colnames(summa.mat) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+    rownames(summa.mat) <- pars
 
-  summ.mu <- summa.mat[grep("beta",rownames(summa.mat)),]
-  rownames(summ.mu) <- covariate.names.mu
+    summ.mu <- summa.mat[grep("beta",rownames(summa.mat)),]
+    if(is.null(dim(summ.mu))){ # if there is only the intercept term:
+      summ.mu <- matrix(ncol=length(summ.mu),nrow=1, data=summ.mu)
+      colnames(summ.mu) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+    }
+    rownames(summ.mu) <- covariate.names.mu
 
-  if(is.null(covariate.names.phi)){
-    summ.phi <- summa.mat[which(rownames(summa.mat)=="phi"),]
-    dim(summ.phi) <- c(1,5)
-    colnames(summ.phi) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
-    rownames(summ.phi) <- "phi"
+      if(is.null(covariate.names.phi)){
+        summ.phi <- summa.mat[which(rownames(summa.mat)=="phi"),]
+        dim(summ.phi) <- c(1,5)
+        colnames(summ.phi) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+        rownames(summ.phi) <- "phi"
+      } else {
+        summ.phi <- summa.mat[grep("psi",rownames(summa.mat)),]
+        rownames(summ.phi) <- covariate.names.phi
+      }
+
+      n.parz <- nrow(summ.mu)+nrow(summ.phi)
+      if( n.pars > n.parz) {
+        summ.add <- summa.mat[(n.parz+1):n.pars,]
+      } else summ.add <- NULL
+
+      residuals <- residuals.flexreg(x, type = "raw", cluster=FALSE, estimate="mean")
+      summ.res <- round(quantile(residuals), digits)
+      names(summ.res) <- c("Min", "1Q", "Median", "3Q", "Max")
+
+
+    waic_out <- suppressWarnings(WAIC(x))
+
+    output <- list(call=call, Model=model.name, formula=formula, link.mu=link.mu, link.phi=link.phi,
+                   Summary.res=summ.res,
+                   Summary.mu=summ.mu, Summary.phi=summ.phi, Summary.add=summ.add,
+                   waic_out = waic_out)
+  } else {
+    # ELSE, if the model is for binomial data:
+    link.mu <- x$link.mu
+    link.theta <- x$link.theta
+    formula <- x$formula
+
+    covariate.names.mu <- colnames(x$design.X)
+    covariate.names.theta <- colnames(x$design.Z)
+
+    posterior <- x$model
+    pars <- extract.pars(posterior = posterior)
+    n.pars <- length(pars)
+    pp <- rstan::extract(posterior, pars)
+    summa <- lapply(pp, function(x) c(mean(x), sd(x),quantile(x, probs = c(.025,.5,.975))))
+    summa.mat <- round(matrix(unlist(summa), ncol=5, byrow = T ),digits)
+    colnames(summa.mat) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+    rownames(summa.mat) <- pars
+
+    summ.mu <- summa.mat[grep("beta",rownames(summa.mat)),]
+    if(is.null(dim(summ.mu))){ # if there is only the intercept term:
+      summ.mu <- matrix(ncol=length(summ.mu),nrow=1, data=summ.mu)
+      colnames(summ.mu) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+    }
+    rownames(summ.mu) <- covariate.names.mu
+
+    if(model.name != "Bin"){
+      if(is.null(covariate.names.theta)){
+        summ.theta <- summa.mat[which(rownames(summa.mat)=="theta"),]
+        summ.theta <- rbind(summ.theta,
+                            summa.mat[which(rownames(summa.mat)=="phi"),])
+        dim(summ.theta) <- c(2,5)
+        colnames(summ.theta) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+        rownames(summ.theta) <- c("theta", "phi")
+      } else {
+        summ.theta <- summa.mat[grep("psi",rownames(summa.mat)),]
+        rownames(summ.theta) <- covariate.names.theta
+      }
+
+      n.parz <- nrow(summ.mu)+nrow(summ.theta)
+      if( n.pars > n.parz) {
+        summ.add <- summa.mat[(n.parz+1):n.pars,]
+      } else summ.add <- NULL
+
+      residuals <- residuals.flexreg(x, type = "raw", cluster=FALSE, estimate="mean")
+      summ.res <- round(quantile(residuals), digits)
+      names(summ.res) <- c("Min", "1Q", "Median", "3Q", "Max")
     } else {
-    summ.phi <- summa.mat[grep("psi",rownames(summa.mat)),]
-    rownames(summ.phi) <- covariate.names.phi
+      summ.phi <- NULL
+      summ.add <- NULL
+      summ.theta <- NULL
+
+      #summ.res <- NULL
+
+      residuals <- residuals.flexreg(x, type = "raw", cluster=FALSE, estimate="mean")
+      summ.res <- round(quantile(residuals), digits)
+      names(summ.res) <- c("Min", "1Q", "Median", "3Q", "Max")
     }
 
-  n.parz <- nrow(summ.mu)+nrow(summ.phi)
-  if( n.pars > n.parz) {
-    summ.add <- summa.mat[(n.parz+1):n.pars,]
-    } else summ.add <- NULL
+    waic_out <- suppressWarnings(WAIC(x))
 
-  residuals <- residuals.flexreg(x, type = "raw", cluster=FALSE, estimate="mean")
-  summ.res <- round(quantile(residuals), digits)
-  names(summ.res) <- c("Min", "1Q", "Median", "3Q", "Max")
+    output <- list(call=call, Model=model.name, formula=formula,
+                   link.mu=link.mu, link.theta=link.theta,
+                   Summary.res=summ.res,
+                   Summary.mu=summ.mu,
+                   Summary.theta=summ.theta,
+                   Summary.add=summ.add,
+                   waic_out = waic_out)
 
-  waic_out <- suppressWarnings(WAIC(x))
-
-output <- list(call=call, Model=model.name, formula=formula, link.mu=link.mu, link.phi=link.phi,
-                 Summary.res=summ.res,
-                 Summary.mu=summ.mu, Summary.phi=summ.phi, Summary.add=summ.add,
-                 waic_out = waic_out)
+  }
   class(output) <- "summary.flexreg"
   return(output)
 }
@@ -76,8 +151,8 @@ output <- list(call=call, Model=model.name, formula=formula, link.mu=link.mu, li
 
 #' Print Methods for summary.flexreg Objects
 #'
-#' @param x an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}}.
-
+#' @param x an object of class \code{`summary.flexreg`}.
+#'
 #' @rdname summary.flexreg
 #' @export
 #'
@@ -93,8 +168,16 @@ print.summary.flexreg <- function(x, ...){
   cat("\nCoefficients (mean model with", x$link.mu, "link):\n")
   print(x$Summary.mu)
 
-  cat("\nCoefficients (precision model with", x$link.phi, "link):\n")
-  print(x$Summary.phi)
+  if(x$Model %in% c("Beta", "Beta_phi", "FB", "FB_phi", "VIB", "VIB_phi")){
+    cat("\nCoefficients (precision model with", x$link.phi, "link for phi):\n")
+    print(x$Summary.phi)
+  } else if(x$Model %in% c("FBB_theta", "BetaBin_theta")){
+    cat("\nCoefficients (overdispersion model with", x$link.theta, "link for theta):\n")
+    print(x$Summary.theta)
+  } else if(x$Model %in% c("FBB", "BetaBin")){
+    cat("\nOverdispersion parameter(s):\n")
+    print(x$Summary.theta)
+  }  # else if Bin then nothing should be printed!
 
   if(!is.null(x$Summary.add)){
     cat("\nAdditional Parameters:\n")
@@ -111,20 +194,21 @@ print.summary.flexreg <- function(x, ...){
 #'
 #' @description Method for plotting regression curves for the mean from fitted regression model objects of class \code{`flexreg`}.
 #'
-#' @param x an object of class flexreg, usually the result of \code{\link{flexreg}}.
+#' @param x an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
 #' @param name.x a character containing the name of the covariate to be plotted on the x-axis of the scatterplot.
 #' @param additional.cov.default a list of additional covariates to be set as default.
 #' @param ... additional arguments. Currently not used.
 #'
-#' @details The function produces a scatterplot of the covariate specified in \code{name.x} and the response \code{y}. Any other variable involved in the formula must be set to a default through the \code{additional.cov.default} argument.
-#' If the regression model is of \code{FB} type the function returns a scatterplot with three curves, one corresponding to the overall mean and two corresponding to the component means of the FB distribution, i.e., \eqn{\lambda_1} and \eqn{\lambda_1}.
+#' @details The function produces a scatterplot of the covariate specified in \code{name.x} and \code{y} or \code{y/n} if the response is continuous bounded or binomial, respectively. Any other variable involved in the formula must be set to a default through the \code{additional.cov.default} argument.
+#' If the regression model is of \code{FB} or \code{FBB} type the function returns a scatterplot with three curves, one corresponding to the overall mean and two corresponding to the component means of the FB distribution, i.e., \eqn{\lambda_1} and \eqn{\lambda_2}.
 #'
 #'
 #' @examples
+#' \dontrun{
 #' data("Reading")
 #' FB <- flexreg(accuracy ~ iq+dyslexia, Reading, n.iter=800)
 #' plot(FB, name.x="iq", additional.cov.default = list("dyslexia"=1))
-#'
+#'}
 #'
 #' @import ggplot2
 #'
@@ -138,6 +222,11 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, ...)
   #assign("group", "Response", envir = .GlobalEnv)
   object <- x
   y <- object$response
+  if(object$model@model_name %in% c("FBB", "FBB_theta", "BetaBin",
+                                    "BetaBin_theta", "Bin")){
+    n <- object$n
+    y <- y/n
+  }
   x <- object$design.X[,which(colnames(object$design.X) == name.x)]
 
  # additional.cov.default <- list("x2" = 0)#list("dyslexia"= -1, "iq:dyslexia" = 0)
@@ -151,7 +240,7 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, ...)
   newdata <- data.frame(x, additional.cov.default)
   names(newdata) <- c(name.x, names(additional.cov.default))
   }
-  cluster <- "FB" %in% object$call$type | is.null(object$call$type)
+  cluster <- "FB" %in% object$call$type | "FBB" %in% object$call$type | is.null(object$call$type)
   if (cluster == T) {
   mu.hat <- predict(object, newdata = newdata, type = "response", cluster = T)
   data.plot <- data.frame(y = y, x = x, mu.hat)
@@ -159,13 +248,15 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, ...)
                        varying = 3:5, v.names=c('Response'))
   data.plot$group <- as.factor(data.plot$time)
   plot1 <- ggplot(data.plot, aes(x=x, y=y, group = group))+ geom_point()+
+    ylab("y/n")+
     geom_line(aes(x=x, y=Response, colour = group))
   } else {
     mu.hat <- predict(object, newdata = newdata, type = "response", cluster = F)
     data.plot <- data.frame(y = y, x = x,  mu.hat)
     names(data.plot)[3] <- "Response"
     plot1 <- ggplot(data.plot, aes(x=x, y=y))+
-      geom_line(aes(x=x, y=Response))
+      geom_line(aes(x=x, y=Response))+
+      ylab("y/n")
   }
   return(plot1+ geom_point()+theme_bw()+
            scale_color_manual(labels = c(expression(mu), expression(lambda[1]),expression(lambda[2])), values = c("black", "red", "blue"))+

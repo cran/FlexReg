@@ -6,18 +6,33 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 
 RcppExport SEXP _rcpp_module_boot_stan_fit4Beta_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4BetaBin_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4BetaBin_theta_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4Beta_phi_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4Bin_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4FB_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4FBB_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4FBB_theta_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4FB_phi_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4VIB_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4VIB_phi_mod();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rcpp_module_boot_stan_fit4Beta_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4Beta_mod, 0},
+    {"_rcpp_module_boot_stan_fit4BetaBin_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4BetaBin_mod, 0},
+    {"_rcpp_module_boot_stan_fit4BetaBin_theta_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4BetaBin_theta_mod, 0},
     {"_rcpp_module_boot_stan_fit4Beta_phi_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4Beta_phi_mod, 0},
+    {"_rcpp_module_boot_stan_fit4Bin_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4Bin_mod, 0},
     {"_rcpp_module_boot_stan_fit4FB_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4FB_mod, 0},
+    {"_rcpp_module_boot_stan_fit4FBB_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4FBB_mod, 0},
+    {"_rcpp_module_boot_stan_fit4FBB_theta_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4FBB_theta_mod, 0},
     {"_rcpp_module_boot_stan_fit4FB_phi_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4FB_phi_mod, 0},
     {"_rcpp_module_boot_stan_fit4VIB_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4VIB_mod, 0},
     {"_rcpp_module_boot_stan_fit4VIB_phi_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4VIB_phi_mod, 0},

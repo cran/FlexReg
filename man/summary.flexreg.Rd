@@ -19,13 +19,13 @@
 
 \item{digits}{an integer indicating the number of decimal places. Default equal to 4.}
 
-\item{x}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}}.}
+\item{x}{an object of class \code{`summary.flexreg`}.}
 }
 \description{
 Methods for extracting information from fitted  regression model objects of class \code{`flexreg`}.
 }
 \details{
-The \code{summary.flexreg} method summarizes the results of \code{\link{flexreg}}, adding also information from the functions
+The \code{summary.flexreg} method summarizes the results of \code{\link{flexreg}} and \code{\link{flexreg_binom}} functions, adding also information from the functions
 \code{\link{residuals.flexreg}} and \code{\link{WAIC}}. The \code{summary.flexreg} method returns an object of class \code{`summary.flexreg`} containing the relevant summary statistics which can subsequently be
 printed using the associated \code{print} method.
 }
@@ -34,5 +34,6 @@ data("Reading")
 dataset <- Reading
 FB <- flexreg(accuracy ~ iq, dataset, n.iter = 1000)
 summary(FB)
+
 
 }
