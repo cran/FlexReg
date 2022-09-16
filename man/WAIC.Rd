@@ -26,14 +26,14 @@ If a list of two or more objects of class \code{`flexreg`} is provided, the func
 \examples{
 \dontrun{
 data("Reading")
-FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, type="FB", n.iter=1000)
 WAIC(FB)
 }
 
 }
 \references{
 {
-Vehtari, A., Gelman, A., and Gabry, J. (2017a). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. Statistics and Computing. \bold{27}(5), 1413–1432. doi:10.1007/s11222-016-9696-4 \cr
+Vehtari, A., Gelman, A., Gabry, J. (2017). Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC. Statistics and Computing. \bold{27}(5), 1413--1432. doi:10.1007/s11222-016-9696-4 \cr
 \cr
 
 }

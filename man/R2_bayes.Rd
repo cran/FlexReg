@@ -10,19 +10,19 @@ R2_bayes(model)
 \item{model}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
 }
 \description{
-Bayesian version of R-squared for flexible regression models for continuous bounded or binomial data.
+Bayesian version of R-squared for flexible regression models for continuous bounded or binomial responses
 }
 \details{
 The function provides a Bayesian version of the R-squared measure, defined as the variance of the predicted values divided by itself plus the expected variance of the errors.
 }
 \examples{
 data("Reading")
-FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, type = "FB", n.iter=1000)
 hist(R2_bayes(FB))
 
 }
 \references{
 {
-Andrew Gelman, Ben Goodrich, Jonah Gabry & Aki Vehtari (2019) R-squared for Bayesian Regression Models, The American Statistician, 73:3, 307-309, DOI: 10.1080/00031305.2018.1549100
+Gelman, A., Goodrich, B., Gabry, J., Vehtari, A. (2019). R-squared for Bayesian Regression Models, The American Statistician, 73:3, 307--309. doi: 10.1080/00031305.2018.1549100
 }
 }

@@ -4,7 +4,7 @@
 #' @param model an object of class \code{`flexreg`}.
 #' @param file a character string giving the name of the file (with extension .pdf).
 #' @param plotfun  an optional character vector of diagnostics plots. The default is to compute \code{all} plots, otherwise one can specify a selection of plots among \code{density}, \code{trace}, \code{intervals}, \code{rate}, \code{rhat}, and \code{acf}.
-#' @param pars an optional character vector of parameter names. If pars is not specified, all parameters in the regression model are evaluated.
+#' @param pars an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.
 #' @param point_est an optional character to specify the point estimate to be shown between \code{median} (the default), \code{mean}, or \code{none}.
 #' @param prob the probability mass to be included in the inner interval (\code{intervals} plot) or in the shaded region (for \code{density} plot). The default is 0.5.
 #' @param prob_outer the probability mass to be included in the outer interval  of the \code{intervals} plot. The default is 0.9.
@@ -16,13 +16,18 @@
 #'
 #' @import bayesplot ggplot2
 #'
+#' @references {
+#' Brooks, SP., Gelman, A. (1998). General methods for monitoring convergence of iterative simulations. Journal of Computational and Graphical Statistics, \bold{7}, 434-455. \cr
+#' \cr
+#' Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org
+#' }
 #'
 #' @details The plots can be further customized using the \code{ggplot2} package.
 #' \itemize{
 #' \item \code{density} returns a density plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_areas} for further details.
 #' \item \code{trace} returns a trace plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_trace} for further details.
 #' \item \code{intervals} returns a plot of uncertainty interval for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_intervals} for further details.
-#' \item \code{rate} returns a plot for each parameter in \code{pars}  with the number of iterations on the x-axis and the monte carlo mean until iteration i-th on the y-axis.
+#' \item \code{rate} returns a plot for each parameter in \code{pars}  with the number of iterations on the x-axis and the Monte Carlo mean until iteration i-th on the y-axis.
 #' \item \code{rhat} returns a plot with the Rhat values for each parameter in \code{pars}. See \code{bayesplot::mcmc_rhat} for further details.
 #' \item \code{acf} returns the autocorrelation plots (one for each parameter in \code{pars}). See \code{bayesplot::mcmc_acf} for further details.
 #'
@@ -138,6 +143,8 @@ extract.pars <- function(posterior){
     pars <- c(pars, pars.full[grep("beta",pars.full)])
     pars <- c(pars, pars.full[grep("psi",pars.full)])#if model.phi is TRUE or if model.theta is TRUE
     pars <- c(pars, pars.full[which(pars.full=="phi")])#if model.phi or model.theta is FALSE
+    pars <- c(pars, pars.full[grep("omega0",pars.full)])#for 0 augmentation
+    pars <- c(pars, pars.full[grep("omega1",pars.full)])#for 1 augmentation
     pars <- c(pars, pars.full[which(pars.full=="theta")])#if model.theta is FALSE
     pars <- c(pars, pars.full[which(pars.full=="p")])#if type is FB, VIB, or FBB
     pars <- c(pars, pars.full[which(pars.full=="w")])#if type is FB or FBB
@@ -183,32 +190,32 @@ rate_plot <- function(chains, pars, n.warmup = n.warmup )
 #'
 #' @param model an object of class \code{`flexreg`}.
 #' @param diagnostics  an optional character vector of diagnostics names. The default is to compute \code{all} diagnostics, otherwise one can specify a selection of diagnostics among \code{Rhat}, \code{geweke}, \code{gaftery}, \code{heidel}, and \code{gelman}.
-#' @param pars an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression model are evaluated.
+#' @param pars an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.
 #' @param additional.args a list containing additional arguments (see details)
 #'
 #' @return A print from \code{check_hmc_diagnostics} function and a list of convergence diagnostics.
 #'
 #'
 #' @references {
-#' Brooks, SP. and Gelman, A. (1998). General methods for monitoring convergence of iterative simulations. Journal of Computational and Graphical Statistics, \bold{7}, 434-455. \cr
+#' Brooks, SP., Gelman, A. (1998). General methods for monitoring convergence of iterative simulations. Journal of Computational and Graphical Statistics, \bold{7}, 434-455. \cr
 #' \cr
 #' Geweke, J. (1992). Evaluating the accuracy of sampling-based approaches to calculating posterior moments. In Bayesian Statistics 4 (ed JM Bernado, JO Berger, AP Dawid and AFM Smith). Clarendon Press, Oxford, UK. \cr
 #' \cr
+#' Heidelberger P., Welch P.D. (1981). A spectral method for confidence interval generation and run length control in simulations. Comm. ACM. \bold{24}, 233-245.\cr
+#' \cr
 #' Raftery, A.E. and Lewis, S.M. (1992). One long run with diagnostics: Implementation strategies for Markov chain Monte Carlo. Statistical Science, \bold{7}, 493-497.\cr
 #' \cr
-#' Heidelberger P. and Welch P.D. (1981). A spectral method for confidence interval generation and run length control in simulations. Comm. ACM. \bold{24}, 233-245.\cr
-#' \cr
-#' The Stan Development Team Stan Modeling Language User's Guide and Reference Manual. http://mc-stan.org/.
+#' Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org
 #' }
 #'
 #' @details \itemize{
 #' \item \code{R-hat} returns the potential scale reduction factor on split chains. An R-hat greater than 1 is indicative of a bad mix of the chains. At convergence R-hat has to be less than 1.05. See \code{rstan::Rhat} for further details.
 #' \item \code{geweke} returns the z-scores, one for each parameter, for a test of equality between the means of the first 10\% and last 50\% of the chain. The fraction to use from the first and last part of the chain can be edited through the additional arguments \code{frac1} and \code{frac2}. The sum of \code{frac1} and \code{frac2} has to be strictly less than 1. See \code{coda::geweke.diag} for further details.
-#' \item \code{raftery} returns the length of "burn in" (\eqn{M}), the required sample size (\eqn{N}), the minimum sample size for a chain with zero autocorrelation (\eqn{Nmin}), and the estimate of the "dependence factor" (\eqn{I = (M+N)/Nmin}). Values of \eqn{I} greater than 5 may be indicative of  a strong autocorrelation.
-#' Additional parameters such as the quantile to be estimated (\eqn{q}), the desired margin of error of the estimate (\eqn{r}), and the probability of obtaining an estimate between \eqn{q-r} and \eqn{q+r} (\eqn{s}) can be passed as list in the \code{additional.args} argument. See \code{coda::raftery.diag} for further details.
-#' \item \code{heidel} returns a p-value referred to a convergence test where the null hypothesis is that the sampled values come from a stationary distribution. It is possible to set the target value for ratio of halfwidth to sample mean (\eqn{eps}) and the significance level of the test (\eqn{pvalue})  into the \code{additional.args} argument. See \code{coda::heidel.diag} for further details.
-#' \item \code{gelman} returns the estimate of the potential scale reduction factor and the upper confidence limit. At least two chains are needed to compute the Gelman and Rubin's convergence diagnostics. Additional parameters such as the confidence level (\eqn{confidence}), a logical flag indicating whether variables should be transformed (\eqn{transform}),
-#' a logical flag indicating whether only the second half of the series should be used in the computation (\eqn{autoburnin}), and a logical flag indicating whether the multivariate potential scale reduction factor should be calculated for multivariate chains (\eqn{multivariate}) can be passed as list in the \code{additional.args} argument. See \code{coda::gelman.diag} for further details.
+#' \item \code{raftery} returns the length of "burn-in" (\eqn{M}), the required sample size (\eqn{N}), the minimum sample size for a chain with zero autocorrelation (\eqn{Nmin}), and the estimate of the "dependence factor" (\eqn{I = (M+N)/Nmin}). Values of \eqn{I} greater than 5 may be indicative of  a strong autocorrelation.
+#' Additional parameters such as the quantile to be estimated (\code{q}), the desired margin of error of the estimate (\code{r}), and the probability (\code{s}) of obtaining an estimate between \eqn{q-r} and \eqn{q+r}  can be passed as list in the \code{additional.args} argument. See \code{coda::raftery.diag} for further details.
+#' \item \code{heidel} returns a p-value referred to a convergence test where the null hypothesis is that the sampled values come from a stationary distribution. It is possible to set the target value for ratio of halfwidth to sample mean (\code{eps}) and the significance level of the test (\code{pvalue})  into the \code{additional.args} argument. See \code{coda::heidel.diag} for further details.
+#' \item \code{gelman} returns the estimate of the potential scale reduction factor and the upper confidence limit. At least two chains are needed to compute the Gelman and Rubin's convergence diagnostics. Additional parameters such as the confidence level (\code{confidence}), a logical flag indicating whether variables should be transformed (\code{transform}),
+#' a logical flag indicating whether only the second half of the series should be used in the computation (\code{autoburnin}), and a logical flag indicating whether the multivariate potential scale reduction factor should be calculated for multivariate chains (\code{multivariate}) can be passed as list in the \code{additional.args} argument. See \code{coda::gelman.diag} for further details.
 #' }
 #'
 #' @import rstan

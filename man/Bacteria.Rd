@@ -13,19 +13,19 @@ A data frame containing 70 observations on the following 4 variables.
 }
 }
 \source{
-\href{10.1007/978-3-319-06877-0_9}{Demétrio et al., (2014). Models for overdispersed data in entomology.}.
+Demétrio et al., (2014). Models for overdispersed data in entomology.
 }
 \description{
 Counts of eggs parasitized by female parasitoids.
 }
 \details{
-The data has been originally analyzed by Demétrio et al (2014) and successively by Ascari and Migliorati (2021).
+The data have been originally analyzed by Demétrio et al (2014) and successively by Ascari and Migliorati (2021).
 Data come from a completely randomized experiment with 10 replicates for each specification of number of females.
 }
 \references{
 {
-Demétrio, C.G.B., Hinde, J., Moral, R.A. (2014). Models for overdispersed data in entomology. Ecological Modelling Applied to Entomology. Entomology in Focus Switzerland: Springer International Publishing; 219- 259. \cr
-\cr
 Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+\cr
+Demétrio, C.G.B., Hinde, J., Moral, R.A. (2014). Models for overdispersed data in entomology. Ecological Modelling Applied to Entomology. Entomology in Focus Switzerland: Springer International Publishing, 219--259. \cr
 }
 }

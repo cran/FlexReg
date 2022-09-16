@@ -2,9 +2,10 @@
 #'
 #' @description Data for assessing the contribution of non-verbal IQ to children's reading skills in dyslexic and non-dyslexic children.
 #'
-#' @format A data frame containing 44 observations on 3 variables.
+#' @format A data frame containing 44 observations on 4 variables.
 #' \describe{
 #' \item{\code{accuracy}}{a reading score.}
+#' \item{\code{accuracy.adj}}{the adjusted reading score: the observed 1's (perfect reading scores) are substituted with 0.99.}
 #' \item{\code{dyslexia}}{a factor indicating wheter the child is dyslexic.}
 #' \item{\code{iq}}{a quantitative measure of the children's non verbal abilities.}
 #' }
@@ -14,11 +15,13 @@
 #' @source  \href{https://CRAN.R-project.org/package=betareg}{betareg}.
 #'
 #' @references{
-#' Smithson, M., and Verkuilen, J. (2006). A Better Lemon Squeezer? Maximum-Likelihood Regression with Beta-Distributed Dependent Variables. Psychological Methods, \bold{11}(7), 54–71. \cr
+#' Cribari-Neto, F.,  Zeileis, A. (2010). Beta Regression in R. Journal of Statistical Software, 34(2), 1--24. \cr
 #' \cr
-#' Cribari-Neto, F., and Zeileis, A. (2010). Beta Regression in R. Journal of Statistical Software, 34(2), 1–24. \cr
+#' Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
 #' \cr
 #' Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
+#' \cr
+#' Smithson, M., Verkuilen, J. (2006). A Better Lemon Squeezer? Maximum-Likelihood Regression with Beta-Distributed Dependent Variables. Psychological Methods, \bold{11}(7), 54--71. \cr
 #' }
 #'
 #' @name Reading
@@ -75,7 +78,7 @@ NULL
 #'
 #' @details Data are collected on the 232 electoral districts into which the Italian territory is organized. Distribution of votes for Aosta constituency is not available. Distributions of votes are available on the Italian Ministry of Interior’s webpage whereas constituencies information have been obtained from 2011 Italian Census.
 #'
-#' @source \href{http://www.interno.gov.it/it/speciali/2018-elections}{Italian Ministry of Interior’s webpage}.
+#' @source Italian Ministry of Interior’s webpage: https://www.interno.gov.it/it/speciali/2018-elections.
 #'
 #'
 #' @name Election
@@ -98,8 +101,9 @@ NULL
 #' @source  Example 2 from Smithson and Verkuilen (2006).
 #'
 #' @references{
-#' Smithson, M., and Verkuilen, J. (2006). A Better Lemon Squeezer? Maximum-Likelihood Regression with Beta-Distributed Dependent Variables. Psychological Methods, 11(7), 54–71. \cr
-#' \cr Lovibond, P. F., & Lovibond, S. H. (1995). The structure of negative emotional states: Comparison of the Depression Anxiety Stress Scales (DASS) with the Beck Depression and Anxiety Inventories. Behaviour research and therapy, 33(3), 335-343.
+#' Lovibond, P. F.,  Lovibond, S. H. (1995). The structure of negative emotional states: Comparison of the Depression Anxiety Stress Scales (DASS) with the Beck Depression and Anxiety Inventories. Behaviour research and therapy, 33(3), 335--343. \cr
+#' \cr
+#' Smithson, M.,  Verkuilen, J. (2006). A Better Lemon Squeezer? Maximum-Likelihood Regression with Beta-Distributed Dependent Variables. Psychological Methods, 11(7), 54--71. \cr
 #' }
 #'
 #' @name Stress
@@ -121,12 +125,12 @@ NULL
 #' \item{\code{bomb}}{a factor, indicating which bomb the subject survived (H = Hiroshima, N = Nagasaki).}
 #' }
 #'
-#' @details The data has been originally analyzed by Otake and Prentice (1984) and successively by Ascari and Migliorati (2021).
+#' @details The data have been originally analyzed by Otake and Prentice (1984) and successively by Ascari and Migliorati (2021).
 #'
 #' @references{
-#' Otake, M., Prentice, R.L. (1984). The analysis of chromosomally aberrant cells based on beta-binomial distribution. Radiat Res. \bold{98}, 456--470. \cr
-#' \cr
 #' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+#' \cr
+#' Otake, M., Prentice, R.L. (1984). The analysis of chromosomally aberrant cells based on beta-binomial distribution. Radiat Res. \bold{98}, 456--470. \cr
 #' }
 #'
 #' @name Atomic
@@ -146,15 +150,15 @@ NULL
 #' \item{\code{females_std}}{the standardized version of \code{females}.}
 #' }
 #'
-#' @details The data has been originally analyzed by Demétrio et al (2014) and successively by Ascari and Migliorati (2021).
+#' @details The data have been originally analyzed by Demétrio et al (2014) and successively by Ascari and Migliorati (2021).
 #' Data come from a completely randomized experiment with 10 replicates for each specification of number of females.
 #'
-#' @source  \href{10.1007/978-3-319-06877-0_9}{Demétrio et al., (2014). Models for overdispersed data in entomology.}.
+#' @source  Demétrio et al., (2014). Models for overdispersed data in entomology.
 #'
 #' @references{
-#' Demétrio, C.G.B., Hinde, J., Moral, R.A. (2014). Models for overdispersed data in entomology. Ecological Modelling Applied to Entomology. Entomology in Focus Switzerland: Springer International Publishing; 219- 259. \cr
-#' \cr
 #' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+#' \cr
+#' Demétrio, C.G.B., Hinde, J., Moral, R.A. (2014). Models for overdispersed data in entomology. Ecological Modelling Applied to Entomology. Entomology in Focus Switzerland: Springer International Publishing, 219--259. \cr
 #' }
 #'
 #' @name Bacteria

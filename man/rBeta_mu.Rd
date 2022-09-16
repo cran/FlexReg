@@ -4,27 +4,32 @@
 \alias{rBeta_mu}
 \title{Random generator from the beta distribution}
 \usage{
-rBeta_mu(n, mu, phi)
+rBeta_mu(n, mu, phi, q0 = NULL, q1 = NULL)
 }
 \arguments{
-\item{n}{the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.}
+\item{n}{the number of values to generate. If \code{length(n) > 1}, the length is taken to be the number required.}
 
-\item{mu}{the mean parameter. It must lie in (0, 1).}
+\item{mu}{the mean parameter of the beta distribution. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter. It must be a positive real value.}
+\item{phi}{the precision parameter of the Beta distribution. It must be a positive real value.}
+
+\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+
+\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
 }
 \value{
 A vector of length \code{n}.
 }
 \description{
-The function randomly generates values from the beta distribution with a mean-precision parameterization.
+The function  generates random values from the beta distribution with a mean-precision parameterization, or from the augmented beta distribution.
 }
 \examples{
-rBeta_mu(100, mu = 0.5, phi = 30)
+rBeta_mu(n = 100, mu = .5, phi = 30)
+rBeta_mu(n = 100, mu = .5, phi = 30, q0 = .2, q1 = .1)
 
 }
 \references{
 {
-Ferrari, S.L.P., and Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501
+Ferrari, S.L.P.,  Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501
 }
 }

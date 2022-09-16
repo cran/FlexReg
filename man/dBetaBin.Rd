@@ -25,7 +25,7 @@ The function computes the probability mass function of the beta-binomial distrib
 }
 \details{
 The beta-binomial distribution has probability mass function
-\deqn{{n\choose y} \frac{\Gamma{(\phi)}}{\Gamma{(\mu\phi)}\Gamma{((1-\mu)\phi)}} \frac{\Gamma{(\mu\phi+y)}\Gamma{((1-\mu)\phi + n - y)}}{\Gamma{(\phi + n)}},}
+\deqn{{n\choose x} \frac{\Gamma{(\phi)}}{\Gamma{(\mu\phi)}\Gamma{((1-\mu)\phi)}} \frac{\Gamma{(\mu\phi+x)}\Gamma{((1-\mu)\phi + n - x)}}{\Gamma{(\phi + n)}},}
 for \eqn{x \in \lbrace 0, 1, \dots, n \rbrace}, where \eqn{0<\mu<1} identifies the mean and \eqn{\phi=(1-\theta)/\theta >0} is the precision parameter.
 }
 \examples{

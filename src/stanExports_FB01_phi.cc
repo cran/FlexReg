@@ -2,12 +2,12 @@
 
 #include <Rcpp.h>
 using namespace Rcpp ;
-#include "stanExports_VIB.h"
+#include "stanExports_FB01_phi.h"
 
-RCPP_MODULE(stan_fit4VIB_mod) {
+RCPP_MODULE(stan_fit4FB01_phi_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_VIB")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_FB01_phi")
 
     .constructor<SEXP,SEXP,SEXP>()
 

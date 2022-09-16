@@ -16,7 +16,7 @@ convergence.diag(
 
 \item{diagnostics}{an optional character vector of diagnostics names. The default is to compute \code{all} diagnostics, otherwise one can specify a selection of diagnostics among \code{Rhat}, \code{geweke}, \code{gaftery}, \code{heidel}, and \code{gelman}.}
 
-\item{pars}{an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression model are evaluated.}
+\item{pars}{an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.}
 
 \item{additional.args}{a list containing additional arguments (see details)}
 }
@@ -31,23 +31,23 @@ Moreover, it prints the number (and percentage) of iterations that ended with a 
 \itemize{
 \item \code{R-hat} returns the potential scale reduction factor on split chains. An R-hat greater than 1 is indicative of a bad mix of the chains. At convergence R-hat has to be less than 1.05. See \code{rstan::Rhat} for further details.
 \item \code{geweke} returns the z-scores, one for each parameter, for a test of equality between the means of the first 10\% and last 50\% of the chain. The fraction to use from the first and last part of the chain can be edited through the additional arguments \code{frac1} and \code{frac2}. The sum of \code{frac1} and \code{frac2} has to be strictly less than 1. See \code{coda::geweke.diag} for further details.
-\item \code{raftery} returns the length of "burn in" (\eqn{M}), the required sample size (\eqn{N}), the minimum sample size for a chain with zero autocorrelation (\eqn{Nmin}), and the estimate of the "dependence factor" (\eqn{I = (M+N)/Nmin}). Values of \eqn{I} greater than 5 may be indicative of  a strong autocorrelation.
-Additional parameters such as the quantile to be estimated (\eqn{q}), the desired margin of error of the estimate (\eqn{r}), and the probability of obtaining an estimate between \eqn{q-r} and \eqn{q+r} (\eqn{s}) can be passed as list in the \code{additional.args} argument. See \code{coda::raftery.diag} for further details.
-\item \code{heidel} returns a p-value referred to a convergence test where the null hypothesis is that the sampled values come from a stationary distribution. It is possible to set the target value for ratio of halfwidth to sample mean (\eqn{eps}) and the significance level of the test (\eqn{pvalue})  into the \code{additional.args} argument. See \code{coda::heidel.diag} for further details.
-\item \code{gelman} returns the estimate of the potential scale reduction factor and the upper confidence limit. At least two chains are needed to compute the Gelman and Rubin's convergence diagnostics. Additional parameters such as the confidence level (\eqn{confidence}), a logical flag indicating whether variables should be transformed (\eqn{transform}),
-a logical flag indicating whether only the second half of the series should be used in the computation (\eqn{autoburnin}), and a logical flag indicating whether the multivariate potential scale reduction factor should be calculated for multivariate chains (\eqn{multivariate}) can be passed as list in the \code{additional.args} argument. See \code{coda::gelman.diag} for further details.
+\item \code{raftery} returns the length of "burn-in" (\eqn{M}), the required sample size (\eqn{N}), the minimum sample size for a chain with zero autocorrelation (\eqn{Nmin}), and the estimate of the "dependence factor" (\eqn{I = (M+N)/Nmin}). Values of \eqn{I} greater than 5 may be indicative of  a strong autocorrelation.
+Additional parameters such as the quantile to be estimated (\code{q}), the desired margin of error of the estimate (\code{r}), and the probability (\code{s}) of obtaining an estimate between \eqn{q-r} and \eqn{q+r}  can be passed as list in the \code{additional.args} argument. See \code{coda::raftery.diag} for further details.
+\item \code{heidel} returns a p-value referred to a convergence test where the null hypothesis is that the sampled values come from a stationary distribution. It is possible to set the target value for ratio of halfwidth to sample mean (\code{eps}) and the significance level of the test (\code{pvalue})  into the \code{additional.args} argument. See \code{coda::heidel.diag} for further details.
+\item \code{gelman} returns the estimate of the potential scale reduction factor and the upper confidence limit. At least two chains are needed to compute the Gelman and Rubin's convergence diagnostics. Additional parameters such as the confidence level (\code{confidence}), a logical flag indicating whether variables should be transformed (\code{transform}),
+a logical flag indicating whether only the second half of the series should be used in the computation (\code{autoburnin}), and a logical flag indicating whether the multivariate potential scale reduction factor should be calculated for multivariate chains (\code{multivariate}) can be passed as list in the \code{additional.args} argument. See \code{coda::gelman.diag} for further details.
 }
 }
 \references{
 {
-Brooks, SP. and Gelman, A. (1998). General methods for monitoring convergence of iterative simulations. Journal of Computational and Graphical Statistics, \bold{7}, 434-455. \cr
+Brooks, SP., Gelman, A. (1998). General methods for monitoring convergence of iterative simulations. Journal of Computational and Graphical Statistics, \bold{7}, 434-455. \cr
 \cr
 Geweke, J. (1992). Evaluating the accuracy of sampling-based approaches to calculating posterior moments. In Bayesian Statistics 4 (ed JM Bernado, JO Berger, AP Dawid and AFM Smith). Clarendon Press, Oxford, UK. \cr
 \cr
+Heidelberger P., Welch P.D. (1981). A spectral method for confidence interval generation and run length control in simulations. Comm. ACM. \bold{24}, 233-245.\cr
+\cr
 Raftery, A.E. and Lewis, S.M. (1992). One long run with diagnostics: Implementation strategies for Markov chain Monte Carlo. Statistical Science, \bold{7}, 493-497.\cr
 \cr
-Heidelberger P. and Welch P.D. (1981). A spectral method for confidence interval generation and run length control in simulations. Comm. ACM. \bold{24}, 233-245.\cr
-\cr
-The Stan Development Team Stan Modeling Language User's Guide and Reference Manual. http://mc-stan.org/.
+Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org
 }
 }

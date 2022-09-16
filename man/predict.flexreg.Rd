@@ -19,32 +19,43 @@
 
 \item{newdata}{an optional data frame containing variables with which to predict. If omitted, the fitted values are used.}
 
-\item{cluster}{logical. If the model is \code{"FB"} or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default, \code{cluster = F}.}
+\item{cluster}{logical. If the model is \code{"FB"} without augmentation or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default, \code{cluster = F}.}
 
-\item{type}{a character indicating the type of predictions. Available options are the  fitted means of response/relative response (\code{response}), the linear predictor (\code{link}),
-the fitted precision parameter phi (\code{precision}), the fitted overdispersion parameter theta (\code{overdispersion}), and the fitted variances of the response (\code{variance}).}
+\item{type}{a character indicating the type of predictions. Available options are: \code{"response"}, that returns the marginal fitted means of response/relative response;
+\code{"link"}, the linear predictor of the mean model;
+\code{"precision"}, the fitted precision parameter \eqn{phi};
+\code{"overdispersion"}, the fitted overdispersion parameter \eqn{theta};
+ \code{"variance"}, the fitted variance of the response.}
 
-\item{estimate}{the type of estimate: \code{mean} (default), \code{median} or \code{quantile}.}
+\item{estimate}{the type of estimate: \code{"mean"} (default), \code{"median"} or \code{"quantile"}.}
 
-\item{q}{if estimate is \code{quantile}, numeric value of probability in (0, 1).}
+\item{q}{if \code{estimate = "quantile"}, numeric value of probability in (0, 1).}
 
 \item{...}{additional arguments. Currently not used.}
 }
 \description{
-Method that computes various types of prediction from objects of class \code{`flexreg`}. If the model type is \code{FB} or \code{FBB} and \code{cluster = T}, the function returns also cluster means.
+Method that computes various types of prediction from objects of class \code{`flexreg`}. If the model type is \code{"FB"} without augmentation or \code{"FBB"} and \code{cluster = T}, the function returns also cluster means.
+}
+\details{
+If \code{type="response"} the function returns the marginal mean that is \eqn{\mu} in case of no augmentation and
+\eqn{q_1+(1-q_0-q_1)\mu} in case of augmentation. If \code{type="variance"} the function returns \eqn{Var(Y|0<Y<1)} in case of no augmentation and
+\eqn{(1-q_0-q_1)Var(Y|0<Y<1)+q_1^2+(1-q_0-q_1)\mu^2-(q_1+(1-q_0-q_1)\mu)^2} in case of augmentation. See Di Brisco and Migliorati (2020) for details.
+The option \code{type = "overdispersion"}  is available only for beta-binomial and flexible beta-binomial models.
 }
 \examples{
-{
+\dontrun{
 data("Reading")
-FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
+FB <- flexreg(accuracy.adj ~ iq, data=Reading, type="FB")
 predict(FB, type="response", cluster=TRUE)
 }
 
 }
 \references{
 {
-Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
-\cr
 Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+\cr
+Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
+\cr
+Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 }
 }

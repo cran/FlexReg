@@ -7,7 +7,7 @@
 rFBB(n, size = NULL, mu, theta = NULL, phi = NULL, p, w)
 }
 \arguments{
-\item{n}{the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.}
+\item{n}{the number of values to generate. If \code{length(n) > 1}, the length is taken to be the number required.}
 
 \item{size}{the total number of trials.}
 
@@ -25,11 +25,11 @@ rFBB(n, size = NULL, mu, theta = NULL, phi = NULL, p, w)
 A vector of length  \code{n}.
 }
 \description{
-The function randomly generates values from the flexible beta-binomial distribution.
+The function generates random values from the flexible beta-binomial distribution.
 }
 \examples{
-rFBB(n = 100, size = 40, mu = 0.5, theta = .4, p = 0.3, w = 0.6)
-rFBB(n = 100, size = 40, mu = 0.5, phi = 1.5, p = 0.3, w = 0.6)
+rFBB(n = 100, size = 40, mu = .5, theta = .4, p = .3, w = .6)
+rFBB(n = 100, size = 40, mu = .5, phi = 1.5, p = .3, w = .6)
 
 }
 \references{

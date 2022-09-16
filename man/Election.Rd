@@ -22,7 +22,7 @@ A data frame containing 232 observations on the following 13 variables.
 }
 }
 \source{
-\href{http://www.interno.gov.it/it/speciali/2018-elections}{Italian Ministry of Interior’s webpage}.
+Italian Ministry of Interior’s webpage: https://www.interno.gov.it/it/speciali/2018-elections.
 }
 \description{
 Results of the Italian general election held on 4 March 2018 for six parties.

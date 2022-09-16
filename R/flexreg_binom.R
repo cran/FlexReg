@@ -1,20 +1,20 @@
 #' Flexible Regression Models for Binomial data
 #'
-#' @description The function fits some flexible regression models for binomial data via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
-#' Available regression models are the flexible beta-binomial (\code{type="FBB"}), the beta-binomial (\code{"type=BetaBin"}), and the binomial one (\code{"type=Bin"}).
+#' @description The function fits some flexible regression models for binomial responses via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
+#' Available regression models are the flexible beta-binomial (\code{type="FBB"}), the beta-binomial (\code{type="BetaBin"}), and the binomial one (\code{type="Bin"}).
 #'
 #'
-#' @param formula an object of class \code{`formula`}: a symbolic description of the model to be fitted (of type \code{y ~ x} or \code{y ~ x | z}).
+#' @param formula an object of class \code{`formula`}: a symbolic description of the model to be fitted (\code{y ~ x} or \code{y ~ x | z}).
 #' @param data an optional data frame, list, or object that is coercible to a data frame through \code{base::as.data.frame} containing the variables in the model. If not found in data, the variables in formula are taken from the environment from which the function flexreg is called.
-#' @param type a character specifying the type of regression model. Current options are the flexible beta-binomial \code{"FBB"} (default), the beta-binomial \code{"BetaBin"}, and the binomial one \code{"Bin"}.
+#' @param type a character specifying the type of regression model. Current options are  \code{"FBB"} (flexible beta-binomial, default), \code{"BetaBin"} (beta-binomial), and  \code{"Bin"} (binomial).
 #' @param n the total number of trials.
-#' @param link.mu a character specifying the link function for the mean model (mu). Currently, \code{"logit"} (default), \code{"probit"}, \code{"cloglog"}, and \code{"loglog"} are supported.
-#' @param prior.beta a character specifying the prior distribution for the \code{beta} regression coefficients of the mean model. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.
+#' @param link.mu a character specifying the link function for the mean model. Currently, \code{"logit"} (default), \code{"probit"}, \code{"cloglog"}, and \code{"loglog"} are supported.
+#' @param prior.beta a character specifying the prior distribution for the  regression coefficients of the mean model, \code{beta}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.
 #' @param hyperparam.beta a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{beta} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.
-#' @param link.theta a character specifying the link function for the overdispersion model (theta). Currently, \code{"identity"} (default), \code{"logit"}, \code{"probit"}, \code{"cloglog"}, and \code{"loglog"} are supported. If \code{link.theta = "identity"}, the prior distribution for \code{theta} is a beta.
+#' @param link.theta a character specifying the link function for the overdispersion model. Currently, \code{"identity"} (default), \code{"logit"}, \code{"probit"}, \code{"cloglog"}, and \code{"loglog"} are supported. If \code{link.theta = "identity"}, the prior distribution for \code{theta} is a beta.
 #' @param hyper.theta.a a numeric (vector of length 1) specifying the first shape parameter for the beta prior distribution of \code{theta}.
 #' @param hyper.theta.b a numeric (vector of length 1) specifying the second shape parameter for the beta prior distribution of \code{theta}.
-#' @param prior.psi a character specifying the prior distribution for \code{psi} regression coefficients of the overdispersion model (not supported if \code{link.theta="identity"}). Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.
+#' @param prior.psi a character specifying the prior distribution for the regression coefficients of the overdispersion model,\code{psi}. Not supported if \code{link.theta="identity"}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.
 #' @param hyperparam.psi a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{psi} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.
 #' @param n.iter 	a positive integer specifying the number of iterations for each chain (including warmup). The default is 5000.
 #' @param burnin.perc the percentage of iterations per chain to discard.
@@ -25,6 +25,7 @@
 #'
 #' @return The \code{flexreg_binom} function returns an object of class \code{`flexreg`}, i.e. a list with the following elements:
 #' \item{\code{call}}{the function call.}
+#' \item{\code{type}}{the type of regression model.}
 #' \item{\code{formula}}{the original formula.}
 #' \item{\code{link.mu}}{a character specifing the link function in the mean model.}
 #' \item{\code{link.theta}}{a character specifing the link function in the overdispersion model.}
@@ -36,17 +37,22 @@
 #' @details Let Y be a random variable whose distribution can be specified in the \code{type} argument and \eqn{\mu} be the mean of Y/n.
 #' The \code{flexreg_binom} function links the parameter \eqn{\mu} to a linear predictor through a function  \eqn{g(\cdot)} specified in \code{link.mu}:
 #' \deqn{g(\mu_i) = x_i^t \bold{\beta},} where \eqn{\bold{\beta}} is the vector of regression coefficients for the mean model.
+#' The prior distribution and the related hyperparameter of \eqn{\bold{\beta}} can be specified in \code{prior.beta} and \code{hyperparam.beta}.
 #' By default, \code{link.theta="identity"}, meaning that the overdispersion parameter \eqn{\theta} is assumed to be constant.
+#' In that case, the prior distribution for \eqn{\theta} is a beta with hyperparameters \eqn{a} and \eqn{b} that can be specified in \code{hyper.theta.a} and \code{hyper.theta.b}.
+#' If not specified, \eqn{a=b=1}, otherwise if only one hyperparameter is specified, the other  is set equal.
 #' It is possible to extend the model by linking \eqn{\theta} to an additional (possibly overlapping) set of covariates through a proper link
 #' function \eqn{q(\cdot)}  specified in the \code{link.theta} argument: \deqn{q(\theta_i) = z_i^t \bold{\psi},} where \eqn{\bold{\psi}} is the vector of regression coefficients for the overdispersion model.
+#' The prior distribution and the related hyperparameter of \eqn{\bold{\psi}} can be specified in \code{prior.psi} and \code{hyperparam.psi}.
+
 #' In \code{flexreg_binom}, the regression model for the mean and, where appropriate, for the overdispersion parameter can be specified in the
-#' \code{formula} argument with a formula of type \eqn{y \sim x_1 + x_2 | z_1 + z_2} where covariates on the left of ("|") are included in the regression model
-#' for the mean and covariates on the right of ("|") are included in the regression model for the overdispersion.
+#' \code{formula} argument with a formula of type \code{y ~ x1 + x2 | z1 + z2} where covariates on the left of "|" are included in the regression model
+#' for the mean and covariates on the right of "|" are included in the regression model for the overdispersion.
 #'
-#' If the second part is omitted, i.e., \eqn{y \sim x_1 + x_2}, the overdispersion is assumed constant for each observation.
+#' If the second part is omitted, i.e., \code{y ~ x1 + x2}, the overdispersion is assumed constant for each observation.
 #'
 #' @references {
-#' Ascari, R., and Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005
+#' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005
 #' }
 #'
 #' @examples
@@ -205,10 +211,10 @@ flexreg_binom <- function(formula, data, type="FBB", n=NULL,
                      n.chain = n.chain, thin = thin, verbose=verbose, ...)
 
 
-  output <- list(call=cl, formula=formula, link.mu=link.mu, link.theta=link.theta,
+  output <- list(call=cl, type=type, formula=formula, link.mu=link.mu, link.theta=link.theta,
                  model=model, response=y, design.X=X, design.Z=Z, n=n)
   class(output)<-"flexreg"
-  print(summary(output))
+  #print(summary(output))
   invisible(output)
   #return(output)
 }

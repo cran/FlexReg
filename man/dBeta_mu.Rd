@@ -4,32 +4,48 @@
 \alias{dBeta_mu}
 \title{Beta probability density function}
 \usage{
-dBeta_mu(x, mu, phi)
+dBeta_mu(x, mu, phi, q0 = NULL, q1 = NULL)
 }
 \arguments{
 \item{x}{a vector of quantiles.}
 
-\item{mu}{the mean parameter. It must lie in (0, 1).}
+\item{mu}{the mean parameter of the beta distribution. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter. It must be a positive real value.}
+\item{phi}{the precision parameter of the Beta distribution. It must be a positive real value.}
+
+\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+
+\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
 }
 \value{
 A vector with the same length as \code{x}.
 }
 \description{
 The function computes the probability density function of the beta distribution with a mean-precision parameterization.
+It can also  compute the probability density function of the augmented beta distribution by assigning positive probabilities to zero and one and a (continuous) beta density to the interval (0,1).
 }
 \details{
 The beta distribution has density
-\deqn{\frac{\Gamma{(\phi)}}{\Gamma{(\mu\phi)}\Gamma{((1-\mu)\phi)}}x^{\mu\phi-1}(1-x)^{(1-\mu)\phi-1}}
+\deqn{f_B(x;\mu,\phi)=\frac{\Gamma{(\phi)}}{\Gamma{(\mu\phi)}\Gamma{((1-\mu)\phi)}}x^{\mu\phi-1}(1-x)^{(1-\mu)\phi-1}}
 for \eqn{0<x<1}, where \eqn{0<\mu<1} identifies the mean and \eqn{\phi>0} is the precision parameter.
+
+The augmented beta distribution has density
+\itemize{
+\item \eqn{q_0},  if  \eqn{x=0}
+\item \eqn{q_1}, if  \eqn{x=1}
+\item \eqn{(1-q_0-q_1)f_B(x;\mu,\phi)}, if \eqn{0<x<1}
+}
+where \eqn{0<q_0<1} identifies the augmentation in zero, \eqn{0<q_1<1} identifies the augmentation in one,
+and \eqn{q_0+q_1<1}.
 }
 \examples{
-dBeta_mu(x = c(.5,.7,.8), mu = 0.3, phi = 20)
+dBeta_mu(x = c(.5,.7,.8), mu = .3, phi = 20)
+dBeta_mu(x = c(.5,.7,.8), mu = .3, phi = 20, q0 = .2)
+dBeta_mu(x = c(.5,.7,.8), mu = .3, phi = 20, q0 = .2, q1= .1)
 
 }
 \references{
 {
-Ferrari, S.L.P., and Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501
+Ferrari, S.L.P., Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501
 }
 }

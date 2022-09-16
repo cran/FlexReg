@@ -13,19 +13,18 @@
 
 \item{p_mean}{a logical value indicating whether the posterior predictives' mean should be plotted.}
 
-\item{response}{a numerical vector containing the response (o relative response, in the case of binomial data) to be added to the plot. If \code{NULL}, observed values are not plotted.}
+\item{response}{a numerical vector containing the response (either \eqn{y} or \eqn{y/n} for bounded or binomial responses, respectively) to be added to the plot. If \code{NULL}, observed values are not plotted.}
 
 \item{...}{additional arguments. Currently not used.}
 }
 \description{
 Method for plotting the simulated posterior predictive distribution from an object of class \code{`flexreg_postpred`}. The plot shows the posterior predictive interval for each statistical unit.
-Additionally, the mean of the posterior predictives and the values of the observed response (or relative response, in case of binomial data) can be added.
+Additionally, the mean of the posterior predictives and the values of the observed response (either \eqn{y} or \eqn{y/n} for bounded or binomial responses, respectively) can be added.
 }
 \examples{
 \dontrun{
 data("Reading")
-dataset <- Reading
-FB <- flexreg(accuracy ~ iq, dataset, n.iter=1000)
+FB <- flexreg(accuracy ~ iq, data = Reading)
 pp <- posterior_predict(FB)
 plot(pp)
 }

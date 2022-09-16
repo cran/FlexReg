@@ -12,8 +12,7 @@
 #'
 #' @examples
 #' data("Reading")
-#' dataset <- Reading
-#' FB <- flexreg(accuracy ~ iq, dataset, n.iter = 1000)
+#' FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter = 1000)
 #' summary(FB)
 #'
 #'
@@ -25,13 +24,16 @@ summary.flexreg <- function(object, ..., digits=4){
   x <- object
   call <- x$call
   model.name <- x$model@model_name
-  if(model.name %in% c("Beta", "Beta_phi", "FB", "FB_phi", "VIB", "VIB_phi")){
+  model.type <- x$type
+  if(model.type %in% c("Beta","FB","VIB")){
     link.mu <- x$link.mu
     link.phi <- x$link.phi
     formula <- x$formula
 
     covariate.names.mu <- colnames(x$design.X)
     covariate.names.phi <- colnames(x$design.Z)
+    covariate.names.0 <- colnames(x$design.X0)
+    covariate.names.1 <- colnames(x$design.X1)
 
     posterior <- x$model
     pars <- extract.pars(posterior = posterior)
@@ -49,17 +51,36 @@ summary.flexreg <- function(object, ..., digits=4){
     }
     rownames(summ.mu) <- covariate.names.mu
 
-      if(is.null(covariate.names.phi)){
+    summ.q0 <- summa.mat[grep("omega0",rownames(summa.mat)),]
+    if(is.na(summ.q0[1])){
+      summ.q0  <- NULL
+    } else if(is.null(dim(summ.q0))){ # if there is only the intercept term:
+      summ.q0 <- matrix(ncol=length(summ.q0),nrow=1, data=summ.q0)
+      colnames(summ.q0) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+    }
+    rownames(summ.q0) <- covariate.names.0
+
+    summ.q1 <- summa.mat[grep("omega1",rownames(summa.mat)),]
+    if(is.na(summ.q1[1])){
+      summ.q1  <- NULL
+    } else if(is.null(dim(summ.q1))){ # if there is only the intercept term:
+      summ.q1 <- matrix(ncol=length(summ.q1),nrow=1, data=summ.q1)
+      colnames(summ.q1) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+    }
+    rownames(summ.q1) <- covariate.names.1
+
+    if(is.null(covariate.names.phi)){
         summ.phi <- summa.mat[which(rownames(summa.mat)=="phi"),]
         dim(summ.phi) <- c(1,5)
         colnames(summ.phi) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
         rownames(summ.phi) <- "phi"
       } else {
         summ.phi <- summa.mat[grep("psi",rownames(summa.mat)),]
+        if(is.null(dim(summ.phi)))  dim(summ.phi) <- c(1,5) #summ.phi <- t(as.matrix(summ.phi))
         rownames(summ.phi) <- covariate.names.phi
       }
 
-      n.parz <- nrow(summ.mu)+nrow(summ.phi)
+      n.parz <- nrow(summ.mu)+nrow(summ.phi)+ifelse(is.null(summ.q0),0,nrow(summ.q0))+ifelse(is.null(summ.q1),0,nrow(summ.q1))
       if( n.pars > n.parz) {
         summ.add <- summa.mat[(n.parz+1):n.pars,]
       } else summ.add <- NULL
@@ -71,9 +92,11 @@ summary.flexreg <- function(object, ..., digits=4){
 
     waic_out <- suppressWarnings(WAIC(x))
 
-    output <- list(call=call, Model=model.name, formula=formula, link.mu=link.mu, link.phi=link.phi,
+    output <- list(call=call,type=model.type, Model=model.name, formula=formula, link.mu=link.mu, link.phi=link.phi,
                    Summary.res=summ.res,
-                   Summary.mu=summ.mu, Summary.phi=summ.phi, Summary.add=summ.add,
+                   Summary.mu=summ.mu, Summary.phi=summ.phi,
+                   Summary.q0=summ.q0, Summary.q1=summ.q1,
+                   Summary.add=summ.add,
                    waic_out = waic_out)
   } else {
     # ELSE, if the model is for binomial data:
@@ -135,7 +158,7 @@ summary.flexreg <- function(object, ..., digits=4){
 
     waic_out <- suppressWarnings(WAIC(x))
 
-    output <- list(call=call, Model=model.name, formula=formula,
+    output <- list(call=call, type=model.type, Model=model.name, formula=formula,
                    link.mu=link.mu, link.theta=link.theta,
                    Summary.res=summ.res,
                    Summary.mu=summ.mu,
@@ -160,7 +183,10 @@ summary.flexreg <- function(object, ..., digits=4){
 print.summary.flexreg <- function(x, ...){
   cat("Call: ")
   print(x$call)
-  cat("\nModel name: ", x$Model, "\n \n")
+  cat("\nModel name: ", x$type,
+      ifelse(is.null(x$call$zero.formula),"", "with zero augmentation"),
+      ifelse(!is.null(x$call$zero.formula) & !is.null(x$call$one.formula), "and", ""),
+      ifelse(is.null(x$call$one.formula),"", "with one augmentation"),"\n \n")
 
   cat("Residuals:\n")
   print(x$Summary.res)
@@ -168,7 +194,7 @@ print.summary.flexreg <- function(x, ...){
   cat("\nCoefficients (mean model with", x$link.mu, "link):\n")
   print(x$Summary.mu)
 
-  if(x$Model %in% c("Beta", "Beta_phi", "FB", "FB_phi", "VIB", "VIB_phi")){
+  if(x$type %in% c("Beta", "FB",  "VIB")){
     cat("\nCoefficients (precision model with", x$link.phi, "link for phi):\n")
     print(x$Summary.phi)
   } else if(x$Model %in% c("FBB_theta", "BetaBin_theta")){
@@ -178,6 +204,16 @@ print.summary.flexreg <- function(x, ...){
     cat("\nOverdispersion parameter(s):\n")
     print(x$Summary.theta)
   }  # else if Bin then nothing should be printed!
+
+  if(!is.null(x$Summary.q0)){
+    cat("\nCoefficients (zero augmentation model with logit link):\n")
+    print(x$Summary.q0)
+  }
+
+  if(!is.null(x$Summary.q1)){
+    cat("\nCoefficients (one augmentation model with logit link):\n")
+    print(x$Summary.q1)
+  }
 
   if(!is.null(x$Summary.add)){
     cat("\nAdditional Parameters:\n")
@@ -195,18 +231,18 @@ print.summary.flexreg <- function(x, ...){
 #' @description Method for plotting regression curves for the mean from fitted regression model objects of class \code{`flexreg`}.
 #'
 #' @param x an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
-#' @param name.x a character containing the name of the covariate to be plotted on the x-axis of the scatterplot.
-#' @param additional.cov.default a list of additional covariates to be set as default.
+#' @param name.x a character containing the name of the covariate from the mean model to be plotted on the x-axis of the scatterplot.
+#' @param additional.cov.default a list of additional covariates from the mean model to be set as default.
 #' @param ... additional arguments. Currently not used.
 #'
-#' @details The function produces a scatterplot of the covariate specified in \code{name.x} and \code{y} or \code{y/n} if the response is continuous bounded or binomial, respectively. Any other variable involved in the formula must be set to a default through the \code{additional.cov.default} argument.
-#' If the regression model is of \code{FB} or \code{FBB} type the function returns a scatterplot with three curves, one corresponding to the overall mean and two corresponding to the component means of the FB distribution, i.e., \eqn{\lambda_1} and \eqn{\lambda_2}.
+#' @details The function produces a scatterplot of the covariate from the mean model specified in \code{name.x} and \code{y} or \code{y/n} if the response is continuous bounded or binomial, respectively. Any other variable specified in the mean model must be set to a default through the \code{additional.cov.default} argument.
+#' If the regression model is of \code{FB} without augmentation or \code{FBB} type the function returns a scatterplot with three curves, one corresponding to the overall mean and two corresponding to the component means of the FB distribution, i.e., \eqn{\lambda_1} and \eqn{\lambda_2}.
 #'
 #'
 #' @examples
 #' \dontrun{
 #' data("Reading")
-#' FB <- flexreg(accuracy ~ iq+dyslexia, Reading, n.iter=800)
+#' FB <- flexreg(accuracy.adj ~ iq + dyslexia, data = Reading)
 #' plot(FB, name.x="iq", additional.cov.default = list("dyslexia"=1))
 #'}
 #'
@@ -221,11 +257,14 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, ...)
   group <- Response <- NULL
   #assign("group", "Response", envir = .GlobalEnv)
   object <- x
+  model.name <- object$model@model_name
   y <- object$response
-  if(object$model@model_name %in% c("FBB", "FBB_theta", "BetaBin",
+  y.name <- "y"
+  if(model.name %in% c("FBB", "FBB_theta", "BetaBin",
                                     "BetaBin_theta", "Bin")){
     n <- object$n
     y <- y/n
+    y.name <- "y/n"
   }
   x <- object$design.X[,which(colnames(object$design.X) == name.x)]
 
@@ -240,7 +279,7 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, ...)
   newdata <- data.frame(x, additional.cov.default)
   names(newdata) <- c(name.x, names(additional.cov.default))
   }
-  cluster <- "FB" %in% object$call$type | "FBB" %in% object$call$type | is.null(object$call$type)
+  cluster <-   model.name %in% c("FBNo", "FBNo_phi", "FBB", "FBB_theta")
   if (cluster == T) {
   mu.hat <- predict(object, newdata = newdata, type = "response", cluster = T)
   data.plot <- data.frame(y = y, x = x, mu.hat)
@@ -248,7 +287,7 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, ...)
                        varying = 3:5, v.names=c('Response'))
   data.plot$group <- as.factor(data.plot$time)
   plot1 <- ggplot(data.plot, aes(x=x, y=y, group = group))+ geom_point()+
-    ylab("y/n")+
+    ylab(y.name)+
     geom_line(aes(x=x, y=Response, colour = group))
   } else {
     mu.hat <- predict(object, newdata = newdata, type = "response", cluster = F)
@@ -256,7 +295,7 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, ...)
     names(data.plot)[3] <- "Response"
     plot1 <- ggplot(data.plot, aes(x=x, y=y))+
       geom_line(aes(x=x, y=Response))+
-      ylab("y/n")
+      ylab(y.name)
   }
   return(plot1+ geom_point()+theme_bw()+
            scale_color_manual(labels = c(expression(mu), expression(lambda[1]),expression(lambda[2])), values = c("black", "red", "blue"))+

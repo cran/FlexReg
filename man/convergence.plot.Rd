@@ -25,7 +25,7 @@ convergence.plot(
 
 \item{plotfun}{an optional character vector of diagnostics plots. The default is to compute \code{all} plots, otherwise one can specify a selection of plots among \code{density}, \code{trace}, \code{intervals}, \code{rate}, \code{rhat}, and \code{acf}.}
 
-\item{pars}{an optional character vector of parameter names. If pars is not specified, all parameters in the regression model are evaluated.}
+\item{pars}{an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.}
 
 \item{point_est}{an optional character to specify the point estimate to be shown between \code{median} (the default), \code{mean}, or \code{none}.}
 
@@ -51,9 +51,16 @@ The plots can be further customized using the \code{ggplot2} package.
 \item \code{density} returns a density plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_areas} for further details.
 \item \code{trace} returns a trace plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_trace} for further details.
 \item \code{intervals} returns a plot of uncertainty interval for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_intervals} for further details.
-\item \code{rate} returns a plot for each parameter in \code{pars}  with the number of iterations on the x-axis and the monte carlo mean until iteration i-th on the y-axis.
+\item \code{rate} returns a plot for each parameter in \code{pars}  with the number of iterations on the x-axis and the Monte Carlo mean until iteration i-th on the y-axis.
 \item \code{rhat} returns a plot with the Rhat values for each parameter in \code{pars}. See \code{bayesplot::mcmc_rhat} for further details.
 \item \code{acf} returns the autocorrelation plots (one for each parameter in \code{pars}). See \code{bayesplot::mcmc_acf} for further details.
 
+}
+}
+\references{
+{
+Brooks, SP., Gelman, A. (1998). General methods for monitoring convergence of iterative simulations. Journal of Computational and Graphical Statistics, \bold{7}, 434-455. \cr
+\cr
+Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org
 }
 }

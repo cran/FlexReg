@@ -16,46 +16,48 @@
 \arguments{
 \item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
 
-\item{type}{a character indicating type of residuals (\code{raw} or \code{standardized}).}
+\item{type}{a character indicating type of residuals (\code{"raw"} or \code{"standardized"}).}
 
-\item{cluster}{logical. If the model is \code{"FB"} or \code{"FBB"}, \code{cluster=T} returns the cluster means. By default \code{cluster = F}.}
+\item{cluster}{logical. If the model is \code{"FB"} without augmentation or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default \code{cluster = F}.}
 
-\item{estimate}{a character indicating the type of estimate: \code{mean} (default), \code{median}, or \code{quantile}.}
+\item{estimate}{a character indicating the type of estimate: \code{"mean"} (default), \code{"median"}, or \code{"quantile"}.}
 
-\item{q}{if estimate is \code{quantile}, a numeric value of probability in (0, 1).}
+\item{q}{if \code{estimate = "quantile"}, a numeric value of probability in (0, 1).}
 
 \item{...}{additional arguments. Currently not used.}
 }
 \description{
-Method that computes various types of residuals from objects of class \code{`flexreg`}. If the model type is \code{FB} or \code{FBB} and \code{cluster = T}, the method returns also residuals with respect to cluster means.
+Method that computes various types of residuals from objects of class \code{`flexreg`}. If the model type is  \code{FB} without augmentation or \code{FBB} and \code{cluster = T}, the method returns also residuals with respect to cluster means.
 }
 \details{
-Raw residuals are defined as \eqn{r_i=y_i-\hat{\mu}_i} (or \eqn{r_i= y_i/n_i-\hat{\mu}_i} for binomial data)
-for \eqn{i=1, \dots, n}. The values \eqn{y_i} for \eqn{i,\dots,n} are referred to the observed
-response variable and they are specified on the left-hand side of \code{formula} in the
-\code{\link{flexreg}} function.
-\eqn{\hat{\mu}_i} for \eqn{i=1, \dots, n} is the predicted value. It can be computed separately
- through the \code{\link{predict}} function by setting \code{type=response}.
+Raw residuals are defined as \eqn{r_i=y_i-\hat{\mu}_i} (or \eqn{r_i= y_i/n_i-\hat{\mu}_i} for binomial data).
+The values \eqn{y_i} or \eqn{y_i/n_i} are  the observed
+responses which are specified on the left-hand side of \code{formula} in the
+\code{\link{flexreg}} or \code{\link{flexreg_binom}} function, respectively.
+ \eqn{\hat{\mu}_i}  is the predicted value, the result of
+  the \code{\link{predict}} function with \code{type = "response"}.
 Standardized residuals are defined as \eqn{\frac{r_i}{\widehat{Var}(y_i)}} where
  \eqn{\widehat{Var}(y_i)}
 is the variance of the dependent variable evaluated at the posterior means
 (default, otherwise quantile of order q) of the parameters.
-If the model is \code{"FB"} or \code{"FBB"} and \code{cluster=T}, the cluster residuals are computed as
+If the model is \code{"FB"} without augmentation or \code{"FBB"} and \code{cluster = T}, the cluster residuals are computed as
 the difference between the observed response/relative response  and the cluster means
-\eqn{\hat{\lambda}_{1i}} and \eqn{\hat{\lambda}_{2i}} for \eqn{i=1, \dots, n}.
+\eqn{\hat{\lambda}_{1i}} and \eqn{\hat{\lambda}_{2i}}.
 }
 \examples{
-{
+\dontrun{
 data("Reading")
-FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
+FB <- flexreg(accuracy.adj ~ iq, data=Reading, type="FB")
 residuals(FB, type="raw", cluster=TRUE)
 }
 
 }
 \references{
 {
-Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
-\cr
 Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+\cr
+Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
+\cr
+Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 }
 }

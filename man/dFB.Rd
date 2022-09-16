@@ -4,39 +4,56 @@
 \alias{dFB}
 \title{Flexible beta probability density function}
 \usage{
-dFB(x, mu, phi, p, w)
+dFB(x, mu, phi, p, w, q0 = NULL, q1 = NULL)
 }
 \arguments{
 \item{x}{a vector of quantiles.}
 
-\item{mu}{the mean parameter. It must lie in (0, 1).}
+\item{mu}{the mean parameter of the flexible beta distribution. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter. It must be a positive real value.}
+\item{phi}{the precision parameter of the flexible beta distribution. It must be a positive real value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 
 \item{w}{the normalized distance among clusters. It must lie in (0, 1).}
+
+\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+
+\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
 }
 \value{
 A vector with the same length as \code{x}.
 }
 \description{
 The function computes the probability density function of the flexible beta distribution.
+It can also  compute the probability density function of the augmented flexible beta distribution by assigning positive probabilities to zero and one and a (continuous) flexible beta density to the interval (0,1).
 }
 \details{
-The FB distribution is a special mixture of two beta distributions
-\deqn{p Beta(x|\lambda_1,\phi)+(1-p)Beta(x|\lambda_2,\phi)}
- for \eqn{0<x<1} where \eqn{Beta(x|\cdot,\cdot)} is the beta distribution with a mean-precision parameterization.
- Moreover, \eqn{0<p<1} is the mixing weight, \eqn{\phi>0} is a precision parameter,
- \eqn{\lambda_1=\mu+(1-p)w} and \eqn{\lambda_2=\mu-pw} are the component means of the first and second component of the mixture,
- \eqn{0<\mu=p\lambda_1+(1-p)\lambda_2<1} is the overall mean, and \eqn{0<w<1} is the  normalized distance between clusters.
+The FB distribution is a special mixture of two beta distributions with density
+\deqn{f_{FB}(x;\mu,\phi,p,w)=p f_B(x;\lambda_1,\phi)+(1-p)f_B(x;\lambda_1,\phi)}
+ for \eqn{0<x<1}, where \eqn{f_B(x;\cdot,\cdot)} is the beta density with a mean-precision parameterization.
+ Moreover, \eqn{0<\mu=p\lambda_1+(1-p)\lambda_2<1} is the overall mean,\eqn{\phi>0} is a precision parameter,
+ \eqn{0<p<1} is the mixing weight, and \eqn{0<w<1} is the  normalized distance between component means.
+ The latter are \eqn{\lambda_1=\mu+(1-p)\tilde{w}} and \eqn{\lambda_2=\mu-p\tilde{w}}, where \eqn{\tilde{w}=w\min{\mu/p, (1-\mu)/(1-p)}}.
+
+The augmented FB distribution has density
+\itemize{
+\item \eqn{q_0}, if \eqn{x=0}
+\item \eqn{q_1}, if \eqn{x=1}
+\item \eqn{(1-q_0-q_1)f_{FB}(x;\mu,\phi,p,w)}, if \eqn{0<x<1 }
+}
+where \eqn{0<q_0<1} identifies the augmentation in zero, \eqn{0<q_1<1} identifies the augmentation in one,
+and \eqn{q_0+q_1<1}.
 }
 \examples{
-dFB(x = c(.5,.7,.8), mu = 0.3, phi = 20, p = .5, w = .5)
-
+dFB(x = c(.5,.7,.8), mu = .3, phi = 20, p = .5, w = .5)
+dFB(x = c(.5,.7,.8), mu = .3, phi = 20, p = .5, w = .5, q0 = .2)
+dFB(x = c(.5,.7,.8), mu = .3, phi = 20, p = .5, w = .5, q0 = .2, q1 = .1)
 }
 \references{
 {
+Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
+\cr
 Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079
 }
 }

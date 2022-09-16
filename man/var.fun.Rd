@@ -4,7 +4,7 @@
 \alias{var.fun}
 \title{var.fun}
 \usage{
-var.fun(model, mu.chain, phi.chain)
+var.fun(model, mu.chain, phi.chain, q0.chain, q1.chain)
 }
 \description{
 var.fun

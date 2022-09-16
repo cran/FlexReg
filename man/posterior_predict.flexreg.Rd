@@ -18,13 +18,14 @@ An object of class \code{`flexreg_postpred`} containing a matrix with the simula
 The function takes an object of class \code{`flexreg`} and generates values from the posterior predictive distribution.
 }
 \details{
-The function generates values from the posterior predictive distribution, which is the distribution of a  future outcome given the observed data. In case of binomial data, the posterior predictive distribution is computed for the relative response \code{y/n}.
+The function generates values from the posterior predictive distribution, which is the distribution of a  future outcome given the observed data.
+The posterior predictive distribution is computed for \eqn{y} in case of bounded responses and
+for \code{y/n} in case of binomial responses.
 }
 \examples{
 \dontrun{
 data("Reading")
-dataset <- Reading
-FB <- flexreg(accuracy ~ iq, dataset, n.iter=1000)
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter=1000)
 pp <- posterior_predict(FB)
 plot(pp)
 }
@@ -32,13 +33,12 @@ plot(pp)
 }
 \references{
 {
-Gelman, A.; Carlin, J. B.; Stern, H. S. and Rubin, D. B. (2014), Bayesian Data Analysis, 3th edition. Chapman and Hall/CRC. doi:10.1201/b16018 \cr
-\cr
 Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
 \cr
-#' Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
+Di Brisco, A. M., Migliorati, S., Ongaro, A. (2020). Robustness against outliers: A new variance inflated regression model for proportions. Statistical Modelling, \bold{20}(3), 274--309. doi:10.1177/1471082X18821213 \cr
 \cr
-Di Brisco, A. M., Migliorati, S., Ongaro, A. (2020) Robustness against outliers: A new variance inflated regression model for proportions. Statistical Modelling, \bold{20}(3), 274--309. doi:10.1177/1471082X18821213 \cr
-
+Gelman, A., Carlin, J. B., Stern, H. S., Rubin, D. B. (2014). Bayesian Data Analysis, 3th edition. Chapman and Hall/CRC. doi:10.1201/b16018 \cr
+\cr
+Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 }
 }

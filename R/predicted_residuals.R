@@ -1,26 +1,37 @@
 #' @title Prediction Method for flexreg Objects
 #'
-#' @description Method that computes various types of prediction from objects of class \code{`flexreg`}. If the model type is \code{FB} or \code{FBB} and \code{cluster = T}, the function returns also cluster means.
+#' @description Method that computes various types of prediction from objects of class \code{`flexreg`}. If the model type is \code{"FB"} without augmentation or \code{"FBB"} and \code{cluster = T}, the function returns also cluster means.
 #'
 #' @param object an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
 #' @param newdata an optional data frame containing variables with which to predict. If omitted, the fitted values are used.
-#' @param cluster logical. If the model is \code{"FB"} or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default, \code{cluster = F}.
-#' @param type a character indicating the type of predictions. Available options are the  fitted means of response/relative response (\code{response}), the linear predictor (\code{link}),
-#' the fitted precision parameter phi (\code{precision}), the fitted overdispersion parameter theta (\code{overdispersion}), and the fitted variances of the response (\code{variance}).
-#' @param estimate the type of estimate: \code{mean} (default), \code{median} or \code{quantile}.
-#' @param q if estimate is \code{quantile}, numeric value of probability in (0, 1).
+#' @param cluster logical. If the model is \code{"FB"} without augmentation or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default, \code{cluster = F}.
+#' @param type a character indicating the type of predictions. Available options are: \code{"response"}, that returns the marginal fitted means of response/relative response;
+#' \code{"link"}, the linear predictor of the mean model;
+#' \code{"precision"}, the fitted precision parameter \eqn{phi};
+#' \code{"overdispersion"}, the fitted overdispersion parameter \eqn{theta};
+#'  \code{"variance"}, the fitted variance of the response.
+#' @param estimate the type of estimate: \code{"mean"} (default), \code{"median"} or \code{"quantile"}.
+#' @param q if \code{estimate = "quantile"}, numeric value of probability in (0, 1).
 #' @param ... additional arguments. Currently not used.
 #'
-#' @examples{
+#' @details If \code{type="response"} the function returns the marginal mean that is \eqn{\mu} in case of no augmentation and
+#' \eqn{q_1+(1-q_0-q_1)\mu} in case of augmentation. If \code{type="variance"} the function returns \eqn{Var(Y|0<Y<1)} in case of no augmentation and
+#' \eqn{(1-q_0-q_1)Var(Y|0<Y<1)+q_1^2+(1-q_0-q_1)\mu^2-(q_1+(1-q_0-q_1)\mu)^2} in case of augmentation. See Di Brisco and Migliorati (2020) for details.
+#' The option \code{type = "overdispersion"}  is available only for beta-binomial and flexible beta-binomial models.
+#'
+#' @examples
+#' \dontrun{
 #' data("Reading")
-#' FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
+#' FB <- flexreg(accuracy.adj ~ iq, data=Reading, type="FB")
 #' predict(FB, type="response", cluster=TRUE)
 #' }
 #'
 #' @references {
-#' Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
-#' \cr
 #' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+#' \cr
+#' Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
+#' \cr
+#' Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 #' }
 #'
 #' @import  stats
@@ -33,11 +44,14 @@ predict.flexreg <- function(object, newdata=NULL, cluster=F,
                             type = "response",
                             estimate="mean", q=NULL, ...){
   model <- object
-  model.name <- model$model@model_name
+  posterior <- model$model
+  model.name <- posterior@model_name
+  model.type <- model$type
+
   n <- length(model$response)
 
-  if(!(model.name %in% c("FB", "FB_phi", "FBB", "FBB_theta")) & cluster==T)
-    stop("Cluster means are available only for FB and FBB models")
+  if(!(model.name %in% c("FBNo", "FBNo_phi", "FBB", "FBB_theta")) & cluster==T)
+    stop("Cluster means are available only for FBB and FB models without augmentation")
   if(!(estimate %in% c("mean", "median", "quantile")))
     stop("Argument `estimate` must be set equal to `mean`, `median` or `quantile`")
   if(estimate=="quantile" & is.null(q))
@@ -45,41 +59,49 @@ predict.flexreg <- function(object, newdata=NULL, cluster=F,
   if(!(type %in% c("response", "link", "precision", "variance", "overdispersion")))
     stop("Argument `type` must be set equal to `response`, `link`, `precision`, `variance`, or `overdispersion`")
 
-  if(type=="variance" & !(model.name %in% c("Beta", "FB", "VIB", "Beta_phi", "FB_phi", "VIB_phi")))
+  if(type=="variance" & (model.name %in% c("BetaBin", "BetaBin_theta","Bin", "FBB", "FBB_theta" )))
     stop("predicted variances are available only for Beta, FB, and VIB models")
   if(type=="overdispersion" & !(model.name %in% c("BetaBin", "BetaBin_theta", "FBB", "FBB_theta")))
     stop("predicted ovedispersion is available only for BetaBin and FBB models")
-  if(type=="precision" & !(model.name %in% c("Beta", "FB", "VIB", "Beta_phi", "FB_phi", "VIB_phi")))
+  if(type=="precision" & (model.name %in% c("BetaBin", "BetaBin_theta","Bin", "FBB", "FBB_theta" )))
     stop("predicted precision is available only for Beta, FB, and VIB models")
 
-  posterior <- model$model
   # If we do not have new data:
   if(is.null(newdata)){
-    if( type == "response") pred.chain <- rstan::extract(posterior, pars="mu", permuted=T)[[1]]
+    if(is.null(model$call$zero.formula)){q0.chain <- 0
+    }else {
+      q0.chain <- rstan::extract(posterior, pars="q0", permuted=T)[[1]]
+    }
+    if(is.null(model$call$one.formula)){q1.chain <- 0
+    }else {
+      q1.chain <- rstan::extract(posterior, pars="q1", permuted=T)[[1]]
+    }
+    if( type == "response"){
+      mu.chain <- rstan::extract(posterior, pars="mu", permuted=T)[[1]]
+      pred.chain <- q1.chain+(1-q0.chain-q1.chain)*mu.chain
+    }
     if( type == "link") {
       beta.chain <- rstan::extract(posterior, pars="beta", permuted=T)[[1]]
       X <- model$design.X
       pred.chain <- beta.chain %*% t(X)
     }
 
-    if( type == "precision" & model.name %in% c("Beta", "FB", "VIB",
-                                                "Beta_phi", "FB_phi", "VIB_phi")) {
+    if( type == "precision") {#non serve ulteriore controllo su type, perchè ci sono gli stop precedenti
       pred.chain <- rstan::extract(posterior, pars="phi", permuted=T)[[1]]
       if(is.na(dim(pred.chain)[2])) pred.chain <- matrix(rep(pred.chain, n),ncol=n)
     }
-    if( type == "variance" & model.name %in% c("Beta", "FB", "VIB",
-                                               "Beta_phi", "FB_phi", "VIB_phi")) {
+    if( type == "variance") {
       mu.chain <- rstan::extract(posterior, pars="mu", permuted=T)[[1]]
       phi.chain <- rstan::extract(posterior, pars="phi", permuted=T)[[1]]
-      pred.chain <- var.fun(model, mu.chain, phi.chain)
+      pred.chain <- var.fun(model, mu.chain, phi.chain, q0.chain, q1.chain)$variance
     }
     if( type == "overdispersion" & model.name %in% c("BetaBin", "BetaBin_theta", "FBB", "FBB_theta")) {
       pred.chain <- rstan::extract(posterior, pars="theta", permuted=T)[[1]]
       if(is.na(dim(pred.chain)[2])) pred.chain <- matrix(rep(pred.chain, n),ncol=n)
     }
 
-    # If cluster == T, report the predicted lambda without considering the type argument
-    if ((model.name %in% c("FB", "FB_phi", "FBB", "FBB_theta")) & cluster==T){
+    # non serve controllare che il modello sia FB perchè ho già imposto il blocco prima
+    if (cluster==T){#(substr(model.name,1,2)=="FB") &
       l1.chain <- rstan::extract(posterior, pars="lambda1", permuted=T)[[1]]
       l2.chain <- rstan::extract(posterior, pars="lambda2", permuted=T)[[1]]
     }
@@ -87,51 +109,61 @@ predict.flexreg <- function(object, newdata=NULL, cluster=F,
     newdata <- as.data.frame(newdata)
     if((c("(Intercept)") %in% colnames(newdata)) ==F & # If newdata does not have the intercept..
        ((c("(Intercept)") %in% colnames(model$design.X)) ==T) |
-       (c("(Intercept)") %in% colnames(model$design.Z) ==T)) # .. and the intercept is required..
+       (c("(Intercept)") %in% colnames(model$design.Z) ==T)|
+       (c("(Intercept)") %in% colnames(model$design.X0) ==T)|
+       (c("(Intercept)") %in% colnames(model$design.X1) ==T)) # .. and the intercept is required..
       newdata$`(Intercept)` <- rep(1, nrow(newdata)) # .. add the intercept
 
-    if(!all(c(colnames(model$design.X),colnames(model$design.Z))  %in% colnames(newdata))){
+    if(!all(c(colnames(model$design.X),colnames(model$design.Z),
+              colnames(model$design.X0),colnames(model$design.X1))  %in% colnames(newdata))){
       stop("newdata must be a data frame containing the same predictors as the ones in formula")
     }
     n <- nrow(newdata)
+
+    newdata.q0 <- newdata[,match(colnames(model$design.X0),colnames(newdata))]
+    newdata.q1 <- newdata[,match(colnames(model$design.X1),colnames(newdata))]
+    q0.chain <- q.chain.nd(model, newdata.q0, newdata.q1)[[1]]
+    if(is.null(q0.chain)) q0.chain <- 0
+    q1.chain <- q.chain.nd(model, newdata.q0, newdata.q1)[[2]]
+    if(is.null(q1.chain)) q1.chain <- 0
+
     if(type == "response") {
       link.mu <- model$link.mu
-      newdata.mu <- newdata[,which(colnames(newdata) %in% colnames(model$design.X) )]
-      pred.chain <- mu.chain.nd(posterior, newdata.mu, link.mu)
+      newdata.mu <- newdata[,match(colnames(model$design.X),colnames(newdata))]
+      mu.chain <- mu.chain.nd(posterior, newdata.mu, link.mu)
+      pred.chain <- q1.chain+(1-q0.chain-q1.chain)*mu.chain
     }
     if(type == "link") {
       beta.chain <- rstan::extract(posterior, pars="beta", permuted=T)[[1]]
-      newdata.mu <- newdata[,which(colnames(newdata) %in% colnames(model$design.X) )]
+      newdata.mu <- newdata[,match(colnames(model$design.X),colnames(newdata))]
       pred.chain  <- beta.chain %*% t(newdata.mu)
     }
-    if(type == "precision" & model.name %in% c("Beta", "FB", "VIB",
-                                               "Beta_phi", "FB_phi", "VIB_phi")){
+    if(type == "precision" & model.type %in% c("Beta", "FB", "VIB")){
       link.phi <- model$link.phi
-      newdata.phi <- newdata[,which(colnames(newdata) %in% colnames(model$design.Z) )]
+      newdata.phi <- newdata[,match(colnames(model$design.Z),colnames(newdata))]
       pred.chain <- phi.chain.nd(posterior, newdata.phi, link.phi)
       if(is.na(dim(pred.chain)[2])) pred.chain <- matrix(rep(pred.chain, n),ncol=n)
     }
     if(type == "overdispersion" & model.name %in% c("BetaBin", "BetaBin_theta", "FBB", "FBB_theta")) {
       link.theta <- model$link.theta
-      newdata.theta <- newdata[,which(colnames(newdata) %in% colnames(model$design.Z) )]
+      newdata.theta <- newdata[,match(colnames(model$design.Z),colnames(newdata))]
       pred.chain <- theta.chain.nd(posterior, newdata.theta, link.theta)
       if(is.na(dim(pred.chain)[2])) pred.chain <- matrix(rep(pred.chain, n),ncol=n)
     }
-    if(type == "variance"& model.name %in% c("Beta", "FB", "VIB",
-                                             "Beta_phi", "FB_phi", "VIB_phi")){
+    if(type == "variance"& model.type %in% c("Beta", "FB", "VIB")){
       link.mu <- model$link.mu
-      newdata.mu <- newdata[,which(colnames(newdata) %in% colnames(model$design.X) )]
+      newdata.mu <- newdata[,match(colnames(model$design.X),colnames(newdata))]
       mu.chain <- mu.chain.nd(posterior, newdata.mu, link.mu)
       link.phi <- model$link.phi
-      newdata.phi <- newdata[,which(colnames(newdata) %in% colnames(model$design.Z) )]
+      newdata.phi <- newdata[,match(colnames(model$design.Z),colnames(newdata))]
       phi.chain <- phi.chain.nd(posterior, newdata.phi, link.phi)
       if(is.na(dim(phi.chain)[2])) phi.chain <- matrix(rep(phi.chain, n),ncol=n)
-      pred.chain <- var.fun(model, mu.chain, phi.chain)$variance
+      pred.chain <- var.fun(model, mu.chain, phi.chain, q0.chain,q1.chain)$variance
     }
 
-    if((model.name %in% c("FB", "FB_phi", "FBB", "FBB_theta")) & cluster==T) {
+    if(cluster==T) {
       link.mu <- model$link.mu
-      newdata.mu <- newdata[,which(colnames(newdata) %in% colnames(model$design.X) )]
+      newdata.mu <- newdata[,match(colnames(model$design.X),colnames(newdata))]
       mu.chain <- mu.chain.nd(posterior, newdata.mu, link.mu)
 
       p.chain <- rstan::extract(posterior, pars="p", permuted=T)[[1]]
@@ -144,19 +176,21 @@ predict.flexreg <- function(object, newdata=NULL, cluster=F,
 
   if(estimate == "quantile"){
     predicted <- apply(pred.chain, 2, quantile, probs=q)
-    if ((model.name %in% c("FB", "FB_phi", "FBB", "FBB_theta")) & cluster==T){
+    if (cluster==T){
       predicted.l1 <- apply(l1.chain, 2, quantile, probs=q)
-      predicted.l2 <- apply(l2.chain, 2, quantile, probs=q)}
+      predicted.l2 <- apply(l2.chain, 2, quantile, probs=q)
+      }
   } else {
     predicted <- apply(pred.chain, 2, eval(str2expression(estimate)))
-    if ((model.name %in% c("FB", "FB_phi", "FBB", "FBB_theta")) & cluster==T){
+    if (cluster==T){
       predicted.l1 <- apply(l1.chain, 2, eval(str2expression(estimate)))
       predicted.l2 <- apply(l2.chain, 2, eval(str2expression(estimate)))
     }
   }
-  if ((model.name %in% c("FB", "FB_phi", "FBB", "FBB_theta")) & cluster==T){
+
+  if (cluster==T){
     predicted <- cbind(predicted, predicted.l1, predicted.l2)
-    colnames(predicted) <- c(type, "lambda1", "lambda2")
+    colnames(predicted) <- c(type,"lambda1", "lambda2")
   } else {
     predicted <- cbind(predicted)
     colnames(predicted) <- type
@@ -166,39 +200,42 @@ predict.flexreg <- function(object, newdata=NULL, cluster=F,
 
 #' @title Residuals Method for flexreg Objects
 #'
-#' @description Method that computes various types of residuals from objects of class \code{`flexreg`}. If the model type is \code{FB} or \code{FBB} and \code{cluster = T}, the method returns also residuals with respect to cluster means.
+#' @description Method that computes various types of residuals from objects of class \code{`flexreg`}. If the model type is  \code{FB} without augmentation or \code{FBB} and \code{cluster = T}, the method returns also residuals with respect to cluster means.
 #'
 #' @param object an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
-#' @param type a character indicating type of residuals (\code{raw} or \code{standardized}).
-#' @param cluster logical. If the model is \code{"FB"} or \code{"FBB"}, \code{cluster=T} returns the cluster means. By default \code{cluster = F}.
-#' @param estimate a character indicating the type of estimate: \code{mean} (default), \code{median}, or \code{quantile}.
-#' @param q if estimate is \code{quantile}, a numeric value of probability in (0, 1).
+#' @param type a character indicating type of residuals (\code{"raw"} or \code{"standardized"}).
+#' @param cluster logical. If the model is \code{"FB"} without augmentation or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default \code{cluster = F}.
+#' @param estimate a character indicating the type of estimate: \code{"mean"} (default), \code{"median"}, or \code{"quantile"}.
+#' @param q if \code{estimate = "quantile"}, a numeric value of probability in (0, 1).
 #' @param ... additional arguments. Currently not used.
 #'
-#' @details Raw residuals are defined as \eqn{r_i=y_i-\hat{\mu}_i} (or \eqn{r_i= y_i/n_i-\hat{\mu}_i} for binomial data)
-#' for \eqn{i=1, \dots, n}. The values \eqn{y_i} for \eqn{i,\dots,n} are referred to the observed
-#' response variable and they are specified on the left-hand side of \code{formula} in the
-#' \code{\link{flexreg}} function.
-#' \eqn{\hat{\mu}_i} for \eqn{i=1, \dots, n} is the predicted value. It can be computed separately
-#'  through the \code{\link{predict}} function by setting \code{type=response}.
+#' @details Raw residuals are defined as \eqn{r_i=y_i-\hat{\mu}_i} (or \eqn{r_i= y_i/n_i-\hat{\mu}_i} for binomial data).
+#' The values \eqn{y_i} or \eqn{y_i/n_i} are  the observed
+#' responses which are specified on the left-hand side of \code{formula} in the
+#' \code{\link{flexreg}} or \code{\link{flexreg_binom}} function, respectively.
+#'  \eqn{\hat{\mu}_i}  is the predicted value, the result of
+#'   the \code{\link{predict}} function with \code{type = "response"}.
 #' Standardized residuals are defined as \eqn{\frac{r_i}{\widehat{Var}(y_i)}} where
 #'  \eqn{\widehat{Var}(y_i)}
 #' is the variance of the dependent variable evaluated at the posterior means
 #' (default, otherwise quantile of order q) of the parameters.
-#' If the model is \code{"FB"} or \code{"FBB"} and \code{cluster=T}, the cluster residuals are computed as
+#' If the model is \code{"FB"} without augmentation or \code{"FBB"} and \code{cluster = T}, the cluster residuals are computed as
 #' the difference between the observed response/relative response  and the cluster means
-#' \eqn{\hat{\lambda}_{1i}} and \eqn{\hat{\lambda}_{2i}} for \eqn{i=1, \dots, n}.
+#' \eqn{\hat{\lambda}_{1i}} and \eqn{\hat{\lambda}_{2i}}.
 #'
-#' @examples{
+#' @examples
+#' \dontrun{
 #' data("Reading")
-#' FB <- flexreg(accuracy ~ iq, Reading, type="FB", n.iter=1000)
+#' FB <- flexreg(accuracy.adj ~ iq, data=Reading, type="FB")
 #' residuals(FB, type="raw", cluster=TRUE)
 #' }
 #'
 #' @references {
-#' Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
-#' \cr
 #' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+#' \cr
+#' Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
+#' \cr
+#' Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 #' }
 #'
 #' @import stats
@@ -210,10 +247,15 @@ predict.flexreg <- function(object, newdata=NULL, cluster=F,
 residuals.flexreg <- function(object, type = "raw",
                               cluster=FALSE, estimate="mean", q=NULL, ...){
   model <- object
-  model.name <- model$model@model_name
+  posterior <- model$model
+  model.name <- posterior@model_name
   n <- model$n
 
-  if(model.name %in% c("Beta", "Beta_phi", "VIB", "VIB_phi", "Bin", "BetaBin", "BetaBin_theta") & cluster==T)
+  if(model.name %in% c("BetaNo", "BetaNo_phi", "Beta0", "Beta0_phi",
+                       "Beta1", "Beta1_phi", "Beta01", "Beta01_phi",
+                       "VIBNo", "VIBNo_phi", "VIB0", "VIB0_phi",
+                       "VIB1", "VIB1_phi", "VIB01", "VIB01_phi",
+                       "Bin", "BetaBin", "BetaBin_theta") & cluster==T)
     stop("Cluster residuals are available only for FB models")
   if(!(estimate %in% c("mean", "median", "quantile")))
     stop("Argument `estimate` must be set equal to `mean`, `median` or `quantile`")
@@ -240,7 +282,6 @@ residuals.flexreg <- function(object, type = "raw",
       }
   } else {
 
-    posterior <- model$model
     mu.chain <- rstan::extract(posterior, pars="mu", permuted=T)[[1]]
     phi.chain <- rstan::extract(posterior, pars="phi", permuted=T)[[1]]
 

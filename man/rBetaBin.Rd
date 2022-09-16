@@ -7,7 +7,7 @@
 rBetaBin(n, size = NULL, mu = NULL, theta = NULL, phi = NULL)
 }
 \arguments{
-\item{n}{the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.}
+\item{n}{the number of values to generate. If \code{length(n)} > 1, the length is taken to be the number required.}
 
 \item{size}{the total number of trials.}
 
@@ -21,11 +21,11 @@ rBetaBin(n, size = NULL, mu = NULL, theta = NULL, phi = NULL)
 A vector of length \code{n}.
 }
 \description{
-The function randomly generates values from the beta-binomial distribution.
+The function  generates random values from the beta-binomial distribution.
 }
 \examples{
-rBetaBin(n=100, size=40, mu = 0.5, theta = 0.4)
-rBetaBin(n=100, size=40, mu = 0.5, phi = 1.5)
+rBetaBin(n = 100, size = 40, mu = .5, theta = .4)
+rBetaBin(n = 100, size = 40, mu = .5, phi = 1.5)
 
 }
 \references{

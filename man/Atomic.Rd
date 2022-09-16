@@ -16,12 +16,12 @@ A data frame containing 1039 observations on the following 4 variables.
 Counts of chromosome aberrations in atomic bombs survivors.
 }
 \details{
-The data has been originally analyzed by Otake and Prentice (1984) and successively by Ascari and Migliorati (2021).
+The data have been originally analyzed by Otake and Prentice (1984) and successively by Ascari and Migliorati (2021).
 }
 \references{
 {
-Otake, M., Prentice, R.L. (1984). The analysis of chromosomally aberrant cells based on beta-binomial distribution. Radiat Res. \bold{98}, 456--470. \cr
-\cr
 Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+\cr
+Otake, M., Prentice, R.L. (1984). The analysis of chromosomally aberrant cells based on beta-binomial distribution. Radiat Res. \bold{98}, 456--470. \cr
 }
 }

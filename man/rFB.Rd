@@ -4,31 +4,37 @@
 \alias{rFB}
 \title{Random generator from the flexible beta distribution}
 \usage{
-rFB(n, mu, phi, p, w)
+rFB(n, mu, phi, p, w, q0 = NULL, q1 = NULL)
 }
 \arguments{
-\item{n}{the number of observations. If \code{length(n)} > 1, the length is taken to be the number required.}
+\item{n}{the number of values to generate. If \code{length(n) > 1}, the length is taken to be the number required.}
 
-\item{mu}{the mean parameter. It must lie in (0, 1).}
+\item{mu}{the mean parameter of the flexible beta distribution. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter. It must be a positive real value.}
+\item{phi}{the precision parameter of the flexible beta distribution. It must be a positive real value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 
 \item{w}{the normalized distance among clusters. It must lie in (0, 1).}
+
+\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+
+\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
 }
 \value{
 A vector of length  \code{n}.
 }
 \description{
-The function randomly generates values from the flexible beta distribution.
+The function generates random values from the flexible beta distribution, or from the augmented flexible beta distribution.
 }
 \examples{
-rFB(100,0.5,30,0.3,0.6)
-
+rFB(n = 100, mu = .5, phi = 30,p = .3, w = .6)
+rFB(n = 100, mu = .5, phi = 30,p = .3, w = .6, q0 = .2, q1 = .1)
 }
 \references{
 {
+Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
+\cr
 Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079
 }
 }

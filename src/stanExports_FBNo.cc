@@ -2,12 +2,12 @@
 
 #include <Rcpp.h>
 using namespace Rcpp ;
-#include "stanExports_FB_phi.h"
+#include "stanExports_FBNo.h"
 
-RCPP_MODULE(stan_fit4FB_phi_mod) {
+RCPP_MODULE(stan_fit4FBNo_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_FB_phi")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_FBNo")
 
     .constructor<SEXP,SEXP,SEXP>()
 

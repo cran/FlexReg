@@ -29,14 +29,14 @@ The function computes the probability mass function of the flexible beta-binomia
 }
 \details{
 The FBB distribution is a special mixture of two beta-binomial distributions
-\deqn{p BB(x|\lambda_1,\phi)+(1-p)BB(x|\lambda_2,\phi)}
- for \eqn{x \in \lbrace 0, 1, \dots, n \rbrace} where \eqn{BB(x|\cdot,\cdot)} is the beta-binomial distribution with a mean-precision parameterization.
+\deqn{p BB(x;\lambda_1,\phi)+(1-p)BB(x;\lambda_2,\phi)}
+ for \eqn{x \in \lbrace 0, 1, \dots, n \rbrace} where \eqn{BB(x;\cdot,\cdot)} is the beta-binomial distribution with a mean-precision parameterization.
  Moreover, \eqn{\phi=(1-\theta)/\theta}, \eqn{0<p<1} is the mixing weight, \eqn{\phi>0} is a precision parameter,
  \eqn{\lambda_1=\mu+(1-p)w} and \eqn{\lambda_2=\mu-pw} are the component means of the first and second component of the mixture,
  \eqn{0<\mu=p\lambda_1+(1-p)\lambda_2<1} is the overall mean, and \eqn{0<w<1} is the  normalized distance between clusters.
 }
 \examples{
-dFBB(x = c(5,7,8), size=10, mu = 0.3, phi = 20, p = .5, w = .5)
+dFBB(x = c(5,7,8), size=10, mu = .3, phi = 20, p = .5, w = .5)
 
 }
 \references{

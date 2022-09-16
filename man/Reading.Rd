@@ -4,9 +4,10 @@
 \alias{Reading}
 \title{Reading Skills data}
 \format{
-A data frame containing 44 observations on 3 variables.
+A data frame containing 44 observations on 4 variables.
 \describe{
 \item{\code{accuracy}}{a reading score.}
+\item{\code{accuracy.adj}}{the adjusted reading score: the observed 1's (perfect reading scores) are substituted with 0.99.}
 \item{\code{dyslexia}}{a factor indicating wheter the child is dyslexic.}
 \item{\code{iq}}{a quantitative measure of the children's non verbal abilities.}
 }
@@ -22,10 +23,12 @@ The data were originally analyzed by Pammer and Kevan (2004) and successively us
 }
 \references{
 {
-Smithson, M., and Verkuilen, J. (2006). A Better Lemon Squeezer? Maximum-Likelihood Regression with Beta-Distributed Dependent Variables. Psychological Methods, \bold{11}(7), 54–71. \cr
+Cribari-Neto, F.,  Zeileis, A. (2010). Beta Regression in R. Journal of Statistical Software, 34(2), 1--24. \cr
 \cr
-Cribari-Neto, F., and Zeileis, A. (2010). Beta Regression in R. Journal of Statistical Software, 34(2), 1–24. \cr
+Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
 \cr
 Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
+\cr
+Smithson, M., Verkuilen, J. (2006). A Better Lemon Squeezer? Maximum-Likelihood Regression with Beta-Distributed Dependent Variables. Psychological Methods, \bold{11}(7), 54--71. \cr
 }
 }

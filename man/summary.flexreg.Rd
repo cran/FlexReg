@@ -13,7 +13,7 @@
 \method{coef}{flexreg}(object, ...)
 }
 \arguments{
-\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}}.}
+\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
 
 \item{...}{additional arguments. Currently not used.}
 
@@ -31,8 +31,7 @@ printed using the associated \code{print} method.
 }
 \examples{
 data("Reading")
-dataset <- Reading
-FB <- flexreg(accuracy ~ iq, dataset, n.iter = 1000)
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter = 1000)
 summary(FB)
 
 

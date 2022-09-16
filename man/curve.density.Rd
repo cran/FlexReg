@@ -13,6 +13,8 @@ curve.density(
   p = NULL,
   w = NULL,
   k = NULL,
+  q0 = NULL,
+  q1 = NULL,
   ...
 )
 }
@@ -33,15 +35,23 @@ curve.density(
 
 \item{k}{the extent of the variance inflation (to be specified if \code{type = "VIB"}). It must lie in (0, 1).}
 
+\item{q0}{the probability of augmentation in zero (it can be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+
+\item{q1}{the probability of augmentation in one (it can be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+
 \item{...}{additional arguments of \code{stat_function()}.}
 }
 \description{
 The function draws a curve corresponding to the probability density/mass function of the specified distribution (beta, flexible beta, variance-inflated beta, binomial, beta-binomial, or flexible beta-binomial).
+For beta, flexible beta, and variance-inflated beta, it also allows to plot the probability of augmentation in zero/one.
 }
 \examples{
-curve.density("Beta", mu=0.5, phi=20)
-curve.density("FB", mu=0.5, phi=20, p=0.4, w=.8)
-curve.density("VIB", mu=0.5, phi=20, p=0.9, k=.8, col=3)
+curve.density("Beta", mu=.5, phi=20)
+curve.density("Beta", mu=.5, phi=20, q1 = .3)
+curve.density("FB", mu=.5, phi=20, p=.4, w=.8)
+curve.density("FB", mu=.5, phi=20, p=.4, w=.8, q0= .1)
+curve.density("VIB", mu=.5, phi=20, p=.9, k=.8, col=3)
+curve.density("VIB", mu=.5, phi=20, p=.9, k=.8, col=3, q0=.1, q1=.3)
 
 curve.density("Bin", size=10, mu=.7)
 curve.density("BetaBin", size=10, mu=.7, phi=10)
@@ -51,12 +61,14 @@ curve.density("FBB", size=10, mu=.7, phi=10, p=.2,w=.7)
 }
 \references{
 {
-Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
+Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
 \cr
-Ascari, R., and Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
+Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
 \cr
-Di Brisco, A. M., Migliorati, S., Ongaro, A. (2020) Robustness against outliers: A new variance inflated regression model for proportions. Statistical Modelling, \bold{20}(3), 274--309. doi:10.1177/1471082X18821213 \cr
+Di Brisco, A. M., Migliorati, S., Ongaro, A. (2020). Robustness against outliers: A new variance inflated regression model for proportions. Statistical Modelling, \bold{20}(3), 274--309. doi:10.1177/1471082X18821213 \cr
 \cr
- Ferrari, S.L.P., and Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501
+Ferrari, S.L.P., and Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501\cr
+\cr
+Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 }
 }
