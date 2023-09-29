@@ -4,12 +4,12 @@
 \alias{Reading}
 \title{Reading Skills data}
 \format{
-A data frame containing 44 observations on 4 variables.
+A  \code{data.frame} containing 44 observations on 4 variables.
 \describe{
 \item{\code{accuracy}}{a reading score.}
 \item{\code{accuracy.adj}}{the adjusted reading score: the observed 1's (perfect reading scores) are substituted with 0.99.}
 \item{\code{dyslexia}}{a factor indicating wheter the child is dyslexic.}
-\item{\code{iq}}{a quantitative measure of the children's non verbal abilities.}
+\item{\code{iq}}{a standardized quantitative measure of the children's non verbal abilities.}
 }
 }
 \source{

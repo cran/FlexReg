@@ -14,11 +14,11 @@
 )
 }
 \arguments{
-\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
+\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.}
 
 \item{type}{a character indicating type of residuals (\code{"raw"} or \code{"standardized"}).}
 
-\item{cluster}{logical. If the model is \code{"FB"} without augmentation or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default \code{cluster = F}.}
+\item{cluster}{logical. If the model is \code{"FB"} without augmentation or \code{"FBB"}, \code{cluster = TRUE} returns the cluster means. By default \code{cluster = FALSE}.}
 
 \item{estimate}{a character indicating the type of estimate: \code{"mean"} (default), \code{"median"}, or \code{"quantile"}.}
 
@@ -26,23 +26,33 @@
 
 \item{...}{additional arguments. Currently not used.}
 }
+\value{
+The method returns an array with as many rows as the number of observations in the sample. If \code{cluster = FALSE}, the array has only one column containing either the raw or standardized residuals.
+If \code{cluster = TRUE}, the array has four columns: the first column contains the raw or standardized residuals, the second and third columns contain the cluster residuals,
+and the fourth column contains the classification labels (see Details).
+}
 \description{
-Method that computes various types of residuals from objects of class \code{`flexreg`}. If the model type is  \code{FB} without augmentation or \code{FBB} and \code{cluster = T}, the method returns also residuals with respect to cluster means.
+Method that computes various types of residuals from objects of class \code{`flexreg`}. If the model type is  \code{FB} or \code{FBB} and \code{cluster = TRUE}, the method returns also residuals with respect to cluster means.
 }
 \details{
-Raw residuals are defined as \eqn{r_i=y_i-\hat{\mu}_i} (or \eqn{r_i= y_i/n_i-\hat{\mu}_i} for binomial data).
-The values \eqn{y_i} or \eqn{y_i/n_i} are  the observed
+The \code{residuals} method  computes raw and standardized residuals from objects of class \code{`flexreg`}.
+Raw residuals are defined as \eqn{r=y-\hat{\mu}} for bounded continuous  responses or as \eqn{r= y/n-\hat{\mu}} for bounded discrete responses.
+Values \eqn{y} and \eqn{y/n} are  the observed
 responses which are specified on the left-hand side of \code{formula} in the
-\code{\link{flexreg}} or \code{\link{flexreg_binom}} function, respectively.
- \eqn{\hat{\mu}_i}  is the predicted value, the result of
+\code{\link{flexreg}} and \code{\link{flexreg_binom}} functions, respectively.
+Moreover,  \eqn{\hat{\mu}}  is the predicted value, the result of
   the \code{\link{predict}} function with \code{type = "response"}.
-Standardized residuals are defined as \eqn{\frac{r_i}{\widehat{Var}(y_i)}} where
- \eqn{\widehat{Var}(y_i)}
-is the variance of the dependent variable evaluated at the posterior means
-(default, otherwise quantile of order q) of the parameters.
-If the model is \code{"FB"} without augmentation or \code{"FBB"} and \code{cluster = T}, the cluster residuals are computed as
-the difference between the observed response/relative response  and the cluster means
-\eqn{\hat{\lambda}_{1i}} and \eqn{\hat{\lambda}_{2i}}.
+Standardized residuals are defined as \eqn{\frac{r}{\sqrt{\widehat{Var}(y)}}} where
+ \eqn{\widehat{Var}(y)}
+is the variance of the response evaluated at the posterior means
+--by default, otherwise evaluated at the posterior quantiles of order \code{q}-- of the parameters.
+If the model is \code{"FB"} or \code{"FBB"}, \code{type = "raw"}, and \code{cluster = TRUE}, the cluster raw residuals are computed as
+the difference between the observed response/relative response  and the cluster means, i.e.,
+\eqn{\hat{\lambda}_{1}} and \eqn{\hat{\lambda}_{2}}.
+If the model is \code{"FB"} or \code{"FBB"}, \code{type = "standardized"} and \code{cluster = TRUE}, the cluster standardized residuals are computed as the
+cluster raw residuals divided by the square root of the cluster variances.
+Cluster residuals, either raw or standardized, can be used for classification purpose. Indeed, with \code{cluster = TRUE} the \code{residuals} method returns also a column named
+\code{"label"} assigning values 1 or 2 to observations depending on whether they are classified in cluster 1 (if the corresponding cluster residual is smaller) or in cluster 2.
 }
 \examples{
 \dontrun{

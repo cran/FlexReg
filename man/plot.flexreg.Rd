@@ -2,16 +2,30 @@
 % Please edit documentation in R/Summaries.R
 \name{plot.flexreg}
 \alias{plot.flexreg}
-\title{Plot method for flexreg Objects}
+\title{Plot Method for \code{flexreg} Objects}
 \usage{
-\method{plot}{flexreg}(x, name.x, additional.cov.default = NA, ...)
+\method{plot}{flexreg}(
+  x,
+  name.x,
+  additional.cov.default = NA,
+  smooth = TRUE,
+  cluster = FALSE,
+  type = "response",
+  ...
+)
 }
 \arguments{
-\item{x}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
+\item{x}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.}
 
 \item{name.x}{a character containing the name of the covariate from the mean model to be plotted on the x-axis of the scatterplot.}
 
-\item{additional.cov.default}{a list of additional covariates from the mean model to be set as default.}
+\item{additional.cov.default}{a list of additional covariates from the mean model and their value to be set as default.}
+
+\item{smooth}{a logical value indicating wheater the curves should be smooth (\code{TRUE}) or piecewise linear (\code{FALSE}, default).}
+
+\item{cluster}{logical. If the model is \code{"FB"} or \code{"FBB"}, \code{cluster = TRUE} plots the cluster means. By default, \code{cluster = FALSE}.}
+
+\item{type}{a vector of characters indicating the regression curves to be plotted. Available options are \code{"response"} and \code{"response.aug"} for augmented models.}
 
 \item{...}{additional arguments. Currently not used.}
 }
@@ -19,8 +33,10 @@
 Method for plotting regression curves for the mean from fitted regression model objects of class \code{`flexreg`}.
 }
 \details{
-The function produces a scatterplot of the covariate from the mean model specified in \code{name.x} and \code{y} or \code{y/n} if the response is continuous bounded or binomial, respectively. Any other variable specified in the mean model must be set to a default through the \code{additional.cov.default} argument.
-If the regression model is of \code{FB} without augmentation or \code{FBB} type the function returns a scatterplot with three curves, one corresponding to the overall mean and two corresponding to the component means of the FB distribution, i.e., \eqn{\lambda_1} and \eqn{\lambda_2}.
+The function produces a scatterplot of the covariate from the mean model specified in \code{name.x} and \code{y} or \code{y/n} if the response is bounded continuous or discrete, respectively. Any other variable specified in the mean model must be set to a default through the \code{additional.cov.default} argument.
+The argument \code{type = "response"} plots the conditional mean curve (i.e., \eqn{\mu}), whereas the argument \code{type = "response.aug"}, available only for augmented models,
+plots the augmented mean curve.
+If the regression model is of \code{"FB"} or \code{"FBB"} type and \code{cluster = TRUE}, then the function returns two additional curves corresponding to the component means, i.e., \eqn{\lambda_1} and \eqn{\lambda_2}.
 }
 \examples{
 \dontrun{

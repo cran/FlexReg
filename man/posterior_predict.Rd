@@ -4,7 +4,7 @@
 \alias{posterior_predict}
 \title{posterior_predict}
 \usage{
-posterior_predict(model, newdata = NULL)
+posterior_predict(model, newdata = NULL, n.new = NULL)
 }
 \description{
 posterior_predict

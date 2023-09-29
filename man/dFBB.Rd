@@ -2,7 +2,7 @@
 % Please edit documentation in R/densities.R
 \name{dFBB}
 \alias{dFBB}
-\title{Flexible beta-binomial probability mass function}
+\title{Probability mass function of the flexible beta-binomial distribution}
 \usage{
 dFBB(x, size, mu, theta = NULL, phi = NULL, p, w)
 }
@@ -13,13 +13,13 @@ dFBB(x, size, mu, theta = NULL, phi = NULL, p, w)
 
 \item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{theta}{the overdispersion paramete. It must  lie in (0, 1).}
+\item{theta}{the overdispersion parameter. It must  lie in (0, 1).}
 
-\item{phi}{the precision parameter. It is an alternative way to specify the \code{theta} parameter. It must be a positive real value.}
+\item{phi}{the precision parameter, an alternative way to specify the overdispersion parameter \code{theta}. It must be a real positive value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 
-\item{w}{the normalized distance among clusters. It must lie in (0, 1).}
+\item{w}{the normalized distance among component means. It must lie in (0, 1).}
 }
 \value{
 A vector with the same length as \code{x}.
@@ -28,12 +28,12 @@ A vector with the same length as \code{x}.
 The function computes the probability mass function of the flexible beta-binomial distribution.
 }
 \details{
-The FBB distribution is a special mixture of two beta-binomial distributions
-\deqn{p BB(x;\lambda_1,\phi)+(1-p)BB(x;\lambda_2,\phi)}
- for \eqn{x \in \lbrace 0, 1, \dots, n \rbrace} where \eqn{BB(x;\cdot,\cdot)} is the beta-binomial distribution with a mean-precision parameterization.
- Moreover, \eqn{\phi=(1-\theta)/\theta}, \eqn{0<p<1} is the mixing weight, \eqn{\phi>0} is a precision parameter,
- \eqn{\lambda_1=\mu+(1-p)w} and \eqn{\lambda_2=\mu-pw} are the component means of the first and second component of the mixture,
- \eqn{0<\mu=p\lambda_1+(1-p)\lambda_2<1} is the overall mean, and \eqn{0<w<1} is the  normalized distance between clusters.
+The FBB distribution is a special mixture of two beta-binomial distributions with probability mass function
+\deqn{f_{FBB}(x;\mu,\phi,p,w) = p BB(x;\lambda_1,\phi)+(1-p)BB(x;\lambda_2,\phi),}
+ for \eqn{x \in \lbrace 0, 1, \dots, n \rbrace}, where \eqn{BB(x;\cdot,\cdot)} is the beta-binomial distribution with a mean-precision parameterization.
+ Moreover, \eqn{\phi=(1-\theta)/\theta>0} is a precision parameter, \eqn{0<p<1} is the mixing weight, \eqn{0<\mu=p\lambda_1+(1-p)\lambda_2<1} is the overall mean,
+  \eqn{0<w<1} is the  normalized distance between component means, and
+ \eqn{\lambda_1=\mu+(1-p)w} and \eqn{\lambda_2=\mu-pw} are the scaled means of the first and second component of the mixture, respectively.
 }
 \examples{
 dFBB(x = c(5,7,8), size=10, mu = .3, phi = 20, p = .5, w = .5)

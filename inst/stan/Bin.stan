@@ -1,7 +1,7 @@
 data {
 	int<lower=1> N; // Number of observations
-	int n[N];  	 // Sample size
-	int y[N];    // outcomes
+	array[N] int n;  	 // Sample size
+	array[N] int y;    // outcomes
 	int<lower=1> K; // Number of covariates
 	matrix[N,K] X;  // Design matrix
 	int<lower=1> link_code_mu;

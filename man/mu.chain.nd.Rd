@@ -4,7 +4,7 @@
 \alias{mu.chain.nd}
 \title{mu.chain.nd}
 \usage{
-mu.chain.nd(posterior, newdata, link.mu)
+mu.chain.nd(posterior, newdata.X, link.mu)
 }
 \description{
 mu.chain.nd

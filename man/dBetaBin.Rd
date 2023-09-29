@@ -2,7 +2,7 @@
 % Please edit documentation in R/densities.R
 \name{dBetaBin}
 \alias{dBetaBin}
-\title{Beta-binomial probability mass function}
+\title{Probability mass function of the beta-binomial distribution}
 \usage{
 dBetaBin(x, size, mu, theta = NULL, phi = NULL)
 }
@@ -15,7 +15,7 @@ dBetaBin(x, size, mu, theta = NULL, phi = NULL)
 
 \item{theta}{the overdispersion parameter. It must  lie in (0, 1).}
 
-\item{phi}{the precision parameter. It is an alternative way to specify the \code{theta} parameter. It must be a positive real value.}
+\item{phi}{the precision parameter, an alternative way to specify the overdispersion parameter \code{theta}. It must be a real positive value.}
 }
 \value{
 A vector with the same length as \code{x}.
@@ -25,7 +25,7 @@ The function computes the probability mass function of the beta-binomial distrib
 }
 \details{
 The beta-binomial distribution has probability mass function
-\deqn{{n\choose x} \frac{\Gamma{(\phi)}}{\Gamma{(\mu\phi)}\Gamma{((1-\mu)\phi)}} \frac{\Gamma{(\mu\phi+x)}\Gamma{((1-\mu)\phi + n - x)}}{\Gamma{(\phi + n)}},}
+\deqn{f_{BB}(x;\mu,\phi)={n\choose x} \frac{\Gamma{(\phi)}}{\Gamma{(\mu\phi)}\Gamma{((1-\mu)\phi)}} \frac{\Gamma{(\mu\phi+x)}\Gamma{((1-\mu)\phi + n - x)}}{\Gamma{(\phi + n)}},}
 for \eqn{x \in \lbrace 0, 1, \dots, n \rbrace}, where \eqn{0<\mu<1} identifies the mean and \eqn{\phi=(1-\theta)/\theta >0} is the precision parameter.
 }
 \examples{

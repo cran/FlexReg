@@ -2,39 +2,39 @@
 % Please edit documentation in R/densities.R
 \name{dFB}
 \alias{dFB}
-\title{Flexible beta probability density function}
+\title{Probability density function of the flexible beta distribution}
 \usage{
 dFB(x, mu, phi, p, w, q0 = NULL, q1 = NULL)
 }
 \arguments{
 \item{x}{a vector of quantiles.}
 
-\item{mu}{the mean parameter of the flexible beta distribution. It must lie in (0, 1).}
+\item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter of the flexible beta distribution. It must be a positive real value.}
+\item{phi}{the precision parameter. It must be a real positive value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 
-\item{w}{the normalized distance among clusters. It must lie in (0, 1).}
+\item{w}{the normalized distance among component means. It must lie in (0, 1).}
 
-\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 
-\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 }
 \value{
 A vector with the same length as \code{x}.
 }
 \description{
 The function computes the probability density function of the flexible beta distribution.
-It can also  compute the probability density function of the augmented flexible beta distribution by assigning positive probabilities to zero and one and a (continuous) flexible beta density to the interval (0,1).
+It can also  compute the probability density function of the augmented flexible beta distribution by assigning positive probabilities to zero and/or one values and a (continuous) flexible beta density to the interval (0,1).
 }
 \details{
-The FB distribution is a special mixture of two beta distributions with density
-\deqn{f_{FB}(x;\mu,\phi,p,w)=p f_B(x;\lambda_1,\phi)+(1-p)f_B(x;\lambda_1,\phi)}
+The FB distribution is a special mixture of two beta distributions with probability density function
+\deqn{f_{FB}(x;\mu,\phi,p,w)=p f_B(x;\lambda_1,\phi)+(1-p)f_B(x;\lambda_2,\phi),}
  for \eqn{0<x<1}, where \eqn{f_B(x;\cdot,\cdot)} is the beta density with a mean-precision parameterization.
- Moreover, \eqn{0<\mu=p\lambda_1+(1-p)\lambda_2<1} is the overall mean,\eqn{\phi>0} is a precision parameter,
- \eqn{0<p<1} is the mixing weight, and \eqn{0<w<1} is the  normalized distance between component means.
- The latter are \eqn{\lambda_1=\mu+(1-p)\tilde{w}} and \eqn{\lambda_2=\mu-p\tilde{w}}, where \eqn{\tilde{w}=w\min{\mu/p, (1-\mu)/(1-p)}}.
+ Moreover, \eqn{0<\mu=p\lambda_1+(1-p)\lambda_2<1} is the overall mean, \eqn{\phi>0} is a precision parameter,
+ \eqn{0<p<1} is the mixing weight,  \eqn{0<w<1} is the  normalized distance between component means, and
+ \eqn{\lambda_1=\mu+(1-p)w} and \eqn{\lambda_2=\mu-pw} are the means of the first and second component of the mixture, respectively.
 
 The augmented FB distribution has density
 \itemize{

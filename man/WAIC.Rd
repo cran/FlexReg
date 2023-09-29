@@ -10,18 +10,21 @@ WAIC(model, ...)
 \method{print}{WAIC.flexreg}(x, ...)
 }
 \arguments{
-\item{model}{an object (or a list of objects) of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
+\item{model}{an object (or a list of objects) of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.}
 
 \item{...}{additional arguments.}
 
 \item{x}{an object of class \code{`WAIC.flexreg`}, usually the result of \code{\link{WAIC}}.}
 }
+\value{
+A named list with components from \code{\link{loo}} and \code{\link{waic}}.
+}
 \description{
 The function computes widely applicable information criterion (WAIC) and efficient approximate leave-one-out cross-validation (LOO) from fitted  regression model objects of class \code{`flexreg`}.
 }
 \details{
-This function takes advantage of the \code{loo} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for objects of class \code{`flexreg`}.
-If a list of two or more objects of class \code{`flexreg`} is provided, the function returns the difference in their expected predictive accuracy (see \code{loo::loo_compare} for further details).
+This function takes advantage of the \pkg{\link{loo}} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for objects of class \code{`flexreg`}.
+If a list of two or more objects of class \code{`flexreg`} is provided, the function returns the difference in their expected predictive accuracy (see \code{\link{loo_compare}} for further details).
 }
 \examples{
 \dontrun{

@@ -1,14 +1,14 @@
-
-
 #' @title WAIC and LOO
 #'
 #' @description The function computes widely applicable information criterion (WAIC) and efficient approximate leave-one-out cross-validation (LOO) from fitted  regression model objects of class \code{`flexreg`}.
 #'
-#' @param model an object (or a list of objects) of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.
+#' @param model an object (or a list of objects) of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.
 #' @param ... additional arguments.
 #'
-#' @details This function takes advantage of the \code{loo} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for objects of class \code{`flexreg`}.
-#' If a list of two or more objects of class \code{`flexreg`} is provided, the function returns the difference in their expected predictive accuracy (see \code{loo::loo_compare} for further details).
+#' @returns A named list with components from \code{\link{loo}} and \code{\link{waic}}.
+#'
+#' @details This function takes advantage of the \pkg{\link{loo}} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for objects of class \code{`flexreg`}.
+#' If a list of two or more objects of class \code{`flexreg`} is provided, the function returns the difference in their expected predictive accuracy (see \code{\link{loo_compare}} for further details).
 #'
 #' @examples
 #' \dontrun{
@@ -40,15 +40,16 @@ WAIC <- function(model, ...){
     loo_out <- loo(extract_log_lik(x$model))
   } else {
     log_liks <- lapply(x, function(x) extract_log_lik(x$model))
-    loos <- lapply(log_liks, function(x) loo(x))
-    waics <- lapply(log_liks, function(x) waic(x))
+    loos <- lapply(log_liks, function(x) suppressWarnings(loo(x)))
+    waics <- lapply(log_liks, function(x) suppressWarnings(waic(x)))
 
     loo_out <- loo_compare(loos)
     waic_out <- loo_compare(waics)
   }
-  output <- list(loo_out=loo_out, waic_out=waic_out)
+  output <- list(loo_out = loo_out, waic_out = waic_out)
   class(output) <- "WAIC.flexreg"
-  return(output)
+
+  return(suppressWarnings(output))
 }
 
 
@@ -63,8 +64,8 @@ WAIC <- function(model, ...){
 
 print.WAIC.flexreg <- function(x, ...){
   cat("Waic method:\n")
-  print(x$waic_out)
+  print(suppressWarnings(x$waic_out))
 
   cat("\nLoo method:\n")
-  print(x$loo_out)
+  print(suppressWarnings(x$loo_out))
 }

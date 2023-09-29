@@ -15,7 +15,7 @@ rFBB(n, size = NULL, mu, theta = NULL, phi = NULL, p, w)
 
 \item{theta}{the overdispersion parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter. It is an alternative way to specify the \code{theta} parameter. It must be a positive real value.}
+\item{phi}{the precision parameter, an alternative way to specify the overdispersion parameter \code{theta}. It must be a real positive value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 

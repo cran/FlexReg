@@ -21,19 +21,19 @@ convergence.plot(
 \arguments{
 \item{model}{an object of class \code{`flexreg`}.}
 
-\item{file}{a character string giving the name of the file (with extension .pdf).}
+\item{file}{a character string giving the name of the file (including the extension .pdf) containing the convergence plots. If \code{NULL}, the convergence plots are printed in the graphics window.}
 
-\item{plotfun}{an optional character vector of diagnostics plots. The default is to compute \code{all} plots, otherwise one can specify a selection of plots among \code{density}, \code{trace}, \code{intervals}, \code{rate}, \code{rhat}, and \code{acf}.}
+\item{plotfun}{an optional character vector of diagnostics plots. The default is to compute \code{"all"} plots, otherwise one can specify a subset of plots among \code{"density"}, \code{"trace"}, \code{"intervals"}, \code{"rate"}, \code{"rhat"}, and \code{"acf"}.}
 
 \item{pars}{an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.}
 
-\item{point_est}{an optional character to specify the point estimate to be shown between \code{median} (the default), \code{mean}, or \code{none}.}
+\item{point_est}{an optional character to specify the point estimate to be shown between \code{"median"} (the default), \code{"mean"}, or \code{"none"}.}
 
-\item{prob}{the probability mass to be included in the inner interval (\code{intervals} plot) or in the shaded region (for \code{density} plot). The default is 0.5.}
+\item{prob}{the probability mass to be included in the inner interval (for \code{"intervals"} plot) or in the shaded region (for \code{"density"} plot). The default is 0.5.}
 
-\item{prob_outer}{the probability mass to be included in the outer interval  of the \code{intervals} plot. The default is 0.9.}
+\item{prob_outer}{the probability mass to be included in the outer interval  of the \code{"intervals"} plot. The default is 0.9.}
 
-\item{lags}{the number of lags to be shown in the \code{acf} plot. The default is 10.}
+\item{lags}{the number of lags to be shown in the \code{"acf"} plot. The default is 10.}
 
 \item{warmup}{a logical scalar indicating whether to include the warmup draws or not (default).}
 
@@ -43,19 +43,27 @@ convergence.plot(
 A .pdf file with one plot per page.
 }
 \description{
-The function produces a .pdf file containing some convergence plots for the Monte Carlo draws.
+The function produces some convergence plots from the Monte Carlo draws.
 }
 \details{
-The plots can be further customized using the \code{ggplot2} package.
 \itemize{
-\item \code{density} returns a density plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_areas} for further details.
-\item \code{trace} returns a trace plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_trace} for further details.
-\item \code{intervals} returns a plot of uncertainty interval for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_intervals} for further details.
-\item \code{rate} returns a plot for each parameter in \code{pars}  with the number of iterations on the x-axis and the Monte Carlo mean until iteration i-th on the y-axis.
-\item \code{rhat} returns a plot with the Rhat values for each parameter in \code{pars}. See \code{bayesplot::mcmc_rhat} for further details.
-\item \code{acf} returns the autocorrelation plots (one for each parameter in \code{pars}). See \code{bayesplot::mcmc_acf} for further details.
+\item \code{"density"} returns a density plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_areas} for further details.
+\item \code{"trace"} returns a trace plot for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_trace} for further details.
+\item \code{"intervals"} returns a plot of uncertainty interval for each parameter in \code{pars} computed from the posterior draws. See \code{bayesplot::mcmc_intervals} for further details.
+\item \code{"rate"} returns a plot for each parameter in \code{pars}  with the number of iterations on the x-axis and the Monte Carlo mean until iteration i-th on the y-axis.
+\item \code{"rhat"} returns a plot with the Rhat values for each parameter in \code{pars}. See \code{bayesplot::mcmc_rhat} for further details.
+\item \code{"acf"} returns the autocorrelation plots (one for each parameter in \code{pars}). See \code{bayesplot::mcmc_acf} for further details.
 
 }
+Moreover, the convergence plots can be further customized using the \pkg{\link{ggplot2}} package.
+}
+\examples{
+\dontrun{
+data("Reading")
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, type = "FB")
+convergence.plot(FB, file = "Convergence_plot_Output.pdf", pars = "beta")
+}
+
 }
 \references{
 {

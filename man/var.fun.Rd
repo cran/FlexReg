@@ -4,7 +4,19 @@
 \alias{var.fun}
 \title{var.fun}
 \usage{
-var.fun(model, mu.chain, phi.chain, q0.chain, q1.chain)
+var.fun(
+  model.class,
+  model.type,
+  posterior,
+  mu.chain,
+  phi.chain,
+  theta.chain,
+  q0.chain,
+  q1.chain,
+  l1.chain,
+  l2.chain,
+  n
+)
 }
 \description{
 var.fun

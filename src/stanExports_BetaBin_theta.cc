@@ -7,7 +7,7 @@ using namespace Rcpp ;
 RCPP_MODULE(stan_fit4BetaBin_theta_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_BetaBin_theta")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("rstantools_model_BetaBin_theta")
 
     .constructor<SEXP,SEXP,SEXP>()
 

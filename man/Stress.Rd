@@ -4,7 +4,7 @@
 \alias{Stress}
 \title{Stress and anxiety data}
 \format{
-A data frame containing 166 observations on the following 2 variables.
+A  \code{data.frame} containing 166 observations on the following 2 variables:
 \describe{
 \item{\code{stress}}{ defined as rate. }
 \item{\code{anxiety}}{defined as rate.}

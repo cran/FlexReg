@@ -4,7 +4,7 @@
 \alias{summary.flexreg}
 \alias{print.summary.flexreg}
 \alias{coef.flexreg}
-\title{Methods for flexreg Objects}
+\title{Methods for \code{`flexreg`} Objects}
 \usage{
 \method{summary}{flexreg}(object, ..., digits = 4)
 
@@ -13,7 +13,7 @@
 \method{coef}{flexreg}(object, ...)
 }
 \arguments{
-\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
+\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.}
 
 \item{...}{additional arguments. Currently not used.}
 
@@ -25,9 +25,9 @@
 Methods for extracting information from fitted  regression model objects of class \code{`flexreg`}.
 }
 \details{
-The \code{summary.flexreg} method summarizes the results of \code{\link{flexreg}} and \code{\link{flexreg_binom}} functions, adding also information from the functions
-\code{\link{residuals.flexreg}} and \code{\link{WAIC}}. The \code{summary.flexreg} method returns an object of class \code{`summary.flexreg`} containing the relevant summary statistics which can subsequently be
-printed using the associated \code{print} method.
+The \code{\link{summary.flexreg}} method summarizes the results of \code{\link{flexreg}} and \code{\link{flexreg_binom}} functions, adding also information from the functions
+\code{\link{residuals.flexreg}} and \code{\link{WAIC}}. The \code{\link{summary.flexreg}} method returns an object of class \code{`summary.flexreg`} containing the relevant summary statistics which can subsequently be
+printed using the associated \code{\link{print.summary.flexreg}} method.
 }
 \examples{
 data("Reading")

@@ -3,16 +3,16 @@
 #' @description The function  generates random values from the beta distribution with a mean-precision parameterization, or from the augmented beta distribution.
 #'
 #' @param n the number of values to generate. If \code{length(n) > 1}, the length is taken to be the number required.
-#' @param mu the mean parameter of the beta distribution. It must lie in (0, 1).
-#' @param phi the precision parameter of the Beta distribution. It must be a positive real value.
-#' @param q0 the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).
-#' @param q1 the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param phi the precision parameter. It must be a real positive value.
+#' @param q0 the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
+#' @param q1 the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
 #'
 #' @return A vector of length \code{n}.
 #'
 #' @examples
-#' rBeta_mu(n = 100, mu = .5, phi = 30)
-#' rBeta_mu(n = 100, mu = .5, phi = 30, q0 = .2, q1 = .1)
+#' rBeta(n = 100, mu = .5, phi = 30)
+#' rBeta(n = 100, mu = .5, phi = 30, q0 = .2, q1 = .1)
 
 #'
 #' @references{
@@ -24,7 +24,7 @@
 #' @export
 #'
 
-rBeta_mu <- function(n, mu, phi, q0 = NULL, q1 = NULL){
+rBeta <- function(n, mu, phi, q0 = NULL, q1 = NULL){
   q0 <- ifelse(is.null(q0),0,q0)
   q1 <- ifelse(is.null(q1),0,q1)
   if (length(n)>1) n <- length(n)
@@ -52,12 +52,12 @@ rBeta_mu <- function(n, mu, phi, q0 = NULL, q1 = NULL){
 #'
 #' @description The function generates random values from the flexible beta distribution, or from the augmented flexible beta distribution.
 #' @param n the number of values to generate. If \code{length(n) > 1}, the length is taken to be the number required.
-#' @param mu the mean parameter of the flexible beta distribution. It must lie in (0, 1).
-#' @param phi the precision parameter of the flexible beta distribution. It must be a positive real value.
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param phi the precision parameter. It must be a real positive value.
 #' @param p the mixing weight. It must lie in (0, 1).
 #' @param w the normalized distance among clusters. It must lie in (0, 1).
-#' @param q0 the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).
-#' @param q1 the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).
+#' @param q0 the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
+#' @param q1 the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
 #'
 #' @return A vector of length  \code{n}.
 #'
@@ -96,8 +96,8 @@ rFB <- function(n, mu, phi, p, w,q0 = NULL, q1 = NULL){
   x[v.aug==1] <- 0
   x[v.aug==2] <- 1
   v <- rbinom(length(which(v.aug==0)),1,prob=p)
-  x[v.aug==0][v==1] <- rBeta_mu(length(which(v==1)),lambda1,phi)
-  x[v.aug==0][v==0] <- rBeta_mu(length(which(v==0)),lambda2,phi)
+  x[v.aug==0][v==1] <- rBeta(length(which(v==1)),lambda1,phi)
+  x[v.aug==0][v==0] <- rBeta(length(which(v==0)),lambda2,phi)
   return(x)
 }
 
@@ -105,12 +105,12 @@ rFB <- function(n, mu, phi, p, w,q0 = NULL, q1 = NULL){
 #'
 #' @description The function generates random values from the variance-inflated beta distribution, or from the augmented variance-inflated beta distribution.
 #' @param n the number of values to generate. If \code{length(n) > 1}, the length is taken to be the number required.
-#' @param mu the mean parameter of the variance-inflated distribution. It must lie in (0, 1).
-#' @param phi the precision parameter of the variance-inflated distribution. It must be a positive real value.
+#' @param mu the mean parameter. It must lie in (0, 1).
+#' @param phi the precision parameter. It must be a real positive value.
 #' @param p the mixing weight. It must lie in (0, 1).
 #' @param k the extent of the variance inflation. It must lie in (0, 1).
-#' @param q0 the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).
-#' @param q1 the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).
+#' @param q0 the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
+#' @param q1 the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
 #'
 #' @return A vector of length  \code{n}.
 #'
@@ -146,8 +146,8 @@ rVIB <- function(n, mu, phi, p, k, q0 = NULL, q1 = NULL){
   x[v.aug==1] <- 0
   x[v.aug==2] <- 1
   v <- rbinom(length(which(v.aug==0)),1,prob=p)
-  x[v.aug==0][v==1] <- rBeta_mu(length(which(v==1)),mu,phi*k)
-  x[v.aug==0][v==0] <- rBeta_mu(length(which(v==0)),mu,phi)
+  x[v.aug==0][v==1] <- rBeta(length(which(v==1)),mu,phi*k)
+  x[v.aug==0][v==0] <- rBeta(length(which(v==0)),mu,phi)
 
   return(x)
 }
@@ -160,7 +160,7 @@ rVIB <- function(n, mu, phi, p, k, q0 = NULL, q1 = NULL){
 #' @param size the total number of trials.
 #' @param mu the mean parameter. It must lie in (0, 1).
 #' @param theta the overdispersion parameter. It must  lie in (0, 1).
-#' @param phi the precision parameter. It is an alternative way to specify the \code{theta} parameter. It must be a positive real value.
+#' @param phi the precision parameter, an alternative way to specify the overdispersion parameter \code{theta}.  It must be a real positive value.
 #'
 #' @return A vector of length \code{n}.
 #'
@@ -194,7 +194,7 @@ rBetaBin <- function(n, size=NULL, mu=NULL, theta=NULL, phi=NULL){
     phi <- (1-theta)/theta
   }
 
-  probs <- rBeta_mu(n, mu = mu, phi = phi)
+  probs <- rBeta(n, mu = mu, phi = phi)
   return(rbinom(n, size=size, prob = probs))
 }
 
@@ -205,7 +205,7 @@ rBetaBin <- function(n, size=NULL, mu=NULL, theta=NULL, phi=NULL){
 #' @param size the total number of trials.
 #' @param mu the mean parameter. It must lie in (0, 1).
 #' @param theta the overdispersion parameter. It must lie in (0, 1).
-#' @param phi the precision parameter. It is an alternative way to specify the \code{theta} parameter. It must be a positive real value.
+#' @param phi the precision parameter, an alternative way to specify the overdispersion parameter \code{theta}. It must be a real positive value.
 #' @param p the mixing weight. It must lie in (0, 1).
 #' @param w the normalized distance among clusters. It must lie in (0, 1).
 #'

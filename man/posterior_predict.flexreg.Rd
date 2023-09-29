@@ -2,14 +2,17 @@
 % Please edit documentation in R/posterior_predictive.R
 \name{posterior_predict.flexreg}
 \alias{posterior_predict.flexreg}
-\title{Posterior Predictive}
+\title{Posterior Predictive Method for \code{`flexreg`} objects}
 \usage{
-\method{posterior_predict}{flexreg}(model, newdata = NULL)
+\method{posterior_predict}{flexreg}(model, newdata = NULL, n.new = NULL)
 }
 \arguments{
-\item{model}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
+\item{model}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.}
 
-\item{newdata}{an optional data frame containing variables with which to predict. If omitted, the fitted values are used.}
+\item{newdata}{an optional  \code{data.frame} containing variables with which to predict. If omitted, the fitted values are used.}
+
+\item{n.new}{an optional vector containing the total number of trials with which to predict. It must be specified if \code{newdata} is not \code{NULL} and the
+\code{\link{flexreg}} object is the result of the \code{\link{flexreg_binom}} function (i.e., the fitted model is binomial, beta-binomial, or flexible beta-binomial). The vector must have the same length as \code{nrow(newdata)}.}
 }
 \value{
 An object of class \code{`flexreg_postpred`} containing a matrix with the simulated posterior predictions. Each column refers to a statistical unit to predict.
@@ -19,8 +22,8 @@ The function takes an object of class \code{`flexreg`} and generates values from
 }
 \details{
 The function generates values from the posterior predictive distribution, which is the distribution of a  future outcome given the observed data.
-The posterior predictive distribution is computed for \eqn{y} in case of bounded responses and
-for \code{y/n} in case of binomial responses.
+The posterior predictive distribution is computed for \eqn{y} in case of bounded continuous  responses and
+for \eqn{y/n} in case of bounded discrete responses.
 }
 \examples{
 \dontrun{

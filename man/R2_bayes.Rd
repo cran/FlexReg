@@ -2,15 +2,19 @@
 % Please edit documentation in R/R2_Bayes.R
 \name{R2_bayes}
 \alias{R2_bayes}
-\title{Bayesian R-squared for flexreg Objects}
+\title{Bayesian R-squared for \code{flexreg} Objects}
 \usage{
 R2_bayes(model)
 }
 \arguments{
-\item{model}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
+\item{model}{an object (or a list of objects) of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.}
+}
+\value{
+A list with the same length as the number of objects of class \code{`flexreg`} passed in the \code{model} argument.
+Each element of the list contains a vector of  Bayesian R-squared values with the same length as the Markov Chain(s) after warmup.
 }
 \description{
-Bayesian version of R-squared for flexible regression models for continuous bounded or binomial responses
+Bayesian version of R-squared for flexible regression models for bounded continuous and discrete responses.
 }
 \details{
 The function provides a Bayesian version of the R-squared measure, defined as the variance of the predicted values divided by itself plus the expected variance of the errors.
@@ -18,7 +22,7 @@ The function provides a Bayesian version of the R-squared measure, defined as th
 \examples{
 data("Reading")
 FB <- flexreg(accuracy.adj ~ iq, data = Reading, type = "FB", n.iter=1000)
-hist(R2_bayes(FB))
+hist(R2_bayes(FB)[[1]])
 
 }
 \references{

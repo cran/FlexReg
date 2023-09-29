@@ -4,7 +4,7 @@
 \alias{theta.chain.nd}
 \title{theta.chain.nd}
 \usage{
-theta.chain.nd(posterior, newdata, link.theta)
+theta.chain.nd(posterior, newdata.theta, link.theta)
 }
 \description{
 theta.chain.nd

@@ -2,35 +2,35 @@
 % Please edit documentation in R/densities.R
 \name{dVIB}
 \alias{dVIB}
-\title{Variance-inflated beta probability density function}
+\title{Probability density function of the variance-inflated beta distribution}
 \usage{
 dVIB(x, mu, phi, p, k, q0 = NULL, q1 = NULL)
 }
 \arguments{
 \item{x}{a vector of quantiles.}
 
-\item{mu}{the mean parameter of the variance-inflated beta distribution. It must lie in (0, 1).}
+\item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter of the variance-Inflated distribution. It must be a positive real value.}
+\item{phi}{the precision parameter. It must be a real positive value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 
 \item{k}{the extent of the variance inflation. It must lie in (0, 1).}
 
-\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 
-\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 }
 \value{
 A vector with the same length as \code{x}.
 }
 \description{
 The function computes the probability density function of the variance-inflated beta distribution.
-It can also  compute the probability density function of the augmented variance-inflated beta distribution by assigning positive probabilities to zero and one and a (continuous) variance-inflated beta density to the interval (0,1).
+It can also  compute the probability density function of the augmented variance-inflated beta distribution by assigning positive probabilities to zero and/or one values and a (continuous) variance-inflated beta density to the interval (0,1).
 }
 \details{
-The VIB distribution is a special mixture of two beta distributions with density
-\deqn{f_{VIB}(x;\mu,\phi,p,k)=p f_B(x;\mu,\phi k)+(1-p)f_B(x;\mu,\phi)}
+The VIB distribution is a special mixture of two beta distributions with probability density function
+\deqn{f_{VIB}(x;\mu,\phi,p,k)=p f_B(x;\mu,\phi k)+(1-p)f_B(x;\mu,\phi),}
  for \eqn{0<x<1}, where \eqn{f_B(x;\cdot,\cdot)} is the beta density with a mean-precision parameterization.
  Moreover, \eqn{0<p<1} is the mixing weight, \eqn{0<\mu<1} represents the overall (as well as mixture component)
  mean, \eqn{\phi>0} is a precision parameter, and \eqn{0<k<1} determines the extent of the variance inflation.

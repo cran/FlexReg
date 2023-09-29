@@ -2,12 +2,12 @@
 #'
 #' @description Data for assessing the contribution of non-verbal IQ to children's reading skills in dyslexic and non-dyslexic children.
 #'
-#' @format A data frame containing 44 observations on 4 variables.
+#' @format A  \code{data.frame} containing 44 observations on 4 variables.
 #' \describe{
 #' \item{\code{accuracy}}{a reading score.}
 #' \item{\code{accuracy.adj}}{the adjusted reading score: the observed 1's (perfect reading scores) are substituted with 0.99.}
 #' \item{\code{dyslexia}}{a factor indicating wheter the child is dyslexic.}
-#' \item{\code{iq}}{a quantitative measure of the children's non verbal abilities.}
+#' \item{\code{iq}}{a standardized quantitative measure of the children's non verbal abilities.}
 #' }
 #'
 #' @details The data were originally analyzed by Pammer and Kevan (2004) and successively used by Smithson and Verkuilen (2006) and by Migliorati et al. (2018).
@@ -30,13 +30,13 @@ NULL
 
 #' @title Italian Households Consumption data
 #'
-#' @description This dataset is a subset from the 2016 Survey on Household Income and Wealth data, a statistical survey conducted by Bank of Italy. The statistical units are the households and the head of the household is conventionally selected as the major income earner.
+#' @description This dataset is a subset from the 2016 Survey on Household Income and Wealth data, a statistical survey conducted by the Bank of Italy. The statistical units are the households and the head of the household is conventionally selected as the major income earner.
 #'
-#' @format A data frame containing 568 observations on the following 8 variables.
+#' @format A  \code{data.frame} containing 568 observations on the following 8 variables:
 #' \describe{
 #' \item{\code{NComp}}{the number of household members.}
-#' \item{\code{Sex}}{the sex of the head of household.}
-#' \item{\code{Age}}{the age of the head of household.}
+#' \item{\code{Sex}}{the sex of the head of the household.}
+#' \item{\code{Age}}{the age of the head of the household.}
 #' \item{\code{NEarners}}{the number of household income earners.}
 #' \item{\code{Area}}{a factor indicating the geographical area where the household is located.}
 #' \item{\code{Citizenship}}{a factor indicating the citizenship of the head of household.}
@@ -44,7 +44,7 @@ NULL
 #' \item{\code{Consumption}}{the propensity to consume, defined as the percentage of \code{Income} that is spent rather than saved.}
 #' }
 #'
-#' @details Full data are available on the website of the Bank of Italy. \code{Consumption} has been created by dividing the variable `consumption' over the `net disposable income'.
+#' @details Full data are available on the website of the Bank of Italy. \code{Consumption} is computed as the ratio between the amount of `consumption' over the `net disposable income'.
 #'
 #' @source{  \href{https://www.bancaditalia.it/statistiche/tematiche/indagini-famiglie-imprese/bilanci-famiglie/distribuzione-microdati/index.html?com.dotmarketing.htmlpage.language=1}{Bank of Italy, Survey on Household Income and Wealth, 2016}. \cr
 #' \cr
@@ -57,9 +57,9 @@ NULL
 
 #' @title Italian Election Results
 #'
-#' @description Results of the Italian general election held on 4 March 2018 for six parties.
+#' @description Data from the Italian general election held on 4 March 2018.
 #'
-#' @format A data frame containing 232 observations on the following 13 variables.
+#' @format A  \code{data.frame} containing 232 observations on the following 13 variables:
 #' \describe{
 #' \item{\code{NVotes}}{the number of valid votes.}
 #' \item{\code{FI}}{the percentage of votes got by `Forza Italia' party.}
@@ -69,14 +69,15 @@ NULL
 #' \item{\code{M5S}}{the percentage of votes got by `Movimento 5 Stelle' party.}
 #' \item{\code{PD}}{the percentage of votes got by `Partito Democratico' party.}
 #' \item{\code{Other}}{the percentage of votes got by other parties, including blank ballots.}
-#' \item{\code{AgeInd}}{the age index, defined as the ratio of the number of elderly persons (aged 65 and over) to the number of young persons (from 0 to 14), multiplied by 100.}
+#' \item{\code{AgeInd}}{the age index, defined as the ratio of the number of elderly persons (aged 65 and over) to the number of young persons (from 0 to 14), divided by 10.}
 #' \item{\code{PopDens}}{the number of inhabitants per square km.}
 #' \item{\code{ER}}{the employment rate, defined as the ratio of the number of employed persons (aged 15-64) to the number of persons (aged 15-64).}
 #' \item{\code{Illiteracy}}{the illiteracy rate, defined as the ratio of the number of persons without a qualification (aged 15 and over) to the total number of persons aged 15 and over.}
 #' \item{\code{Foreign}}{the number of foreigners per 1000 inhabitants.}
 #' }
 #'
-#' @details Data are collected on the 232 electoral districts into which the Italian territory is organized. Distribution of votes for Aosta constituency is not available. Distributions of votes are available on the Italian Ministry of Interior’s webpage whereas constituencies information have been obtained from 2011 Italian Census.
+#' @details Data are collected on the 232 electoral districts into which the Italian territory is organized. Distribution of votes for Aosta constituency is not available. Distributions of votes are available on the Italian Ministry of Interior’s webpage, whereas constituencies information have been obtained from 2011 Italian Census.
+#' The count of votes got by each party can be derived by multiplying the percentage of votes and the number of valid votes.
 #'
 #' @source Italian Ministry of Interior’s webpage: https://www.interno.gov.it/it/speciali/2018-elections.
 #'
@@ -90,7 +91,7 @@ NULL
 #'
 #' @description Data for assessing the dependency between stress and anxiety in  nonclinical women in Townsville, Queensland, Australia.
 #'
-#' @format A data frame containing 166 observations on the following 2 variables.
+#' @format A  \code{data.frame} containing 166 observations on the following 2 variables:
 #' \describe{
 #' \item{\code{stress}}{ defined as rate. }
 #' \item{\code{anxiety}}{defined as rate.}
@@ -115,12 +116,13 @@ NULL
 
 #' @title Atomic bombs data
 #'
-#' @description Counts of chromosome aberrations in atomic bombs survivors.
+#' @description Count/Percentage of chromosome aberrations in atomic bombs survivors.
 #'
-#' @format A data frame containing 1039 observations on the following 4 variables.
+#' @format A  \code{data.frame} containing 1039 observations on the following 5 variables:
 #' \describe{
+#' \item{\code{y.perc}}{the percentage of cells with chromosomal abnormalities.}
 #' \item{\code{y}}{the number of cells with chromosomal abnormalities.}
-#' \item{\code{n}}{the number of analyzed cells.  It is fixed to 100 for all the observations.}
+#' \item{\code{n}}{the number of analyzed cells.  It is fixed to 100 for all the survivors.}
 #' \item{\code{dose}}{a quantitative measure of the radiation exposure level, expressed in rads.}
 #' \item{\code{bomb}}{a factor, indicating which bomb the subject survived (H = Hiroshima, N = Nagasaki).}
 #' }
@@ -140,11 +142,12 @@ NULL
 
 #' @title Bacteria data
 #'
-#' @description Counts of eggs parasitized by female parasitoids.
+#' @description Count/Percentage of eggs parasitized by female parasitoids.
 #'
-#' @format A data frame containing 70 observations on the following 4 variables.
+#' @format A  \code{data.frame} containing 70 observations on the following 5 variables:
 #' \describe{
-#' \item{\code{y}}{the total number of parasitized eggs.}
+#' \item{\code{y.perc}}{the percentage of parasitized eggs.}
+#' \item{\code{y}}{the number of parasitized eggs.}
 #' \item{\code{n}}{the maximum number of eggs that female parasitoids could parasitized. It is fixed to 128 for all the observations.}
 #' \item{\code{females}}{the number of female parasitoids.}
 #' \item{\code{females_std}}{the standardized version of \code{females}.}

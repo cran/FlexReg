@@ -2,13 +2,13 @@
 % Please edit documentation in R/flexreg_binom.R
 \name{flexreg_binom}
 \alias{flexreg_binom}
-\title{Flexible Regression Models for Binomial data}
+\title{Flexible Regression Models for Bounded Discrete Responses}
 \usage{
 flexreg_binom(
   formula,
   data,
   type = "FBB",
-  n = NULL,
+  n,
   link.mu = "logit",
   prior.beta = "normal",
   hyperparam.beta = 100,
@@ -17,28 +17,28 @@ flexreg_binom(
   link.theta = NULL,
   prior.psi = NULL,
   hyperparam.psi = NULL,
-  n.iter = 5000,
-  burnin.perc = 0.5,
   n.chain = 1,
+  n.iter = 5000,
+  warmup.perc = 0.5,
   thin = 1,
   verbose = TRUE,
   ...
 )
 }
 \arguments{
-\item{formula}{an object of class \code{`formula`}: a symbolic description of the model to be fitted (\code{y ~ x} or \code{y ~ x | z}).}
+\item{formula}{an object of class "\code{\link{formula}}": a symbolic description of the model to be fitted (\code{y ~ x} or \code{y ~ x | z}, see Details).}
 
-\item{data}{an optional data frame, list, or object that is coercible to a data frame through \code{base::as.data.frame} containing the variables in the model. If not found in data, the variables in formula are taken from the environment from which the function flexreg is called.}
+\item{data}{an optional  \code{data.frame}, list, or object that is coercible to a  \code{data.frame} through \code{\link{as.data.frame}} containing the variables in the model. If not found in \code{data}, the variables in \code{formula} are taken from the environment from which the function \code{\link{flexreg_binom}} is called.}
 
 \item{type}{a character specifying the type of regression model. Current options are  \code{"FBB"} (flexible beta-binomial, default), \code{"BetaBin"} (beta-binomial), and  \code{"Bin"} (binomial).}
 
-\item{n}{the total number of trials.}
+\item{n}{a character specifying the name of the variable containing the total number of trials.}
 
 \item{link.mu}{a character specifying the link function for the mean model. Currently, \code{"logit"} (default), \code{"probit"}, \code{"cloglog"}, and \code{"loglog"} are supported.}
 
 \item{prior.beta}{a character specifying the prior distribution for the  regression coefficients of the mean model, \code{beta}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.beta}{a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{beta} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
+\item{hyperparam.beta}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{beta} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
 \item{hyper.theta.a}{a numeric (vector of length 1) specifying the first shape parameter for the beta prior distribution of \code{theta}.}
 
@@ -48,22 +48,22 @@ flexreg_binom(
 
 \item{prior.psi}{a character specifying the prior distribution for the regression coefficients of the overdispersion model,\code{psi}. Not supported if \code{link.theta="identity"}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.psi}{a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{psi} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
-
-\item{n.iter}{a positive integer specifying the number of iterations for each chain (including warmup). The default is 5000.}
-
-\item{burnin.perc}{the percentage of iterations per chain to discard.}
+\item{hyperparam.psi}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{psi} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
 \item{n.chain}{a positive integer specifying the number of Markov chains. The default is 1.}
 
+\item{n.iter}{a positive integer specifying the number of iterations for each chain (including warm-up). The default is 5000.}
+
+\item{warmup.perc}{the percentage of iterations per chain to discard.}
+
 \item{thin}{a positive integer specifying the period for saving samples. The default is 1.}
 
-\item{verbose}{\code{TRUE} (default) or \code{FALSE}: flag indicating whether to print intermediate output.}
+\item{verbose}{a logical (with default \code{TRUE}) indicating whether to print intermediate output.}
 
-\item{...}{additional arguments for \code{rstan::sampling}.}
+\item{...}{additional arguments from \code{\link{sampling}}.}
 }
 \value{
-The \code{flexreg_binom} function returns an object of class \code{`flexreg`}, i.e. a list with the following elements:
+The \code{\link{flexreg_binom}} function returns an object of class \code{`flexreg`}, i.e. a list with the following elements:
 \item{\code{call}}{the function call.}
 \item{\code{type}}{the type of regression model.}
 \item{\code{formula}}{the original formula.}
@@ -75,30 +75,30 @@ The \code{flexreg_binom} function returns an object of class \code{`flexreg`}, i
 \item{\code{design.Z}}{the design matrix for the overdispersion model (if defined).}
 }
 \description{
-The function fits some flexible regression models for binomial responses via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
-Available regression models are the flexible beta-binomial (\code{type="FBB"}), the beta-binomial (\code{type="BetaBin"}), and the binomial one (\code{type="Bin"}).
+The function fits some flexible regression models for bounded discrete responses via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
+Available regression models are the flexible beta-binomial (\code{type = "FBB"}, default), the beta-binomial (\code{type = "BetaBin"}), and the binomial one (\code{type = "Bin"}).
 }
 \details{
 Let Y be a random variable whose distribution can be specified in the \code{type} argument and \eqn{\mu} be the mean of Y/n.
-The \code{flexreg_binom} function links the parameter \eqn{\mu} to a linear predictor through a function  \eqn{g(\cdot)} specified in \code{link.mu}:
-\deqn{g(\mu_i) = x_i^t \bold{\beta},} where \eqn{\bold{\beta}} is the vector of regression coefficients for the mean model.
+The \code{\link{flexreg_binom}} function links the parameter \eqn{\mu} to a linear predictor through a function  \eqn{g_1(\cdot)} specified in \code{link.mu}:
+\deqn{g_1(\mu) = x^t \bold{\beta},} where \eqn{\bold{\beta}} is the vector of regression coefficients for the mean model.
 The prior distribution and the related hyperparameter of \eqn{\bold{\beta}} can be specified in \code{prior.beta} and \code{hyperparam.beta}.
 By default, \code{link.theta="identity"}, meaning that the overdispersion parameter \eqn{\theta} is assumed to be constant.
-In that case, the prior distribution for \eqn{\theta} is a beta with hyperparameters \eqn{a} and \eqn{b} that can be specified in \code{hyper.theta.a} and \code{hyper.theta.b}.
+In that case, the prior distribution for \eqn{\theta} is a beta with shape hyperparameters \eqn{a} and \eqn{b} that can be specified in \code{hyper.theta.a} and \code{hyper.theta.b}.
 If not specified, \eqn{a=b=1}, otherwise if only one hyperparameter is specified, the other  is set equal.
 It is possible to extend the model by linking \eqn{\theta} to an additional (possibly overlapping) set of covariates through a proper link
-function \eqn{q(\cdot)}  specified in the \code{link.theta} argument: \deqn{q(\theta_i) = z_i^t \bold{\psi},} where \eqn{\bold{\psi}} is the vector of regression coefficients for the overdispersion model.
+function \eqn{g_2(\cdot)}  specified in the \code{link.theta} argument: \deqn{g_2(\theta) = z^t \bold{\psi},} where \eqn{\bold{\psi}} is the vector of regression coefficients for the overdispersion model.
 The prior distribution and the related hyperparameter of \eqn{\bold{\psi}} can be specified in \code{prior.psi} and \code{hyperparam.psi}.
-In \code{flexreg_binom}, the regression model for the mean and, where appropriate, for the overdispersion parameter can be specified in the
+In \code{\link{flexreg_binom}}, the regression model for the mean and, where appropriate, for the overdispersion parameter can be specified in the
 \code{formula} argument with a formula of type \code{y ~ x1 + x2 | z1 + z2} where covariates on the left of "|" are included in the regression model
-for the mean and covariates on the right of "|" are included in the regression model for the overdispersion.
+for the mean, whereas covariates on the right of "|" are included in the regression model for the overdispersion.
 
 If the second part is omitted, i.e., \code{y ~ x1 + x2}, the overdispersion is assumed constant for each observation.
 }
 \examples{
 \dontrun{
 data(Bacteria)
-fbb <- flexreg_binom(y~females, n=n, data=Bacteria, type="FBB")
+fbb <- flexreg_binom(y ~ females,  n = "n", data = Bacteria, type = "FBB")
 }
 }
 \references{

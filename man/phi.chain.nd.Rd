@@ -4,7 +4,7 @@
 \alias{phi.chain.nd}
 \title{phi.chain.nd}
 \usage{
-phi.chain.nd(posterior, newdata, link.phi)
+phi.chain.nd(posterior, newdata.Z, link.phi)
 }
 \description{
 phi.chain.nd

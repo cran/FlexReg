@@ -4,7 +4,7 @@
 \alias{q0.chain.nd}
 \title{q0.chain.nd}
 \usage{
-q0.chain.nd(posterior, newdata)
+q0.chain.nd(posterior, newdata.X0)
 }
 \description{
 q0.chain.nd

@@ -21,29 +21,29 @@ curve.density(
 \arguments{
 \item{type}{a character specifying the distribution type to be plotted (\code{"Beta"}, \code{"FB"}, \code{"VIB"}, \code{"Bin"}, \code{"BetaBin"}, or \code{"FBB"}).}
 
-\item{size}{the total number of trials (to be specified if \code{type} is \code{"Bin"}, \code{"BetaBin"}, or \code{"FBB"}).}
+\item{size}{the total number of trials (to be specified only if \code{type} is \code{"Bin"}, \code{"BetaBin"}, or \code{"FBB"}).}
 
 \item{mu}{the mean parameter of the distribution. It must lie in (0, 1).}
 
-\item{theta}{the overdispersion parameter (to be specified if \code{type} is \code{"BetaBin"} or \code{"FBB"}). It must  lie in (0, 1).}
+\item{theta}{the overdispersion parameter (to be specified only if \code{type} is \code{"BetaBin"} or \code{"FBB"}). It must  lie in (0, 1).}
 
-\item{phi}{the precision parameter (an alternative way to specify the \code{theta} parameter if \code{type} is \code{"BetaBin"} or \code{"FBB"}). It must be a positive real value.}
+\item{phi}{the precision parameter (if \code{type} is \code{"BetaBin"} or \code{"FBB"}, it represents an alternative way to specify the \code{theta} parameter). It must be a real positive value.}
 
-\item{p}{the mixing weight (to be specified if \code{type} is \code{"FB"} or \code{"VIB"}). It must lie in (0, 1).}
+\item{p}{the mixing weight (to be specified only if \code{type} is \code{"FB"}, \code{"VIB"}, or \code{"FBB"}). It must lie in (0, 1).}
 
-\item{w}{the normalized distance among clusters of the FB distribution (to be specified if \code{type = "FB"}). It must lie in (0, 1).}
+\item{w}{the normalized distance among component means of the FB and FBB distributions (to be specified only if \code{type = "FB"}, or \code{type = "FBB"}). It must lie in (0, 1).}
 
-\item{k}{the extent of the variance inflation (to be specified if \code{type = "VIB"}). It must lie in (0, 1).}
+\item{k}{the extent of the variance inflation (to be specified only if \code{type = "VIB"}). It must lie in (0, 1).}
 
-\item{q0}{the probability of augmentation in zero (it can be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q0}{the probability of augmentation in zero (to be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 
-\item{q1}{the probability of augmentation in one (it can be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q1}{the probability of augmentation in one (to be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 
-\item{...}{additional arguments of \code{stat_function()}.}
+\item{...}{additional arguments of \code{\link{stat_function}}.}
 }
 \description{
 The function draws a curve corresponding to the probability density/mass function of the specified distribution (beta, flexible beta, variance-inflated beta, binomial, beta-binomial, or flexible beta-binomial).
-For beta, flexible beta, and variance-inflated beta, it also allows to plot the probability of augmentation in zero/one.
+For beta, flexible beta, and variance-inflated beta, it also allows to include the representation of the probability of augmentation in zero and/or one values.
 }
 \examples{
 curve.density("Beta", mu=.5, phi=20)

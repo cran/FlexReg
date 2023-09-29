@@ -4,9 +4,10 @@
 \alias{Bacteria}
 \title{Bacteria data}
 \format{
-A data frame containing 70 observations on the following 4 variables.
+A  \code{data.frame} containing 70 observations on the following 5 variables:
 \describe{
-\item{\code{y}}{the total number of parasitized eggs.}
+\item{\code{y.perc}}{the percentage of parasitized eggs.}
+\item{\code{y}}{the number of parasitized eggs.}
 \item{\code{n}}{the maximum number of eggs that female parasitoids could parasitized. It is fixed to 128 for all the observations.}
 \item{\code{females}}{the number of female parasitoids.}
 \item{\code{females_std}}{the standardized version of \code{females}.}
@@ -16,7 +17,7 @@ A data frame containing 70 observations on the following 4 variables.
 Demétrio et al., (2014). Models for overdispersed data in entomology.
 }
 \description{
-Counts of eggs parasitized by female parasitoids.
+Count/Percentage of eggs parasitized by female parasitoids.
 }
 \details{
 The data have been originally analyzed by Demétrio et al (2014) and successively by Ascari and Migliorati (2021).

@@ -2,11 +2,11 @@
 % Please edit documentation in R/Internal_functions.R
 \name{q01.chain.nd}
 \alias{q01.chain.nd}
-\title{q1.chain.nd}
+\title{q01.chain.nd}
 \usage{
-q01.chain.nd(posterior, newdata.q0, newdata.q1)
+q01.chain.nd(posterior, newdata.X0, newdata.X1)
 }
 \description{
-q1.chain.nd
+q01.chain.nd
 }
 \keyword{internal}

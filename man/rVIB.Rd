@@ -9,17 +9,17 @@ rVIB(n, mu, phi, p, k, q0 = NULL, q1 = NULL)
 \arguments{
 \item{n}{the number of values to generate. If \code{length(n) > 1}, the length is taken to be the number required.}
 
-\item{mu}{the mean parameter of the variance-inflated distribution. It must lie in (0, 1).}
+\item{mu}{the mean parameter. It must lie in (0, 1).}
 
-\item{phi}{the precision parameter of the variance-inflated distribution. It must be a positive real value.}
+\item{phi}{the precision parameter. It must be a real positive value.}
 
 \item{p}{the mixing weight. It must lie in (0, 1).}
 
 \item{k}{the extent of the variance inflation. It must lie in (0, 1).}
 
-\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q0}{the probability of augmentation in zero. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 
-\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation is \code{NULL} (default).}
+\item{q1}{the probability of augmentation in one. It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 }
 \value{
 A vector of length  \code{n}.

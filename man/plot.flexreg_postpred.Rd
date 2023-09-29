@@ -2,7 +2,7 @@
 % Please edit documentation in R/posterior_predictive.R
 \name{plot.flexreg_postpred}
 \alias{plot.flexreg_postpred}
-\title{Posterior Predictives Plot}
+\title{Plot Method for \code{`flexreg_postpred`} objects}
 \usage{
 \method{plot}{flexreg_postpred}(x, prob = 0.9, p_mean = F, response = NULL, ...)
 }
@@ -13,13 +13,13 @@
 
 \item{p_mean}{a logical value indicating whether the posterior predictives' mean should be plotted.}
 
-\item{response}{a numerical vector containing the response (either \eqn{y} or \eqn{y/n} for bounded or binomial responses, respectively) to be added to the plot. If \code{NULL}, observed values are not plotted.}
+\item{response}{a numerical vector containing the response (either \eqn{y} or \eqn{y/n} for bounded continuous or discrete responses, respectively) to be added to the plot. If \code{NULL}, observed values are not plotted.}
 
 \item{...}{additional arguments. Currently not used.}
 }
 \description{
-Method for plotting the simulated posterior predictive distribution from an object of class \code{`flexreg_postpred`}. The plot shows the posterior predictive interval for each statistical unit.
-Additionally, the mean of the posterior predictives and the values of the observed response (either \eqn{y} or \eqn{y/n} for bounded or binomial responses, respectively) can be added.
+Method for an object of class \code{`flexreg_postpred`} containing the simulated posterior predictive distribution, usually the result of \code{\link{posterior_predict}} function. The plot shows the posterior predictive interval for each statistical unit.
+Additionally, the mean of the posterior predictives and the values of the observed response (either \eqn{y} or \eqn{y/n} for bounded continuous  or discrete responses, respectively) can be added.
 }
 \examples{
 \dontrun{

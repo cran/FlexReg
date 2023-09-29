@@ -7,7 +7,7 @@ using namespace Rcpp ;
 RCPP_MODULE(stan_fit4VIB01_phi_mod) {
 
 
-    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("model_VIB01_phi")
+    class_<rstan::stan_fit<stan_model, boost::random::ecuyer1988> >("rstantools_model_VIB01_phi")
 
     .constructor<SEXP,SEXP,SEXP>()
 

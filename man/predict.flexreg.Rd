@@ -2,12 +2,13 @@
 % Please edit documentation in R/predicted_residuals.R
 \name{predict.flexreg}
 \alias{predict.flexreg}
-\title{Prediction Method for flexreg Objects}
+\title{Predict Method for \code{`flexreg`} Objects}
 \usage{
 \method{predict}{flexreg}(
   object,
   newdata = NULL,
-  cluster = F,
+  n.new = NULL,
+  cluster = FALSE,
   type = "response",
   estimate = "mean",
   q = NULL,
@@ -15,32 +16,43 @@
 )
 }
 \arguments{
-\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}}.}
+\item{object}{an object of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.}
 
-\item{newdata}{an optional data frame containing variables with which to predict. If omitted, the fitted values are used.}
+\item{newdata}{an optional  \code{data.frame} containing variables with which to predict. If omitted, the fitted values are used.}
 
-\item{cluster}{logical. If the model is \code{"FB"} without augmentation or \code{"FBB"}, \code{cluster = T} returns the cluster means. By default, \code{cluster = F}.}
+\item{n.new}{an optional vector containing the total number of trials with which to predict. It must be specified if \code{newdata} is not \code{NULL} and the
+\code{\link{flexreg}} object is the result of the \code{\link{flexreg_binom}} function (i.e., the fitted model is binomial, beta-binomial, or flexible beta-binomial). The vector must have the same length as \code{nrow(newdata)}.}
 
-\item{type}{a character indicating the type of predictions. Available options are: \code{"response"}, that returns the marginal fitted means of response/relative response;
-\code{"link"}, the linear predictor of the mean model;
-\code{"precision"}, the fitted precision parameter \eqn{phi};
-\code{"overdispersion"}, the fitted overdispersion parameter \eqn{theta};
- \code{"variance"}, the fitted variance of the response.}
+\item{cluster}{a logical (with default \code{FALSE}).  The option \code{cluster = TRUE} is available only for \code{"FB"} and \code{"FBB"} models and allows to compute some component-specific predictions (see Details).}
 
-\item{estimate}{the type of estimate: \code{"mean"} (default), \code{"median"} or \code{"quantile"}.}
+\item{type}{a character indicating the type of prediction. Available options are: \code{"response"}, returning the marginal fitted mean of the response/relative response;
+\code{"link"}, returning the linear predictor of the mean model;
+\code{"precision"}, returning the fitted precision parameter;
+\code{"overdispersion"}, returning the fitted overdispersion parameter;
+\code{"variance"}, returning the fitted variance of the response.}
 
-\item{q}{if \code{estimate = "quantile"}, numeric value of probability in (0, 1).}
+\item{estimate}{a character indicating the type of estimate. Available options are \code{"mean"} (default), \code{"median"}, and \code{"quantile"}.}
+
+\item{q}{if \code{estimate = "quantile"}, a numeric value of probability in (0, 1).}
 
 \item{...}{additional arguments. Currently not used.}
 }
+\value{
+The function returns a \code{data.frame} of different dimensions depending on the type of prediction.
+}
 \description{
-Method that computes various types of prediction from objects of class \code{`flexreg`}. If the model type is \code{"FB"} without augmentation or \code{"FBB"} and \code{cluster = T}, the function returns also cluster means.
+Method that computes various types of predictions from objects of class \code{`flexreg`}.
 }
 \details{
-If \code{type="response"} the function returns the marginal mean that is \eqn{\mu} in case of no augmentation and
-\eqn{q_1+(1-q_0-q_1)\mu} in case of augmentation. If \code{type="variance"} the function returns \eqn{Var(Y|0<Y<1)} in case of no augmentation and
-\eqn{(1-q_0-q_1)Var(Y|0<Y<1)+q_1^2+(1-q_0-q_1)\mu^2-(q_1+(1-q_0-q_1)\mu)^2} in case of augmentation. See Di Brisco and Migliorati (2020) for details.
-The option \code{type = "overdispersion"}  is available only for beta-binomial and flexible beta-binomial models.
+The \code{\link{predict}} method computes various types of predictions from objects of class \code{`flexreg`}.
+If \code{type = "response"}, the function returns the marginal mean, i.e., \eqn{\mu}.
+In case of models for continuous bounded responses with augmentation, the function returns also the overall mean
+\eqn{q_1+(1-q_0-q_1)\mu} and the probabilities of augmentation \eqn{q_0} and/or \eqn{q_1}.
+If \code{type = "variance"}, the function returns \eqn{Var(Y|0<Y<1)} in case of no augmentation and
+\eqn{(1-q_0-q_1)Var(Y|0<Y<1)+q_1^2+(1-q_0-q_1)\mu^2-(q_1+(1-q_0-q_1)\mu)^2} in case of augmentation.
+If \code{cluster = TRUE}, for FB and FBB models, the function returns the cluster means (\eqn{\lambda_1} and \eqn{\lambda_2}) when \code{type = "response"} and the cluster variances when \code{type = "variance"}.
+
+The option \code{type = "overdispersion"}  is available only for beta-binomial and flexible beta-binomial models and returns the fitted overdispersion.
 }
 \examples{
 \dontrun{

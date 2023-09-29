@@ -14,29 +14,38 @@ convergence.diag(
 \arguments{
 \item{model}{an object of class \code{`flexreg`}.}
 
-\item{diagnostics}{an optional character vector of diagnostics names. The default is to compute \code{all} diagnostics, otherwise one can specify a selection of diagnostics among \code{Rhat}, \code{geweke}, \code{gaftery}, \code{heidel}, and \code{gelman}.}
+\item{diagnostics}{an optional character vector of diagnostics names. The default is to compute \code{"all"} diagnostics, otherwise one can specify a selection of diagnostics among \code{"Rhat"}, \code{"geweke"}, \code{"raftery"}, \code{"heidel"}, and \code{"gelman"}.}
 
 \item{pars}{an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.}
 
 \item{additional.args}{a list containing additional arguments (see details)}
 }
 \value{
-A print from \code{check_hmc_diagnostics} function and a list of convergence diagnostics.
+A print from \code{\link{check_hmc_diagnostics}} function and a list of convergence diagnostics.
 }
 \description{
-The function returns some diagnostics to check for convergence to the equilibrium distribution of the Markov Chain(s).
+The function returns some diagnostic measures to check for convergence to the equilibrium distribution of the Markov Chain(s).
 Moreover, it prints the number (and percentage) of iterations that ended with a divergence and that saturated the max treedepth, and the E-BFMI values for each chain for which E-BFMI is less than 0.2.
 }
 \details{
 \itemize{
-\item \code{R-hat} returns the potential scale reduction factor on split chains. An R-hat greater than 1 is indicative of a bad mix of the chains. At convergence R-hat has to be less than 1.05. See \code{rstan::Rhat} for further details.
-\item \code{geweke} returns the z-scores, one for each parameter, for a test of equality between the means of the first 10\% and last 50\% of the chain. The fraction to use from the first and last part of the chain can be edited through the additional arguments \code{frac1} and \code{frac2}. The sum of \code{frac1} and \code{frac2} has to be strictly less than 1. See \code{coda::geweke.diag} for further details.
-\item \code{raftery} returns the length of "burn-in" (\eqn{M}), the required sample size (\eqn{N}), the minimum sample size for a chain with zero autocorrelation (\eqn{Nmin}), and the estimate of the "dependence factor" (\eqn{I = (M+N)/Nmin}). Values of \eqn{I} greater than 5 may be indicative of  a strong autocorrelation.
-Additional parameters such as the quantile to be estimated (\code{q}), the desired margin of error of the estimate (\code{r}), and the probability (\code{s}) of obtaining an estimate between \eqn{q-r} and \eqn{q+r}  can be passed as list in the \code{additional.args} argument. See \code{coda::raftery.diag} for further details.
-\item \code{heidel} returns a p-value referred to a convergence test where the null hypothesis is that the sampled values come from a stationary distribution. It is possible to set the target value for ratio of halfwidth to sample mean (\code{eps}) and the significance level of the test (\code{pvalue})  into the \code{additional.args} argument. See \code{coda::heidel.diag} for further details.
-\item \code{gelman} returns the estimate of the potential scale reduction factor and the upper confidence limit. At least two chains are needed to compute the Gelman and Rubin's convergence diagnostics. Additional parameters such as the confidence level (\code{confidence}), a logical flag indicating whether variables should be transformed (\code{transform}),
-a logical flag indicating whether only the second half of the series should be used in the computation (\code{autoburnin}), and a logical flag indicating whether the multivariate potential scale reduction factor should be calculated for multivariate chains (\code{multivariate}) can be passed as list in the \code{additional.args} argument. See \code{coda::gelman.diag} for further details.
+\item \code{"Rhat"} returns the potential scale reduction factor on split chains. An R-hat greater than 1 is indicative of a bad mix of the chains. At convergence R-hat has to be less than 1.05. See \code{rstan::Rhat} for further details.
+\item \code{"geweke"} returns the z-scores, one for each parameter, for a test of equality between the means of the first 10\% and last 50\% of the chain. The fraction to use from the first and last part of the chain can be edited through the additional arguments \code{frac1} and \code{frac2}. The sum of \code{frac1} and \code{frac2} has to be strictly less than 1. See \code{coda::geweke.diag} for further details.
+\item \code{"raftery"} returns the estimate of the "dependence factor" \eqn{I}. Values of \eqn{I} greater than 5 may indicate a strong autocorrelation.
+Additional parameters such as the quantile to be estimated (\code{q}), the desired margin of error of the estimate (\code{r}), and the probability (\code{s}) of obtaining an estimate between \eqn{q-r} and \eqn{q+r}  can be passed as a list in the \code{additional.args} argument. See \code{coda::raftery.diag} for further details.
+\item \code{"heidel"} returns the p-values, one for each parameter, referred to a convergence test where the null hypothesis is that the sampled values come from a stationary distribution. It is possible to set the target value for ratio of halfwidth to sample mean (\code{eps}) and the significance level of the test (\code{pvalue})  into the \code{additional.args} argument. See \code{coda::heidel.diag} for further details.
+\item \code{"gelman"} returns the estimate of the potential scale reduction factor and the upper confidence limit. At least two chains are needed to compute the Gelman and Rubin's convergence diagnostic. Additional parameters such as the confidence level (\code{confidence}), a logical flag indicating whether variables should be transformed (\code{transform}),
+a logical flag indicating whether only the second half of the series should be used in the computation (\code{autoburnin}), and a logical flag indicating whether the multivariate potential scale reduction factor should be calculated for multivariate chains (\code{multivariate}) can be passed as a list in the \code{additional.args} argument. See \code{coda::gelman.diag} for further details.
 }
+}
+\examples{
+\dontrun{
+data("Reading")
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, type = "FB")
+convergence.diag(FB,  diagnostics = c("Rhat", "geweke"), pars = "beta")
+
+}
+
 }
 \references{
 {

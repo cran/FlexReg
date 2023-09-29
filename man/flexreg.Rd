@@ -2,7 +2,7 @@
 % Please edit documentation in R/flexreg_Augmentation.R
 \name{flexreg}
 \alias{flexreg}
-\title{Flexible Regression Models for Proportions}
+\title{Flexible Regression Models for Bounded Continuous Responses}
 \usage{
 flexreg(
   formula,
@@ -22,22 +22,22 @@ flexreg(
   hyperparam.phi = NULL,
   prior.psi = NULL,
   hyperparam.psi = NULL,
-  n.iter = 5000,
-  burnin.perc = 0.5,
   n.chain = 1,
+  n.iter = 5000,
+  warmup.perc = 0.5,
   thin = 1,
   verbose = TRUE,
   ...
 )
 }
 \arguments{
-\item{formula}{an object of class \code{`formula`}: a symbolic description of the mean model (\code{y ~ x}) or the mean and precision model (\code{y ~ x | z}) to be fitted.}
+\item{formula}{an object of class "\code{\link{formula}}": a symbolic description of the mean model (\code{y ~ x}) or the mean and precision models (\code{y ~ x | z}) to be fitted (see Details).}
 
-\item{zero.formula}{an object of class \code{`formula`}: a symbolic description of the zero augmented model to be fitted (see Details).}
+\item{zero.formula}{an object of class "\code{\link{formula}}": a symbolic description of the zero augmented model to be fitted (see Details).}
 
-\item{one.formula}{an object of class \code{`formula`}: a symbolic description of the one augmented model to be fitted (see Details).}
+\item{one.formula}{an object of class "\code{\link{formula}}": a symbolic description of the one augmented model to be fitted (see Details).}
 
-\item{data}{an optional data frame, list, or object that is coercible to a data frame through \code{base::as.data.frame} containing the variables in the model. If not found in data, the variables in formula are taken from the environment from which the function flexreg is called.}
+\item{data}{an optional  \code{data.frame}, list, or object that is coercible to a  \code{data.frame} through \code{\link{as.data.frame}} containing the variables in the model. If not found in \code{data}, the variables in \code{formula}, \code{zero.formula}, and \code{one.formula} are taken from the environment from which the function \code{\link{flexreg}} is called.}
 
 \item{type}{a character specifying the type of regression model. Current options are \code{"FB"} (flexible beta, default), \code{"VIB"} (variance inflated beta), and \code{"Beta"}.}
 
@@ -45,43 +45,44 @@ flexreg(
 
 \item{prior.beta}{a character specifying the prior distribution for the  regression coefficients of the mean model, \code{beta}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.beta}{a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{beta} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
+\item{hyperparam.beta}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{beta} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
 \item{prior.omega0}{a character specifying the prior distribution for the  regression coefficients of the augmented model in zero, \code{omega0}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.omega0}{a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{omega0} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
+\item{hyperparam.omega0}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{omega0} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
 \item{prior.omega1}{a character specifying the prior distribution for the  regression coefficients of the augmented model in one, \code{omega1}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.omega1}{a positive numeric (vector of length 1) specifying the hyperprior standard deviation parameter for the prior distribution of \code{omega1} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
+\item{hyperparam.omega1}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{omega1} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
 \item{link.phi}{a character specifying the link function for the precision model (phi). Currently, \code{"identity"} (default), \code{"log"}, and \code{"sqrt"} are supported.}
 
 \item{prior.phi}{a character specifying the prior distribution for precision parameter \code{phi} if \cr \code{link.phi = "identity"}. Currently, \code{"gamma"} (default) and \code{"unif"} are supported.}
 
-\item{hyperparam.phi}{a positive numeric (vector of length 1) specifying the hyperprior parameter for the prior distribution of \code{phi}. If the prior is \code{"gamma"}, the value identifies the gamma's shape and rate parameters (a value of 0.001 is suggested). If the prior is \code{"uniform"} the hyperparameter must be specified to define the upper limit of the support of \code{phi}.}
+\item{hyperparam.phi}{a positive numeric (vector of length 1) specifying the hyperprior parameter for the prior distribution of \code{phi}. If the prior is \code{"gamma"}, the value identifies the gamma's shape and rate parameters (the default is 0.001). If the prior is \code{"uniform"} the hyperparameter must be specified to define the upper limit of the support of \code{phi}.}
 
 \item{prior.psi}{a character specifying the prior distribution for the regression coefficients of the precision model \code{psi} (not supported if \code{link.phi = "identity"}). Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.}
 
-\item{hyperparam.psi}{a positive numeric (vector of length 1) specifying the hyperprior standaerd deviation parameter for the prior distribution of \code{psi} regression coefficients. A value of 100 is suggested if the prior is \code{"normal"}, 2.5 if \code{"cauchy"}.}
-
-\item{n.iter}{a positive integer specifying the number of iterations for each chain (including warmup). The default is 5000.}
-
-\item{burnin.perc}{the percentage of iterations per chain to discard.}
+\item{hyperparam.psi}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{psi} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
 \item{n.chain}{a positive integer specifying the number of Markov chains. The default is 1.}
 
+\item{n.iter}{a positive integer specifying the number of iterations for each chain (including warm-up). The default is 5000.}
+
+\item{warmup.perc}{the percentage of iterations per chain to discard.}
+
 \item{thin}{a positive integer specifying the period for saving samples. The default is 1.}
 
-\item{verbose}{\code{TRUE} (default) or \code{FALSE}: flag indicating whether to print intermediate output.}
+\item{verbose}{a logical (with default \code{TRUE}) indicating whether to print intermediate output.}
 
-\item{...}{additional arguments for \code{rstan::sampling}.}
+\item{...}{additional arguments from \code{\link{sampling}}.}
 }
 \value{
-The \code{flexreg} function returns an object of class \code{`flexreg`}, i.e. a list with the following elements:
+The \code{\link{flexreg}} function returns an object of class \code{`flexreg`}, i.e. a list with the following elements:
 \item{\code{call}}{the function call.}
 \item{\code{type}}{the type of regression model.}
 \item{\code{formula}}{the overall formula.}
+\item{\code{aug}}{a character specifing the absence of the augmentation (\code{"No"}) or the presence of augmentation in zero (\code{"0"}), one (\code{"1"}), or both (\code{"01"}).}
 \item{\code{link.mu}}{a character specifing the link function in the mean model.}
 \item{\code{link.phi}}{a character specifing the link function in the precision model.}
 \item{\code{model}}{an object of class \code{`stanfit`} containing the fitted model.}
@@ -92,36 +93,36 @@ The \code{flexreg} function returns an object of class \code{`flexreg`}, i.e. a 
 \item{\code{design.X1}}{the design matrix for the augmented model in one (if defined).}
 }
 \description{
-The function fits some flexible regression models for continuous bounded responses (e.g., proportions and rates) via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
-Available regression models are the flexible beta regression model (\code{type="FB"}, default), the variance inflated beta (\code{type="VIB"}),  the beta  (\code{type="Beta"}), and their augmented versions.
+The function fits some flexible regression models for bounded continuous responses (e.g., proportions and rates) via a Bayesian approach to inference based on Hamiltonian Monte Carlo algorithm.
+Available regression models are the flexible beta regression model (\code{type = "FB"}, default), the variance inflated beta (\code{type = "VIB"}),  the beta  (\code{type = "Beta"}), as well as their augmented versions.
 }
 \details{
-Let \eqn{\mu} be the mean of a random variable Y, whose distribution can be specified in the \code{type} argument.
-The \code{flexreg} function links the parameter \eqn{\mu} to a linear predictor through a function  \eqn{g(\cdot)} specified in \code{link.mu}:
-\deqn{g(\mu_i) = \bold{x}_i^t \bold{\beta},} where \eqn{\bold{\beta}} is the vector of regression coefficients for the mean model.
-The prior distribution and the related hyperparameter of \eqn{\bold{\beta}} can be specified in \code{prior.beta} and \code{hyperparam.beta}.
+Let Y be a continuous bounded random variable whose distribution can be specified in the \code{type} argument and \eqn{\mu} be the mean of Y.
+The \code{\link{flexreg}} function links the parameter \eqn{\mu} to a linear predictor through a function  \eqn{g_1(\cdot)} specified in \code{link.mu}:
+\deqn{g_1(\mu) = \bold{x}^t \bold{\beta},} where \eqn{\bold{\beta}} is the vector of regression coefficients for the mean model.
+The prior distribution and the related hyperparameter of \eqn{\bold{\beta}} can be specified in \code{prior.beta} and \code{hyperparam.beta}, respectively.
 By default, the precision parameter \eqn{\phi} is assumed to be constant.
 The prior distribution and the related hyperparameter of \eqn{\phi} can be specified in \code{prior.phi} and \code{hyperparam.phi}.
 It is possible to extend the model by linking \eqn{\phi} to an additional (possibly overlapping) set of covariates through a proper link
-function \eqn{q(\cdot)}  specified in the \code{link.phi} argument:
-\deqn{q(\phi_i) = \bold{z}_i^t \bold{\psi},} where \eqn{\bold{\psi}} is the vector of regression coefficients for the precision model.
+function \eqn{g_2(\cdot)}  specified in the \code{link.phi} argument:
+\deqn{g_2(\phi) = \bold{z}^t \bold{\psi},} where \eqn{\bold{\psi}} is the vector of regression coefficients for the precision model.
 The prior distribution and the related hyperparameter of \eqn{\bold{\psi}} can be specified in \code{prior.psi} and \code{hyperparam.psi}.
-In \code{flexreg}, the regression model for the mean and, where appropriate, for the precision parameter can be specified in the
+In the function \code{\link{flexreg}}, the regression model for the mean and, where appropriate, for the precision parameter can be specified in the
 \code{formula} argument with a formula of type \code{y ~ x1 + x2 | z1 + z2} where covariates on the left of "|" are included in the regression model
-for the mean and covariates on the right of "|" are included in the regression model for the precision.
+for the mean, whereas covariates on the right of "|" are included in the regression model for the precision.
 
 If the second part is omitted, i.e., \code{y ~ x1 + x2}, the precision is assumed constant for each observation.
 
-In presence of zero responses, one has to link the parameter \eqn{q_0} to an additional (possibly overlapping) set of covariates through a logit link function:
-\deqn{g_0(q_{0i}) = \bold{x}_{0i}^t \bold{\omega_0},} where \eqn{\bold{\omega_0}} is the vector of regression coefficients for the augmented model in zero.
+In presence of zero values in the response, one has to link the parameter \eqn{q_0}, i.e., the probability of augmentation in zero,  to an additional (possibly overlapping) set of covariates through a logit link function:
+\deqn{g_3(q_{0}) = \bold{x}_{0}^t \bold{\omega_0},} where \eqn{\bold{\omega_0}} is the vector of regression coefficients for the augmented model in zero.
 The prior distribution and the related hyperparameter of \eqn{\bold{\omega_0}} can be specified in \code{prior.omega0} and \code{hyperparam.omega0}.
-In presence of one responses, one has to link the parameter \eqn{q_1} to an additional (possibly overlapping) set of covariates through a logit link function:
-\deqn{g_1(q_{1i}) = \bold{x}_{1i}^t \bold{\omega_1},} where \eqn{\bold{\omega_1}} is the vector of regression coefficients for the augmented model in one.
+In presence of one values in the response, one has to link the parameter \eqn{q_1}, i.e., the probability of augmentation in one,  to an additional (possibly overlapping) set of covariates through a logit link function:
+\deqn{g_4(q_{1}) = \bold{x}_{1}^t \bold{\omega_1},} where \eqn{\bold{\omega_1}} is the vector of regression coefficients for the augmented model in one.
 The prior distribution and the related hyperparameter of \eqn{\bold{\omega_1}} can be specified in \code{prior.omega1} and \code{hyperparam.omega1}.
 If both the augmented models in zero and one are specified, the link function is a bivariate logit.
-In \code{flexreg}, the augmented models in zero and/or one can be specified in the
-\code{zero.formula} and/or \code{one.formula} argument with a formula of type \code{ ~ x}.
-Left hand side in \code{zero.formula} and \code{one.formula} can be omitted; if specified they have to be the same as left hand side in \code{formula}.
+In \code{\link{flexreg}} function, the augmented models in zero and/or one can be specified in the
+\code{zero.formula} and/or \code{one.formula} arguments with a formula of type \code{ ~ x}.
+Left hand side in \code{zero.formula} and \code{one.formula} can be omitted; if specified, they have to be the same as left hand side in \code{formula}.
 }
 \examples{
 \dontrun{

@@ -4,11 +4,11 @@
 \alias{Consumption}
 \title{Italian Households Consumption data}
 \format{
-A data frame containing 568 observations on the following 8 variables.
+A  \code{data.frame} containing 568 observations on the following 8 variables:
 \describe{
 \item{\code{NComp}}{the number of household members.}
-\item{\code{Sex}}{the sex of the head of household.}
-\item{\code{Age}}{the age of the head of household.}
+\item{\code{Sex}}{the sex of the head of the household.}
+\item{\code{Age}}{the age of the head of the household.}
 \item{\code{NEarners}}{the number of household income earners.}
 \item{\code{Area}}{a factor indicating the geographical area where the household is located.}
 \item{\code{Citizenship}}{a factor indicating the citizenship of the head of household.}
@@ -23,8 +23,8 @@ A data frame containing 568 observations on the following 8 variables.
 }
 }
 \description{
-This dataset is a subset from the 2016 Survey on Household Income and Wealth data, a statistical survey conducted by Bank of Italy. The statistical units are the households and the head of the household is conventionally selected as the major income earner.
+This dataset is a subset from the 2016 Survey on Household Income and Wealth data, a statistical survey conducted by the Bank of Italy. The statistical units are the households and the head of the household is conventionally selected as the major income earner.
 }
 \details{
-Full data are available on the website of the Bank of Italy. \code{Consumption} has been created by dividing the variable `consumption' over the `net disposable income'.
+Full data are available on the website of the Bank of Italy. \code{Consumption} is computed as the ratio between the amount of `consumption' over the `net disposable income'.
 }

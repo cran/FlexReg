@@ -4,16 +4,17 @@
 \alias{Atomic}
 \title{Atomic bombs data}
 \format{
-A data frame containing 1039 observations on the following 4 variables.
+A  \code{data.frame} containing 1039 observations on the following 5 variables:
 \describe{
+\item{\code{y.perc}}{the percentage of cells with chromosomal abnormalities.}
 \item{\code{y}}{the number of cells with chromosomal abnormalities.}
-\item{\code{n}}{the number of analyzed cells.  It is fixed to 100 for all the observations.}
+\item{\code{n}}{the number of analyzed cells.  It is fixed to 100 for all the survivors.}
 \item{\code{dose}}{a quantitative measure of the radiation exposure level, expressed in rads.}
 \item{\code{bomb}}{a factor, indicating which bomb the subject survived (H = Hiroshima, N = Nagasaki).}
 }
 }
 \description{
-Counts of chromosome aberrations in atomic bombs survivors.
+Count/Percentage of chromosome aberrations in atomic bombs survivors.
 }
 \details{
 The data have been originally analyzed by Otake and Prentice (1984) and successively by Ascari and Migliorati (2021).

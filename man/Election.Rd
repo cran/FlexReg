@@ -4,7 +4,7 @@
 \alias{Election}
 \title{Italian Election Results}
 \format{
-A data frame containing 232 observations on the following 13 variables.
+A  \code{data.frame} containing 232 observations on the following 13 variables:
 \describe{
 \item{\code{NVotes}}{the number of valid votes.}
 \item{\code{FI}}{the percentage of votes got by `Forza Italia' party.}
@@ -14,7 +14,7 @@ A data frame containing 232 observations on the following 13 variables.
 \item{\code{M5S}}{the percentage of votes got by `Movimento 5 Stelle' party.}
 \item{\code{PD}}{the percentage of votes got by `Partito Democratico' party.}
 \item{\code{Other}}{the percentage of votes got by other parties, including blank ballots.}
-\item{\code{AgeInd}}{the age index, defined as the ratio of the number of elderly persons (aged 65 and over) to the number of young persons (from 0 to 14), multiplied by 100.}
+\item{\code{AgeInd}}{the age index, defined as the ratio of the number of elderly persons (aged 65 and over) to the number of young persons (from 0 to 14), divided by 10.}
 \item{\code{PopDens}}{the number of inhabitants per square km.}
 \item{\code{ER}}{the employment rate, defined as the ratio of the number of employed persons (aged 15-64) to the number of persons (aged 15-64).}
 \item{\code{Illiteracy}}{the illiteracy rate, defined as the ratio of the number of persons without a qualification (aged 15 and over) to the total number of persons aged 15 and over.}
@@ -25,8 +25,9 @@ A data frame containing 232 observations on the following 13 variables.
 Italian Ministry of Interior’s webpage: https://www.interno.gov.it/it/speciali/2018-elections.
 }
 \description{
-Results of the Italian general election held on 4 March 2018 for six parties.
+Data from the Italian general election held on 4 March 2018.
 }
 \details{
-Data are collected on the 232 electoral districts into which the Italian territory is organized. Distribution of votes for Aosta constituency is not available. Distributions of votes are available on the Italian Ministry of Interior’s webpage whereas constituencies information have been obtained from 2011 Italian Census.
+Data are collected on the 232 electoral districts into which the Italian territory is organized. Distribution of votes for Aosta constituency is not available. Distributions of votes are available on the Italian Ministry of Interior’s webpage, whereas constituencies information have been obtained from 2011 Italian Census.
+The count of votes got by each party can be derived by multiplying the percentage of votes and the number of valid votes.
 }
