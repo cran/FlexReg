@@ -75,7 +75,7 @@ flexreg(
 
 \item{verbose}{a logical (with default \code{TRUE}) indicating whether to print intermediate output.}
 
-\item{...}{additional arguments from \code{\link{sampling}}.}
+\item{...}{additional arguments from \code{\link[rstan]{sampling}}.}
 }
 \value{
 The \code{\link{flexreg}} function returns an object of class \code{`flexreg`}, i.e. a list with the following elements:

@@ -55,7 +55,7 @@ The function produces some convergence plots from the Monte Carlo draws.
 \item \code{"acf"} returns the autocorrelation plots (one for each parameter in \code{pars}). See \code{bayesplot::mcmc_acf} for further details.
 
 }
-Moreover, the convergence plots can be further customized using the \pkg{\link{ggplot2}} package.
+Moreover, the convergence plots can be further customized using the \pkg{ggplot2} package.
 }
 \examples{
 \dontrun{

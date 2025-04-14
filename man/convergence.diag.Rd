@@ -21,7 +21,7 @@ convergence.diag(
 \item{additional.args}{a list containing additional arguments (see details)}
 }
 \value{
-A print from \code{\link{check_hmc_diagnostics}} function and a list of convergence diagnostics.
+A print from \code{\link[rstan]{check_hmc_diagnostics}} function and a list of convergence diagnostics.
 }
 \description{
 The function returns some diagnostic measures to check for convergence to the equilibrium distribution of the Markov Chain(s).

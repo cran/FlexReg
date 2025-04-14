@@ -11,9 +11,11 @@
 #' printed using the associated \code{\link{print.summary.flexreg}} method.
 #'
 #' @examples
+#' \dontrun{
 #' data("Reading")
 #' FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter = 1000)
 #' summary(FB)
+#' }
 #'
 #'
 #' @method summary flexreg

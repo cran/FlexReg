@@ -8,7 +8,7 @@
 \description{
 The \pkg{\link{FlexReg}} package provides functions and methods to implement several types of regression models for bounded continuous responses (e.g., proportions and rates) and
 bounded discrete responses (e.g., number of successes in n trials).
-Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \pkg{\link{rstan}} package.
+Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \pkg{rstan} package.
 }
 \references{
 Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
@@ -22,4 +22,15 @@ Ferrari, S.L.P., Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and
 Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018). A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 \cr
 Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org
+}
+\author{
+\strong{Maintainer}: Roberto Ascari \email{roberto.ascari@unimib.it}
+
+Authors:
+\itemize{
+  \item Agnese M. Di Brisco
+  \item Sonia Migliorati
+  \item Andrea Ongaro
+}
+
 }

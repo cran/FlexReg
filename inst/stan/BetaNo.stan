@@ -10,7 +10,7 @@ data {
 	real<lower=0> hyper_phi;
 }
 
-parameters {  
+parameters {
 	vector[K] beta;
 	real<lower=0> phi;
 }
@@ -18,7 +18,7 @@ parameters {
 transformed parameters {
 	vector<lower=0,upper=1>[N]  mu;
 	vector<lower=0>[N] b;
-	vector<lower=0>[N] a; 
+	vector<lower=0>[N] a;
 
 	if(link_code_mu == 1)
 		mu = inv_logit(X * beta);
@@ -29,10 +29,10 @@ transformed parameters {
 	else if(link_code_mu == 4)
 		mu = exp(-exp(X * beta));
 
-for (i in 1:N){
-	b[i] = (1-mu[i])*phi;
-	a[i] = mu[i]*phi;
-}
+  for (i in 1:N){
+	  b[i] = (1-mu[i])*phi;
+	  a[i] = mu[i]*phi;
+  }
 }
 model {
 	//priors
@@ -49,12 +49,12 @@ for (l in 1:K) {
 	}
 // likelihood of log(y)
 for(i in 1:N)
-target += beta_lpdf(y[i] | a[i],b[i]); 
-}   
+target += beta_lpdf(y[i] | a[i],b[i]);
+}
 
 generated quantities{
 	vector[N] log_lik;
 	for(i in 1:N){
-		log_lik[i] = beta_lpdf(y[i] | a[i],b[i]); 
+		log_lik[i] = beta_lpdf(y[i] | a[i],b[i]);
 	}
-}   
+}

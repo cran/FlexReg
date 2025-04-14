@@ -310,10 +310,11 @@ dFBB <- function(x, size, mu, theta=NULL, phi=NULL, p, w){
 #' @param k  the extent of the variance inflation (to be specified only if \code{type = "VIB"}). It must lie in (0, 1).
 #' @param q0 the probability of augmentation in zero (to be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
 #' @param q1 the probability of augmentation in one (to be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).
-#' @param ... additional arguments of \code{\link{stat_function}}.
+#' @param ... additional arguments of \code{\link[ggplot2]{stat_function}}.
 #'
 #'
 #' @examples
+#' \dontrun{
 #' curve.density("Beta", mu=.5, phi=20)
 #' curve.density("Beta", mu=.5, phi=20, q1 = .3)
 #' curve.density("FB", mu=.5, phi=20, p=.4, w=.8)
@@ -324,7 +325,7 @@ dFBB <- function(x, size, mu, theta=NULL, phi=NULL, p, w){
 #' curve.density("Bin", size=10, mu=.7)
 #' curve.density("BetaBin", size=10, mu=.7, phi=10)
 #' curve.density("FBB", size=10, mu=.7, phi=10, p=.2,w=.7)
-#'
+#' }
 #'
 #' @references{
 #' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr

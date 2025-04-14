@@ -5,10 +5,10 @@
 #' @param model an object (or a list of objects) of class \code{`flexreg`}, usually the result of \code{\link{flexreg}} or \code{\link{flexreg_binom}} functions.
 #' @param ... additional arguments.
 #'
-#' @returns A named list with components from \code{\link{loo}} and \code{\link{waic}}.
+#' @returns A named list with components from \code{\link[loo]{loo}} and \code{\link[loo]{waic}}.
 #'
-#' @details This function takes advantage of the \pkg{\link{loo}} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for objects of class \code{`flexreg`}.
-#' If a list of two or more objects of class \code{`flexreg`} is provided, the function returns the difference in their expected predictive accuracy (see \code{\link{loo_compare}} for further details).
+#' @details This function takes advantage of the \pkg{loo} package to compute the widely applicable information criterion (WAIC) and leave-one-out cross-validation (LOO) for objects of class \code{`flexreg`}.
+#' If a list of two or more objects of class \code{`flexreg`} is provided, the function returns the difference in their expected predictive accuracy (see \code{\link[loo]{loo_compare}} for further details).
 #'
 #' @examples
 #' \dontrun{

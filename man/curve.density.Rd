@@ -39,13 +39,14 @@ curve.density(
 
 \item{q1}{the probability of augmentation in one (to be specified only if \code{type} is \code{"Beta"}, \code{"FB"}, or \code{"VIB"}). It must lie in (0, 1). In case of no augmentation, it is \code{NULL} (default).}
 
-\item{...}{additional arguments of \code{\link{stat_function}}.}
+\item{...}{additional arguments of \code{\link[ggplot2]{stat_function}}.}
 }
 \description{
 The function draws a curve corresponding to the probability density/mass function of the specified distribution (beta, flexible beta, variance-inflated beta, binomial, beta-binomial, or flexible beta-binomial).
 For beta, flexible beta, and variance-inflated beta, it also allows to include the representation of the probability of augmentation in zero and/or one values.
 }
 \examples{
+\dontrun{
 curve.density("Beta", mu=.5, phi=20)
 curve.density("Beta", mu=.5, phi=20, q1 = .3)
 curve.density("FB", mu=.5, phi=20, p=.4, w=.8)
@@ -56,7 +57,7 @@ curve.density("VIB", mu=.5, phi=20, p=.9, k=.8, col=3, q0=.1, q1=.3)
 curve.density("Bin", size=10, mu=.7)
 curve.density("BetaBin", size=10, mu=.7, phi=10)
 curve.density("FBB", size=10, mu=.7, phi=10, p=.2,w=.7)
-
+}
 
 }
 \references{

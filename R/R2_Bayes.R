@@ -13,9 +13,11 @@
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' data("Reading")
 #' FB <- flexreg(accuracy.adj ~ iq, data = Reading, type = "FB", n.iter=1000)
 #' hist(R2_bayes(FB)[[1]])
+#' }
 #'
 #' @export
 #'

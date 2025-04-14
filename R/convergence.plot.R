@@ -40,7 +40,7 @@
 #' \item \code{"acf"} returns the autocorrelation plots (one for each parameter in \code{pars}). See \code{bayesplot::mcmc_acf} for further details.
 #'
 #' }
-#' Moreover, the convergence plots can be further customized using the \pkg{\link{ggplot2}} package.
+#' Moreover, the convergence plots can be further customized using the \pkg{ggplot2} package.
 #'
 #' @export
 #'
@@ -201,7 +201,7 @@ rate_plot <- function(chains, pars, n.warmup = n.warmup){
 #' @param pars an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.
 #' @param additional.args a list containing additional arguments (see details)
 #'
-#' @return A print from \code{\link{check_hmc_diagnostics}} function and a list of convergence diagnostics.
+#' @return A print from \code{\link[rstan]{check_hmc_diagnostics}} function and a list of convergence diagnostics.
 #'
 #' @examples
 #' \dontrun{

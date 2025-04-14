@@ -2,7 +2,7 @@
 #'
 #' @description The \pkg{\link{FlexReg}} package provides functions and methods to implement several types of regression models for bounded continuous responses (e.g., proportions and rates) and
 #' bounded discrete responses (e.g., number of successes in n trials).
-#' Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \pkg{\link{rstan}} package.
+#' Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \pkg{rstan} package.
 #'
 #' @docType package
 #' @name FlexReg-package

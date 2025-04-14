@@ -20,9 +20,11 @@ Bayesian version of R-squared for flexible regression models for bounded continu
 The function provides a Bayesian version of the R-squared measure, defined as the variance of the predicted values divided by itself plus the expected variance of the errors.
 }
 \examples{
+\dontrun{
 data("Reading")
 FB <- flexreg(accuracy.adj ~ iq, data = Reading, type = "FB", n.iter=1000)
 hist(R2_bayes(FB)[[1]])
+}
 
 }
 \references{

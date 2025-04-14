@@ -21,7 +21,7 @@
 #' @param warmup.perc the percentage of iterations per chain to discard.
 #' @param thin a positive integer specifying the period for saving samples. The default is 1.
 #' @param verbose a logical (with default \code{TRUE}) indicating whether to print intermediate output.
-#' @param ... additional arguments from \code{\link{sampling}}.
+#' @param ... additional arguments from \code{\link[rstan]{sampling}}.
 #'
 #' @return The \code{\link{flexreg_binom}} function returns an object of class \code{`flexreg`}, i.e. a list with the following elements:
 #' \item{\code{call}}{the function call.}
