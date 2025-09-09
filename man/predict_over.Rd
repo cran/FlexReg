@@ -4,7 +4,7 @@
 \alias{predict_over}
 \title{predict_over}
 \usage{
-predict_over(model, posterior, newdata)
+predict_over(model, newdata)
 }
 \description{
 predict_over

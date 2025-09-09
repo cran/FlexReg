@@ -25,8 +25,9 @@
 summary.flexreg <- function(object, ..., digits=4){
   x <- object
   call <- x$call
-  model.name <- x$model@model_name
+  model.name <- x$model[[1]]@model_name
   model.type <- x$type
+  aug <- x$aug
 
   if("flexreg_bound" %in% class(x)){
     link.mu <- x$link.mu
@@ -38,7 +39,7 @@ summary.flexreg <- function(object, ..., digits=4){
     covariate.names.0 <- colnames(x$design.X0)
     covariate.names.1 <- colnames(x$design.X1)
 
-    posterior <- x$model
+    posterior <- x$model[[1]]
     pars <- extract.pars(posterior = posterior)
     n.pars <- length(pars)
     pp <- rstan::extract(posterior, pars)
@@ -55,52 +56,74 @@ summary.flexreg <- function(object, ..., digits=4){
     }
     rownames(summ.mu) <- covariate.names.mu
 
-    summ.q0 <- summa.mat[grep("omega0",rownames(summa.mat)),]
-    if(is.na(summ.q0[1])){
-      summ.q0  <- NULL
-    } else if(is.null(dim(summ.q0))){ # if there is only the intercept term:
-      summ.q0 <- matrix(ncol=length(summ.q0),nrow=1, data=summ.q0)
-      colnames(summ.q0) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
-    }
-    rownames(summ.q0) <- covariate.names.0
+    if(length(x$model)>1){
+      posterior.aug <- x$model[[2]]
+      pars.aug <- extract.pars(posterior = posterior.aug)
+      n.pars <- length(pars)
+      pp.aug <- rstan::extract(posterior.aug, pars.aug)
+      summa.aug <- lapply(pp.aug, function(x) c(mean(x), sd(x),quantile(x, probs = c(.025,.5,.975))))
+      summa.mat.aug <- round(matrix(unlist(summa.aug), ncol=5, byrow = T ),digits)
+      colnames(summa.mat.aug) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+      rownames(summa.mat.aug) <- pars.aug
 
-    summ.q1 <- summa.mat[grep("omega1",rownames(summa.mat)),]
-    if(is.na(summ.q1[1])){
-      summ.q1  <- NULL
-    } else if(is.null(dim(summ.q1))){ # if there is only the intercept term:
-      summ.q1 <- matrix(ncol=length(summ.q1),nrow=1, data=summ.q1)
-      colnames(summ.q1) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
-    }
-    rownames(summ.q1) <- covariate.names.1
-
-    if(is.null(covariate.names.phi)){
-        summ.phi <- summa.mat[which(rownames(summa.mat)=="phi"),]
-        dim(summ.phi) <- c(1,5)
-        colnames(summ.phi) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
-        rownames(summ.phi) <- "phi"
-      } else {
-        summ.phi <- summa.mat[grep("psi",rownames(summa.mat)),]
-        if(is.null(dim(summ.phi)))  dim(summ.phi) <- c(1,5) #summ.phi <- t(as.matrix(summ.phi))
-        rownames(summ.phi) <- covariate.names.phi
+      if(aug == "01"){
+        summ.q0 <- summa.mat.aug[grep("omega0",rownames(summa.mat.aug)),]
+        summ.q1 <- summa.mat.aug[grep("omega1",rownames(summa.mat.aug)),]
+      } else if(aug == "0"){
+        summ.q0 <- summa.mat.aug[grep("beta",rownames(summa.mat.aug)),]
+        summ.q1 <- NULL
+      } else if(aug == "1"){
+        summ.q1 <- summa.mat.aug[grep("beta",rownames(summa.mat.aug)),]
+        summ.q0 <- NULL
       }
 
-      n.parz <- nrow(summ.mu)+nrow(summ.phi)+ifelse(is.null(summ.q0),0,nrow(summ.q0))+ifelse(is.null(summ.q1),0,nrow(summ.q1))
-      if( n.pars > n.parz) {
-        summ.add <- summa.mat[(n.parz+1):n.pars,]
-      } else summ.add <- NULL
+      if(is.null(dim(summ.q1)) & !is.null(summ.q1)){ # if there is only the intercept term:
+        summ.q1 <- matrix(ncol=length(summ.q1),nrow=1, data=summ.q1)
+        colnames(summ.q1) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+      }
+      rownames(summ.q1) <- covariate.names.1
 
-      residuals <- residuals.flexreg(x, type = "raw", cluster = FALSE, estimate="mean")
-      summ.res <- round(quantile(residuals$raw), digits)
-      names(summ.res) <- c("Min", "1Q", "Median", "3Q", "Max")
+      if(is.null(dim(summ.q0)) & !is.null(summ.q0)){ # if there is only the intercept term:
+        summ.q0 <- matrix(ncol=length(summ.q0),nrow=1, data=summ.q0)
+        colnames(summ.q0) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+      }
+      rownames(summ.q0) <- covariate.names.0
+    } else{ # If no augmentation
+      summ.q0 = summ.q1 <- NULL
+    }
+
+
+    if(is.null(covariate.names.phi)){
+      summ.phi <- summa.mat[which(rownames(summa.mat)=="phi"),]
+      dim(summ.phi) <- c(1,5)
+      colnames(summ.phi) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
+      rownames(summ.phi) <- "phi"
+    } else {
+      summ.phi <- summa.mat[grep("psi",rownames(summa.mat)),]
+      if(is.null(dim(summ.phi)))  dim(summ.phi) <- c(1,5)
+      rownames(summ.phi) <- covariate.names.phi
+    }
+
+    n.parz <- nrow(summ.mu)+nrow(summ.phi)
+    if( n.pars > n.parz) {
+      summ.add <- summa.mat[(n.parz+1):n.pars,]
+    } else summ.add <- NULL
+
+
+    residuals <- residuals.flexreg(x, type = "raw", cluster = FALSE, estimate="mean")
+    summ.res <- round(quantile(residuals$raw), digits)
+    names(summ.res) <- c("Min", "1Q", "Median", "3Q", "Max")
 
 
     waic_out <- suppressWarnings(WAIC(x))
 
-    output <- list(call=call,type=model.type, Model=model.name, formula=formula, link.mu=link.mu, link.phi=link.phi,
+    output <- list(call=call, type = model.type,
+                   Model = model.name, formula = formula,
+                   link.mu = link.mu, link.phi = link.phi,
                    Summary.res=summ.res,
-                   Summary.mu=summ.mu, Summary.phi=summ.phi,
-                   Summary.q0=summ.q0, Summary.q1=summ.q1,
-                   Summary.add=summ.add,
+                   Summary.mu = summ.mu, Summary.phi = summ.phi,
+                   Summary.q0 = summ.q0, Summary.q1 = summ.q1,
+                   Summary.add = summ.add,
                    waic_out = waic_out)
   } else {
     # ELSE, if the model is for binomial data:
@@ -111,7 +134,7 @@ summary.flexreg <- function(object, ..., digits=4){
     covariate.names.mu <- colnames(x$design.X)
     covariate.names.theta <- colnames(x$design.Z)
 
-    posterior <- x$model
+    posterior <- x$model[[1]]
     pars <- extract.pars(posterior = posterior)
     n.pars <- length(pars)
     pp <- rstan::extract(posterior, pars)
@@ -153,8 +176,6 @@ summary.flexreg <- function(object, ..., digits=4){
       summ.add <- NULL
       summ.theta <- NULL
 
-      #summ.res <- NULL
-
       residuals <- residuals.flexreg(x, type = "raw", cluster = FALSE, estimate = "mean")
       summ.res <- round(quantile(residuals$raw), digits)
       names(summ.res) <- c("Min", "1Q", "Median", "3Q", "Max")
@@ -162,12 +183,14 @@ summary.flexreg <- function(object, ..., digits=4){
 
     waic_out <- suppressWarnings(WAIC(x))
 
-    output <- list(call=call, type=model.type, Model=model.name, formula=formula,
-                   link.mu=link.mu, link.theta=link.theta,
-                   Summary.res=summ.res,
-                   Summary.mu=summ.mu,
-                   Summary.theta=summ.theta,
-                   Summary.add=summ.add,
+    output <- list(call=call, type = model.type,
+                   Model = model.name, formula = formula,
+                   link.mu = link.mu,
+                   link.theta = link.theta,
+                   Summary.res = summ.res,
+                   Summary.mu = summ.mu,
+                   Summary.theta = summ.theta,
+                   Summary.add = summ.add,
                    waic_out = waic_out)
 
   }
@@ -211,12 +234,12 @@ print.summary.flexreg <- function(x, ...){
   }  # else if Bin then nothing should be printed!
 
   if(!is.null(x$Summary.q0)){
-    cat("\nCoefficients (zero augmentation model with logit link):\n")
+    cat("\nCoefficients (zero augmentation model with multinomial logit link):\n")
     print(x$Summary.q0)
   }
 
   if(!is.null(x$Summary.q1)){
-    cat("\nCoefficients (one augmentation model with logit link):\n")
+    cat("\nCoefficients (one augmentation model with multinomial logit link):\n")
     print(x$Summary.q1)
   }
 
@@ -255,7 +278,13 @@ print.flexreg <- function(x, ...){
 
   if(summ$type %in% c("Beta", "FB",  "VIB")){
     cat("\nCoefficients (precision model with", summ$link.phi, "link for phi):\n")
-    print(summ$Summary.phi[,1])
+    if(length(summ$Summary.phi[,1])==1){
+      summ.phi.temp <- summ$Summary.phi[,1]
+      names(summ.phi.temp) <- "phi"
+      print(summ.phi.temp)
+    } else{
+      print(summ$Summary.phi[,1])
+    }
   } else if(summ$Model %in% c("FBB_theta", "BetaBin_theta")){
     cat("\nCoefficients (overdispersion model with", summ$link.theta, "link for theta):\n")
     print(summ$Summary.theta[,1])
@@ -265,12 +294,12 @@ print.flexreg <- function(x, ...){
   }  # else if Bin then nothing should be printed!
 
   if(!is.null(summ$Summary.q0)){
-    cat("\nCoefficients (zero augmentation model with logit link):\n")
+    cat("\nCoefficients (zero augmentation model with multinomial logit link):\n")
     print(summ$Summary.q0[,1])
   }
 
   if(!is.null(summ$Summary.q1[,1])){
-    cat("\nCoefficients (one augmentation model with logit link):\n")
+    cat("\nCoefficients (one augmentation model with multinomial logit link):\n")
     print(summ$Summary.q1[,1])
   }
 
@@ -317,20 +346,20 @@ print.flexreg <- function(x, ...){
 
 plot.flexreg <- function(x, name.x, additional.cov.default = NA, smooth = TRUE,
                          cluster = FALSE, type = "response", ...)
-  {
-
+{
+  model <- x
   if(!all(type %in% c("response", "response.aug"))) {
     stop("Argument `type` must be set equal to `response` and/or `response.aug`")
   }
 
-  if((x$type %in% c("Beta", "BetaBin", "Bin", "VIB")) & cluster == TRUE){
+  if((model$type %in% c("Beta", "BetaBin", "Bin", "VIB")) & cluster == TRUE){
     cluster <- FALSE
     warning("Clusters means are not plotted for Beta, VIB,  Binomial, and Beta-Binomal models.")
   }
 
 
   group <- Response <- NULL
-  object <- x
+  object <- model
   model.type <- object$type
   y <- object$response
   y.name <- "y"
@@ -344,19 +373,21 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, smooth = TRUE,
   }
 
   if(smooth == F){
-    x <- object$design.X[,which(colnames(object$design.X) == name.x)]
+    x.grid <- object$design.X[,which(colnames(object$design.X) == name.x)]
   } else if(smooth == TRUE){
-    x <- object$design.X[,which(colnames(object$design.X) == name.x)]
+    x.grid <- object$design.X[,which(colnames(object$design.X) == name.x)]
     N <- dim(unique(object$design.X))[1]
-    x <- seq(min(x), max(x), length.out=ifelse(N<50,50,N))
+    x.grid <- seq(min(x.grid), max(x.grid), length.out=ifelse(N<50,50,N))
   }
 
-  newdata <- data.frame(x, additional.cov.default)
+  newdata <- data.frame(x.grid, additional.cov.default)
   names(newdata) <- c(name.x, names(additional.cov.default))
 
   newdata <- newdata.adjust(newdata, object$formula)
 
-  mu.hat <- predict(object, newdata = newdata, n.new = rep(1, nrow(newdata)), type = "response", cluster = cluster)
+  mu.hat <- predict(object, newdata = newdata,
+                    n.new = rep(1, nrow(newdata)),
+                    type = "response", cluster = cluster)
   if(!all(type %in% names(mu.hat))){
     type <- "response"
     warning("The augmented response is not available for this model, the response is plotted instead.")
@@ -367,12 +398,12 @@ plot.flexreg <- function(x, name.x, additional.cov.default = NA, smooth = TRUE,
 
   cov.obs <- object$design.X[,which(colnames(object$design.X) == name.x)]
 
-  data.plot <- data.frame(y=y, x=cov.obs)
-  pp1 <- ggplot(data=data.plot, aes(x=x, y=y))+
+  data.plot <- data.frame(y = y, x = cov.obs)
+  pp1 <- ggplot(data=data.plot, aes(x = x, y = y))+
     geom_point()+
     theme_minimal()
 
-  dd <- data.frame(x = x, y = mu.hat)
+  dd <- data.frame(x = x.grid, y = mu.hat)
   dd <- reshape(dd, direction = "long",
                 varying = 2:ncol(dd), v.names=c('Response'))
   dd$group <- as.factor(dd$time)

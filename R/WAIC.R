@@ -28,28 +28,50 @@
 #' @export
 #'
 
-WAIC <- function(model, ...){
+
+WAIC <-  function(model,...){
   x <- model
   if(!inherits(x, "flexreg")){
-  if(any(unlist(lapply(x, function(x) !inherits(x, "flexreg")))))
-    stop("The argument must be an object (or a list of objects) of class `flexreg`")
+    if(any(unlist(lapply(x, function(x) !inherits(x, "flexreg")))))
+      stop("The argument must be an object (or a list of objects) of class `flexreg`")
   }
-
   if(inherits(x, "flexreg")){
-    waic_out <- waic(extract_log_lik(x$model))
-    loo_out <- loo(extract_log_lik(x$model))
+    loglik <- WAIC_internal(model = x$model,  response = x$response)
+    waic_out <- suppressWarnings(loo::waic(loglik))
+    loo_out <- suppressWarnings(loo::loo(loglik))
   } else {
-    log_liks <- lapply(x, function(x) extract_log_lik(x$model))
-    loos <- lapply(log_liks, function(x) suppressWarnings(loo(x)))
-    waics <- lapply(log_liks, function(x) suppressWarnings(waic(x)))
-
-    loo_out <- loo_compare(loos)
-    waic_out <- loo_compare(waics)
+    #per quando si ha lista di modelli
+    loglik <- lapply(x, function(x) WAIC_internal(x$model, x$response))
+    loos <- lapply(loglik, function(x) suppressWarnings(loo::loo(x)))
+    waics <- lapply(loglik, function(x) suppressWarnings(loo::waic(x)))
+    loo_out <- loo::loo_compare(loos)
+    waic_out <- loo::loo_compare(waics)
   }
   output <- list(loo_out = loo_out, waic_out = waic_out)
   class(output) <- "WAIC.flexreg"
 
   return(suppressWarnings(output))
+}
+
+
+#' internal function
+#' @keywords internal
+#'
+WAIC_internal <- function(model, response,...){
+  if(length(model)>1){
+
+    ll_cont <- loo::extract_log_lik(model[[1]])
+    ll_aug <- loo::extract_log_lik(model[[2]])
+
+    index01 <- which(response==0 | response ==1)
+    N <- length(response)
+    index_cont <- (1:N)[-index01]
+    loglik <- ll_aug
+    loglik[,index_cont] <- ll_aug[,index_cont] + ll_cont
+  } else {
+    loglik <- loo::extract_log_lik(model[[1]])
+  }
+  return(loglik=loglik)
 }
 
 

@@ -52,7 +52,6 @@ predict.flexreg <- function(object, newdata = NULL, n.new = NULL, cluster = FALS
                             type = "response",
                             estimate = "mean", q = NULL, ...){
   model <- object
-  posterior <- model$model
   model.type <- model$type
   model.class <- class(model)
   formula <- model$formula
@@ -106,11 +105,12 @@ predict.flexreg <- function(object, newdata = NULL, n.new = NULL, cluster = FALS
   if(!is.null(newdata)) newdata <- newdata.adjust(newdata, formula) #adjust the newdata
 
   #produce outcome depending on the chosen type
-  if(type == "response") pred.chain <- predict_response(model, posterior, newdata, cluster, n)
-  if(type == "link") pred.chain <- predict_link(model, posterior, newdata)
-  if(type == "precision") pred.chain <- predict_precision(model, posterior, newdata)
-  if(type == "variance") pred.chain <- predict_variance(model, posterior, newdata, cluster, cluster.var, model.type, model.class, n)
-  if(type == "overdispersion") pred.chain <- predict_over(model, posterior, newdata)
+  if(type == "response") pred.chain <- predict_response(model, newdata, cluster, n)
+  if(type == "link") pred.chain <- predict_link(model, newdata)
+  if(type == "precision") pred.chain <- predict_precision(model, newdata)
+  if(type == "variance") pred.chain <- predict_variance(model, newdata, cluster, cluster.var, model.type, model.class, n)
+  if(type == "overdispersion") pred.chain <- predict_over(model, newdata)
+
 
   pred.chain <- pred.chain[unlist(lapply(pred.chain, is.matrix))]
   predicted <- lapply(pred.chain, function(x)

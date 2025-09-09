@@ -4,7 +4,7 @@
 \alias{predict_precision}
 \title{predict_precision}
 \usage{
-predict_precision(model, posterior, newdata)
+predict_precision(model, newdata)
 }
 \description{
 predict_precision

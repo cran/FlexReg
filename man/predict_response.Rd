@@ -4,7 +4,7 @@
 \alias{predict_response}
 \title{predict_response}
 \usage{
-predict_response(model, posterior, newdata, cluster, n)
+predict_response(model, newdata, cluster, n)
 }
 \description{
 predict_response

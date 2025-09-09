@@ -7,12 +7,9 @@
 A  \code{data.frame} containing 232 observations on the following 13 variables:
 \describe{
 \item{\code{NVotes}}{the number of valid votes.}
-\item{\code{FI}}{the percentage of votes got by `Forza Italia' party.}
-\item{\code{FDI}}{the percentage of votes got by `Fratelli d'Italia' party.}
-\item{\code{LEGA}}{the percentage of votes got by `Lega' party.}
-\item{\code{LEU}}{the percentage of votes got by `Liberi e Uguali' party.}
-\item{\code{M5S}}{the percentage of votes got by `Movimento 5 Stelle' party.}
-\item{\code{PD}}{the percentage of votes got by `Partito Democratico' party.}
+\item{\code{FI}}{the percentage of votes got by \verb{Forza Italia' party.\} \\item\{\code{FDI}\}\{the percentage of votes got by }Fratelli d'Italia' party.}
+\item{\code{LEGA}}{the percentage of votes got by \verb{Lega' party.\} \\item\{\code{LEU}\}\{the percentage of votes got by }Liberi e Uguali' party.}
+\item{\code{M5S}}{the percentage of votes got by \verb{Movimento 5 Stelle' party.\} \\item\{\code{PD}\}\{the percentage of votes got by }Partito Democratico' party.}
 \item{\code{Other}}{the percentage of votes got by other parties, including blank ballots.}
 \item{\code{AgeInd}}{the age index, defined as the ratio of the number of elderly persons (aged 65 and over) to the number of young persons (from 0 to 14), divided by 10.}
 \item{\code{PopDens}}{the number of inhabitants per square km.}

@@ -27,7 +27,7 @@ namespace model_FBB_namespace {
 using stan::model::model_base_crtp;
 using namespace stan::math;
 stan::math::profile_map profiles__;
-static constexpr std::array<const char*, 69> locations_array__ =
+static constexpr std::array<const char*, 71> locations_array__ =
   {" (found before start of program)",
   " (in 'string', line 16, column 1 to column 16)",
   " (in 'string', line 17, column 1 to column 29)",
@@ -41,39 +41,39 @@ static constexpr std::array<const char*, 69> locations_array__ =
   " (in 'string', line 27, column 1 to column 23)",
   " (in 'string', line 28, column 1 to column 23)",
   " (in 'string', line 29, column 1 to column 19)",
-  " (in 'string', line 77, column 1 to column 19)",
-  " (in 'string', line 32, column 1 to column 23)",
-  " (in 'string', line 41, column 2 to column 27)",
-  " (in 'string', line 40, column 6 to line 41, column 27)",
-  " (in 'string', line 39, column 2 to column 29)",
-  " (in 'string', line 38, column 6 to line 41, column 27)",
-  " (in 'string', line 37, column 2 to column 21)",
-  " (in 'string', line 36, column 6 to line 41, column 27)",
-  " (in 'string', line 35, column 2 to column 27)",
-  " (in 'string', line 34, column 1 to line 41, column 27)",
-  " (in 'string', line 44, column 2 to column 59)",
-  " (in 'string', line 45, column 2 to column 55)",
-  " (in 'string', line 48, column 2 to column 25)",
-  " (in 'string', line 49, column 2 to column 29)",
-  " (in 'string', line 52, column 2 to column 25)",
-  " (in 'string', line 53, column 2 to column 29)",
-  " (in 'string', line 43, column 15 to line 54, column 2)",
-  " (in 'string', line 43, column 1 to line 54, column 2)",
-  " (in 'string', line 79, column 2 to line 80, column 55)",
-  " (in 'string', line 78, column 14 to line 81, column 2)",
-  " (in 'string', line 78, column 1 to line 81, column 2)",
-  " (in 'string', line 59, column 1 to column 15)",
-  " (in 'string', line 60, column 1 to column 15)",
-  " (in 'string', line 62, column 1 to column 44)",
-  " (in 'string', line 67, column 3 to column 40)",
-  " (in 'string', line 66, column 7 to line 67, column 40)",
-  " (in 'string', line 65, column 3 to column 40)",
-  " (in 'string', line 64, column 2 to line 67, column 40)",
-  " (in 'string', line 63, column 16 to line 68, column 2)",
-  " (in 'string', line 63, column 1 to line 68, column 2)",
-  " (in 'string', line 72, column 1 to line 73, column 72)",
-  " (in 'string', line 71, column 14 to line 74, column 2)",
-  " (in 'string', line 71, column 1 to line 74, column 2)",
+  " (in 'string', line 68, column 1 to column 19)",
+  " (in 'string', line 30, column 1 to column 23)",
+  " (in 'string', line 38, column 2 to column 27)",
+  " (in 'string', line 37, column 6 to line 38, column 27)",
+  " (in 'string', line 36, column 2 to column 29)",
+  " (in 'string', line 35, column 6 to line 38, column 27)",
+  " (in 'string', line 34, column 2 to column 21)",
+  " (in 'string', line 33, column 6 to line 38, column 27)",
+  " (in 'string', line 32, column 2 to column 27)",
+  " (in 'string', line 31, column 1 to line 38, column 27)",
+  " (in 'string', line 40, column 2 to column 59)",
+  " (in 'string', line 41, column 2 to column 55)",
+  " (in 'string', line 43, column 2 to column 25)",
+  " (in 'string', line 44, column 2 to column 29)",
+  " (in 'string', line 46, column 2 to column 25)",
+  " (in 'string', line 47, column 2 to column 29)",
+  " (in 'string', line 39, column 15 to line 48, column 2)",
+  " (in 'string', line 39, column 1 to line 48, column 2)",
+  " (in 'string', line 70, column 2 to line 71, column 55)",
+  " (in 'string', line 69, column 14 to line 72, column 2)",
+  " (in 'string', line 69, column 1 to line 72, column 2)",
+  " (in 'string', line 52, column 2 to column 81)",
+  " (in 'string', line 53, column 2 to column 81)",
+  " (in 'string', line 54, column 1 to column 44)",
+  " (in 'string', line 59, column 3 to column 40)",
+  " (in 'string', line 58, column 7 to line 59, column 40)",
+  " (in 'string', line 57, column 3 to column 40)",
+  " (in 'string', line 56, column 2 to line 59, column 40)",
+  " (in 'string', line 55, column 16 to line 60, column 2)",
+  " (in 'string', line 55, column 1 to line 60, column 2)",
+  " (in 'string', line 63, column 1 to line 64, column 72)",
+  " (in 'string', line 62, column 14 to line 65, column 2)",
+  " (in 'string', line 62, column 1 to line 65, column 2)",
   " (in 'string', line 2, column 1 to column 16)",
   " (in 'string', line 3, column 7 to column 8)",
   " (in 'string', line 3, column 1 to column 16)",
@@ -83,11 +83,13 @@ static constexpr std::array<const char*, 69> locations_array__ =
   " (in 'string', line 6, column 8 to column 9)",
   " (in 'string', line 6, column 10 to column 11)",
   " (in 'string', line 6, column 1 to column 15)",
-  " (in 'string', line 8, column 1 to column 27)",
-  " (in 'string', line 9, column 1 to column 30)",
-  " (in 'string', line 10, column 1 to column 31)",
-  " (in 'string', line 12, column 1 to column 29)",
-  " (in 'string', line 13, column 1 to column 29)",
+  " (in 'string', line 7, column 1 to column 27)",
+  " (in 'string', line 8, column 1 to column 30)",
+  " (in 'string', line 9, column 1 to column 31)",
+  " (in 'string', line 10, column 1 to column 29)",
+  " (in 'string', line 11, column 1 to column 29)",
+  " (in 'string', line 12, column 1 to column 24)",
+  " (in 'string', line 13, column 1 to column 24)",
   " (in 'string', line 16, column 8 to column 9)",
   " (in 'string', line 22, column 25 to column 26)",
   " (in 'string', line 23, column 25 to column 26)",
@@ -96,7 +98,7 @@ static constexpr std::array<const char*, 69> locations_array__ =
   " (in 'string', line 26, column 17 to column 18)",
   " (in 'string', line 27, column 17 to column 18)",
   " (in 'string', line 28, column 17 to column 18)",
-  " (in 'string', line 77, column 8 to column 9)"};
+  " (in 'string', line 68, column 8 to column 9)"};
 #include <stan_meta_header.hpp>
 class model_FBB final : public model_base_crtp<model_FBB> {
 private:
@@ -110,7 +112,11 @@ private:
   double hyperprior_beta;
   double hyper_theta_a;
   double hyper_theta_b;
+  Eigen::Matrix<double,-1,1> hyperparam_p_data__;
+  Eigen::Matrix<double,-1,1> hyperparam_w_data__;
   Eigen::Map<Eigen::Matrix<double,-1,-1>> X{nullptr, 0, 0};
+  Eigen::Map<Eigen::Matrix<double,-1,1>> hyperparam_p{nullptr, 0};
+  Eigen::Map<Eigen::Matrix<double,-1,1>> hyperparam_w{nullptr, 0};
 public:
   ~model_FBB() {}
   model_FBB(stan::io::var_context& context__, unsigned int random_seed__ = 0,
@@ -238,22 +244,66 @@ public:
       stan::math::check_greater_or_equal(function__, "hyper_theta_b",
         hyper_theta_b, 0);
       current_statement__ = 60;
-      stan::math::validate_non_negative_index("beta", "K", K);
+      context__.validate_dims("data initialization", "hyperparam_p",
+        "double", std::vector<size_t>{static_cast<size_t>(2)});
+      hyperparam_p_data__ = Eigen::Matrix<double,-1,1>::Constant(2,
+                              std::numeric_limits<double>::quiet_NaN());
+      new (&hyperparam_p)
+        Eigen::Map<Eigen::Matrix<double,-1,1>>(hyperparam_p_data__.data(), 2);
+      {
+        std::vector<local_scalar_t__> hyperparam_p_flat__;
+        current_statement__ = 60;
+        hyperparam_p_flat__ = context__.vals_r("hyperparam_p");
+        current_statement__ = 60;
+        pos__ = 1;
+        current_statement__ = 60;
+        for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
+          current_statement__ = 60;
+          stan::model::assign(hyperparam_p, hyperparam_p_flat__[(pos__ - 1)],
+            "assigning variable hyperparam_p", stan::model::index_uni(sym1__));
+          current_statement__ = 60;
+          pos__ = (pos__ + 1);
+        }
+      }
       current_statement__ = 61;
-      stan::math::validate_non_negative_index("mu", "N", N);
+      context__.validate_dims("data initialization", "hyperparam_w",
+        "double", std::vector<size_t>{static_cast<size_t>(2)});
+      hyperparam_w_data__ = Eigen::Matrix<double,-1,1>::Constant(2,
+                              std::numeric_limits<double>::quiet_NaN());
+      new (&hyperparam_w)
+        Eigen::Map<Eigen::Matrix<double,-1,1>>(hyperparam_w_data__.data(), 2);
+      {
+        std::vector<local_scalar_t__> hyperparam_w_flat__;
+        current_statement__ = 61;
+        hyperparam_w_flat__ = context__.vals_r("hyperparam_w");
+        current_statement__ = 61;
+        pos__ = 1;
+        current_statement__ = 61;
+        for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
+          current_statement__ = 61;
+          stan::model::assign(hyperparam_w, hyperparam_w_flat__[(pos__ - 1)],
+            "assigning variable hyperparam_w", stan::model::index_uni(sym1__));
+          current_statement__ = 61;
+          pos__ = (pos__ + 1);
+        }
+      }
       current_statement__ = 62;
-      stan::math::validate_non_negative_index("lambda1", "N", N);
+      stan::math::validate_non_negative_index("beta", "K", K);
       current_statement__ = 63;
-      stan::math::validate_non_negative_index("lambda2", "N", N);
+      stan::math::validate_non_negative_index("mu", "N", N);
       current_statement__ = 64;
-      stan::math::validate_non_negative_index("b1", "N", N);
+      stan::math::validate_non_negative_index("lambda1", "N", N);
       current_statement__ = 65;
-      stan::math::validate_non_negative_index("b2", "N", N);
+      stan::math::validate_non_negative_index("lambda2", "N", N);
       current_statement__ = 66;
-      stan::math::validate_non_negative_index("a1", "N", N);
+      stan::math::validate_non_negative_index("b1", "N", N);
       current_statement__ = 67;
-      stan::math::validate_non_negative_index("a2", "N", N);
+      stan::math::validate_non_negative_index("b2", "N", N);
       current_statement__ = 68;
+      stan::math::validate_non_negative_index("a1", "N", N);
+      current_statement__ = 69;
+      stan::math::validate_non_negative_index("a2", "N", N);
+      current_statement__ = 70;
       stan::math::validate_non_negative_index("log_lik", "N", N);
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -413,9 +463,25 @@ public:
       stan::math::check_greater_or_equal(function__, "phi", phi, 0);
       {
         current_statement__ = 34;
-        lp_accum__.add(stan::math::beta_lpdf<propto__>(p, 1, 1));
+        lp_accum__.add(stan::math::beta_lpdf<propto__>(p,
+                         (stan::model::rvalue(hyperparam_p, "hyperparam_p",
+                            stan::model::index_uni(1)) *
+                         stan::model::rvalue(hyperparam_p, "hyperparam_p",
+                           stan::model::index_uni(2))), ((1 -
+                         stan::model::rvalue(hyperparam_p, "hyperparam_p",
+                           stan::model::index_uni(1))) *
+                         stan::model::rvalue(hyperparam_p, "hyperparam_p",
+                           stan::model::index_uni(2)))));
         current_statement__ = 35;
-        lp_accum__.add(stan::math::beta_lpdf<propto__>(w, 1, 1));
+        lp_accum__.add(stan::math::beta_lpdf<propto__>(w,
+                         (stan::model::rvalue(hyperparam_w, "hyperparam_w",
+                            stan::model::index_uni(1)) *
+                         stan::model::rvalue(hyperparam_w, "hyperparam_w",
+                           stan::model::index_uni(2))), ((1 -
+                         stan::model::rvalue(hyperparam_w, "hyperparam_w",
+                           stan::model::index_uni(1))) *
+                         stan::model::rvalue(hyperparam_w, "hyperparam_w",
+                           stan::model::index_uni(2)))));
         current_statement__ = 36;
         lp_accum__.add(stan::math::beta_lpdf<propto__>(theta, hyper_theta_a,
                          hyper_theta_b));

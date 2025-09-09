@@ -4,7 +4,7 @@
 \alias{predict_q.chain}
 \title{predict_q.chain}
 \usage{
-predict_q.chain(model, posterior, newdata = NULL)
+predict_q.chain(model, newdata = NULL)
 }
 \description{
 predict_q.chain

@@ -4,11 +4,11 @@
 \name{FlexReg-package}
 \alias{FlexReg-package}
 \alias{FlexReg}
-\title{The `FlexReg' package.}
+\title{The 'FlexReg' package.}
 \description{
-The \pkg{\link{FlexReg}} package provides functions and methods to implement several types of regression models for bounded continuous responses (e.g., proportions and rates) and
+The FlexReg package provides functions and methods to implement several types of regression models for bounded continuous responses (e.g., proportions and rates) and
 bounded discrete responses (e.g., number of successes in n trials).
-Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \pkg{rstan} package.
+Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \code{rstan} package.
 }
 \references{
 Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
@@ -34,3 +34,4 @@ Authors:
 }
 
 }
+\keyword{internal}

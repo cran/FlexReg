@@ -22,7 +22,8 @@ newdata.adjust <- function(newdata, formula){
 #' @keywords internal
 #'
 #'
-predict_mu.chain <- function(model, posterior, newdata){
+predict_mu.chain <- function(model, newdata){
+  posterior <- model$model[[1]]
   if(is.null(newdata)){
     mu.chain <- rstan::extract(posterior, pars="mu", permuted=T)[[1]]
   } else {
@@ -38,37 +39,57 @@ predict_mu.chain <- function(model, posterior, newdata){
 #' @keywords internal
 #'
 
-predict_response <- function(model, posterior, newdata, cluster, n){
+predict_response <- function(model, newdata, cluster, n){
 
-  mu.chain <- predict_mu.chain(model, posterior, newdata)
-  q.chain <- predict_q.chain(model, posterior, newdata)#vedere se togliere il controllo sulla funzione e mettere controllo sul modello,
-  #ma forse conviene lasciare così
 
-  if(cluster == T){
-    lambda.chain <- predict_lambda.chain(posterior, mu.chain, newdata)
-  } else {
-    lambda.chain <- list(l1.chain = 0, l2.chain = 0)
-  }
+  if(is.null(newdata)){
+    newdata.temp <- model$design.X
+  } else newdata.temp <- newdata
+
+  mu.chain <- predict_mu.chain(model, newdata.temp)
 
   if("flexreg_bound" %in% class(model)){
-  q2.chain <-  1-q.chain$q0.chain-q.chain$q1.chain
-  q.chain <- append(q.chain, list(q2.chain=q2.chain))
-  response.binom <- 0
+    response.binom <- 0
 
-  if(model$aug == "No") {
-    response <- 0
-  } else{
-  response <- q.chain$q1.chain + q.chain$q2.chain*mu.chain
-  }
+    if(model$aug == "No") {
+      response <- 0
+      q.chain <- list(q0.chain = 0, q1.chain = 0)
+    } else{
+      q.chain <- predict_q.chain(model, newdata)
+      q2.chain <-  1-q.chain$q0.chain-q.chain$q1.chain
+      q.chain <- append(q.chain, list(q2.chain=q2.chain))
 
-  } else {
+      response <- q.chain$q1.chain + q.chain$q2.chain*mu.chain
+    }
+
+    if(cluster == T){
+      posterior <- model$model[[1]]
+      lambda.chain <- predict_lambda.chain(posterior, mu.chain, newdata.temp)
+    } else {
+      lambda.chain <- list(l1.chain = 0, l2.chain = 0)
+    }
+
+  } else { # The model is for binomial data
     response <- 0
+    q.chain <- list(q0.chain = 0, q1.chain = 0)
+
     response.binom <- t(apply(mu.chain, 1, function(x) x*n))
+
+    if(cluster == T){
+      posterior <- model$model[[1]]
+      lambda.chain <- predict_lambda.chain(posterior, mu.chain, newdata)
+    } else {
+      lambda.chain <- list(l1.chain = 0, l2.chain = 0)
+    }
   }
 
-  return(pred.chain = list(response.aug = response, response = mu.chain, response.binom = response.binom, q0 = q.chain$q0.chain, q1 = q.chain$q1.chain,
-                           l1 = lambda.chain$l1.chain, l2 = lambda.chain$l2.chain))
-                           #overall = overall.chain))
+  return(pred.chain = list(response.binom = response.binom,
+                           response.aug = response,
+                           response = mu.chain,
+                           q0 = q.chain$q0.chain,
+                           q1 = q.chain$q1.chain,
+                           l1 = lambda.chain$l1.chain,
+                           l2 = lambda.chain$l2.chain))
 }
 
 
@@ -76,8 +97,8 @@ predict_response <- function(model, posterior, newdata, cluster, n){
 #' @keywords internal
 #'
 
-predict_link <- function(model, posterior, newdata){
-
+predict_link <- function(model,  newdata){
+  posterior <- model$model[[1]]
   beta.chain <- rstan::extract(posterior, pars="beta", permuted=T)[[1]]
   X <- model$design.X
 
@@ -92,17 +113,21 @@ predict_link <- function(model, posterior, newdata){
 #' @keywords internal
 #'
 
-predict_precision <- function(model, posterior, newdata){
- # n <- length(model$response)
-
-  if(is.null(newdata)){
+predict_precision <- function(model, newdata){
+  # n <- length(model$response)
+  posterior <- model$model[[1]]
+  link.phi <- model$link.phi
+  if(is.null(link.phi)) link.phi <- "identity"
+  if(link.phi=="identity"){
     pred.chain <- list(precision = as.matrix(rstan::extract(posterior, pars="phi", permuted=T)[[1]]))
-  } else{
-    link.phi <- model$link.phi
-    if(is.null(link.phi)) link.phi <- "identity"
+   }else{
+    if(is.null(newdata)) {
+      newdata.Z <- model$design.Z
+    }else{
     newdata.Z <- newdata[,match(colnames(model$design.Z),colnames(newdata))]
-    pred.chain <- list(precision=as.matrix(phi.chain.nd(posterior, newdata.Z, link.phi)))
     }
+    pred.chain <- list(precision=as.matrix(phi.chain.nd(posterior, newdata.Z, link.phi)))
+  }
 
   #if(is.na(dim(pred.chain[[1]])[2])) pred.chain <- list(precision=matrix(rep(pred.chain[[1]], n),ncol=n))
   return(pred.chain)
@@ -112,14 +137,14 @@ predict_precision <- function(model, posterior, newdata){
 #' @keywords internal
 #'
 phi.chain.nd <- function(posterior, newdata.Z, link.phi){
-  if(link.phi == "identity") {
-    phi.chain <- rstan::extract(posterior, pars="phi", permuted=T)[[1]]
-  } else {
+  #if(link.phi == "identity") {
+   # phi.chain <- rstan::extract(posterior, pars="phi", permuted=T)[[1]]
+  #} else {
     psi.chain <- rstan::extract(posterior, pars="psi", permuted=T)[[1]]
     eta.chain <- psi.chain %*% t(newdata.Z)
     if(link.phi == "log") phi.chain <- apply(eta.chain,c(1,2), function(x) exp(x)) else
       if(link.phi == "sqrt") phi.chain <- apply(eta.chain,c(1,2), function(x) x^2)
-  }
+ # }
   return(phi.chain)
 }
 
@@ -128,49 +153,56 @@ phi.chain.nd <- function(posterior, newdata.Z, link.phi){
 #' @keywords internal
 #'
 
-predict_variance <- function(model, posterior, newdata, cluster, cluster.var = T, model.type, model.class, n){
+predict_variance <- function(model, newdata, cluster, cluster.var = T, model.type, model.class, n){
 
-  response.chain <- predict_response(model, posterior, newdata, cluster, n)
+  posterior <- model$model[[1]]
+  response.chain <- predict_response(model, newdata, cluster, n)
   if("flexreg_binom" %in% class(model)){
-    theta.chain <- predict_over(model, posterior, newdata)[[1]]
+    theta.chain <- predict_over(model, newdata)[[1]]
     phi.chain <- NULL
-    } else{
-      phi.chain <- predict_precision(model, posterior, newdata)[[1]]
-      theta.chain <- NULL
-    }
+  } else{ # if the model is for continuous data
 
-  q.chain <- predict_q.chain(model, posterior, newdata)
-  #if(!is.null(newdata) & !is.null(n)) n <- newdata$n
-  variance.chain <- var.fun(model.class = model.class, model.type = model.type, posterior = posterior, mu.chain = response.chain$response,
-                            q0.chain = response.chain$q0, q1.chain = response.chain$q1,
-                            l1.chain = response.chain$l1, l2.chain = response.chain$l2,
-                            phi.chain = phi.chain, theta.chain = theta.chain, n = n)
-  pred.chain <- list(variance = variance.chain$variance, cluster1 = variance.chain$var1, cluster2 = variance.chain$var2)
+    phi.chain <- predict_precision(model, newdata)[[1]]
+    theta.chain <- NULL
+  }
+
+  variance.chain <- var.fun(model.class = model.class,
+                            model.type = model.type,
+                            posterior = posterior,
+                            mu.chain = response.chain$response,
+                            q0.chain = response.chain$q0,
+                            q1.chain = response.chain$q1,
+                            l1.chain = response.chain$l1,
+                            l2.chain = response.chain$l2,
+                            phi.chain = phi.chain,
+                            theta.chain = theta.chain, n = n)
+  pred.chain <- list(variance = variance.chain$variance,
+                     cluster1 = variance.chain$var1,
+                     cluster2 = variance.chain$var2)
   if(cluster.var == F){
     pred.chain <- list(variance = pred.chain$variance)
   }
   return(pred.chain)
 }
 
-
 #' @title predict_over
 #' @keywords internal
 #'
 
-predict_over <- function(model, posterior, newdata){
+predict_over <- function(model, newdata){
+  posterior <- model$model[[1]]
   #n <- length(model$response)
   if(model$type == "Bin"){
     pred.chain <- NULL
   } else {
-  if(is.null(newdata)){
-    pred.chain <- list(overdispersion = as.matrix(rstan::extract(posterior, pars="theta", permuted=T)[[1]]))
-  } else {
-    link.theta <- model$link.theta
-    newdata.theta <- newdata[,match(colnames(model$design.Z),colnames(newdata))]
-    pred.chain <- list(overdispersion=as.matrix(theta.chain.nd(posterior, newdata.theta, link.theta)))
+    if(is.null(newdata)){
+      pred.chain <- list(overdispersion = as.matrix(rstan::extract(posterior, pars="theta", permuted=T)[[1]]))
+    } else {
+      link.theta <- model$link.theta
+      newdata.theta <- newdata[,match(colnames(model$design.Z),colnames(newdata))]
+      pred.chain <- list(overdispersion=as.matrix(theta.chain.nd(posterior, newdata.theta, link.theta)))
     }
   }
-  #if(is.na(dim(pred.chain[[1]])[2])) pred.chain <- list(overdispersion=matrix(rep(pred.chain[[1]], n),ncol=n))
   return(pred.chain)
 }
 
@@ -191,7 +223,8 @@ mu.chain.nd <- function(posterior, newdata.X, link.mu){
 #' @title predict_q.chain
 #' @keywords internal
 #'
-predict_q.chain <- function(model, posterior, newdata = NULL){
+predict_q.chain <- function(model, newdata = NULL){
+  posterior.aug <- model$model[[2]]
 
   if(is.null(model$call$zero.formula) & is.null(model$call$one.formula)){
     q0.chain <- 0
@@ -200,32 +233,33 @@ predict_q.chain <- function(model, posterior, newdata = NULL){
     q1.chain <- 0
 
     if(is.null(newdata)){
-      q0.chain <- rstan::extract(posterior, pars="q0", permuted=T)[[1]]
+      q0.chain <- rstan::extract(posterior.aug, pars="mu", permuted=T)[[1]]
     } else{
       newdata.X0 <- newdata[,match(colnames(model$design.X0),colnames(newdata))]
-      q0.chain <- q0.chain.nd(posterior, newdata.X0)
+      q0.chain <- q0.chain.nd(posterior.aug, newdata.X0)
     }
 
   } else if(is.null(model$call$zero.formula) & !is.null(model$call$one.formula)){
     q0.chain <- 0
 
     if(is.null(newdata)){
-      q1.chain <- rstan::extract(posterior, pars="q1", permuted=T)[[1]]
+      q1.chain <- rstan::extract(posterior.aug, pars="mu", permuted=T)[[1]]
     } else{
       newdata.X1 <- newdata[,match(colnames(model$design.X1),colnames(newdata))]
-      q1.chain <- q1.chain.nd(posterior, newdata.X1)
+      q1.chain <- q1.chain.nd(posterior.aug, newdata.X1)
     }
 
   } else if(!is.null(model$call$zero.formula) & !is.null(model$call$one.formula)){
     if(is.null(newdata)){
-      q0.chain <- rstan::extract(posterior, pars="q0", permuted=T)[[1]]
-      q1.chain <- rstan::extract(posterior, pars="q1", permuted=T)[[1]]
+      q.chain <- rstan::extract(posterior.aug, pars="q", permuted=T)[[1]]
+      q0.chain <- q.chain[,,1]
+      q1.chain <- q.chain[,,2]
     }else{
-    newdata.X0 <- newdata[,match(colnames(model$design.X0),colnames(newdata))]
-    newdata.X1 <- newdata[,match(colnames(model$design.X1),colnames(newdata))]
-    q.chain <- q01.chain.nd(posterior, newdata.X0, newdata.X1)
-    q0.chain <- q.chain$q0.chain
-    q1.chain <- q.chain$q1.chain
+      newdata.X0 <- newdata[,match(colnames(model$design.X0),colnames(newdata))]
+      newdata.X1 <- newdata[,match(colnames(model$design.X1),colnames(newdata))]
+      q.chain <- q01.chain.nd(posterior.aug, newdata.X0, newdata.X1)
+      q0.chain <- q.chain$q0.chain
+      q1.chain <- q.chain$q1.chain
     }
   }
 
@@ -237,8 +271,8 @@ predict_q.chain <- function(model, posterior, newdata = NULL){
 #' @title q0.chain.nd
 #' @keywords internal
 #'
-q0.chain.nd <- function(posterior, newdata.X0){
-  omega0.chain <- rstan::extract(posterior, pars="omega0", permuted=T)[[1]]
+q0.chain.nd <- function(posterior.aug, newdata.X0){
+  omega0.chain <- rstan::extract(posterior.aug, pars="beta", permuted=T)[[1]]
   eta.chain <- omega0.chain %*% t(newdata.X0)
   q0.chain <- apply(eta.chain,c(1,2), function(x) 1/(1+exp(-x)))
   return(q0.chain)
@@ -247,8 +281,8 @@ q0.chain.nd <- function(posterior, newdata.X0){
 #' @title q1.chain.nd
 #' @keywords internal
 #'
-q1.chain.nd <- function(posterior, newdata.X1){
-  omega1.chain <- rstan::extract(posterior, pars="omega1", permuted=T)[[1]]
+q1.chain.nd <- function(posterior.aug, newdata.X1){
+  omega1.chain <- rstan::extract(posterior.aug, pars="beta", permuted=T)[[1]]
   eta.chain <- omega1.chain %*% t(newdata.X1)
   q1.chain <- apply(eta.chain,c(1,2), function(x) 1/(1+exp(-x)))
   return(q1.chain)
@@ -257,9 +291,9 @@ q1.chain.nd <- function(posterior, newdata.X1){
 #' @title q01.chain.nd
 #' @keywords internal
 #'
-q01.chain.nd <- function(posterior, newdata.X0, newdata.X1){
-  omega0.chain <- rstan::extract(posterior, pars="omega0", permuted=T)[[1]]
-  omega1.chain <- rstan::extract(posterior, pars="omega1", permuted=T)[[1]]
+q01.chain.nd <- function(posterior.aug, newdata.X0, newdata.X1){
+  omega0.chain <- rstan::extract(posterior.aug, pars="omega0", permuted=T)[[1]]
+  omega1.chain <- rstan::extract(posterior.aug, pars="omega1", permuted=T)[[1]]
   eta0.chain <- exp(omega0.chain %*% t(newdata.X0))
   eta1.chain <- exp(omega1.chain %*% t(newdata.X1))
   eta.chain <- cbind(eta0.chain,eta1.chain)
@@ -273,8 +307,6 @@ q01.chain.nd <- function(posterior, newdata.X0, newdata.X1){
 #' @keywords internal
 #'
 
-
-
 var.fun <- function(model.class, model.type, posterior, mu.chain, phi.chain, theta.chain, q0.chain, q1.chain, l1.chain, l2.chain, n){
 
   if("flexreg_binom" %in% model.class){
@@ -282,33 +314,33 @@ var.fun <- function(model.class, model.type, posterior, mu.chain, phi.chain, the
       var1 <- var2 <- NULL
       cond.variance <- t(apply(mu.chain, 1, function(x) n*(x*(1-x))))
     } else{
-    if(ncol(theta.chain) == 1)  theta.chain <- matrix(rep(theta.chain, length(n)), ncol=length(n))#theta.chain <- as.vector(theta.chain)
-    if(model.type == "BetaBin"){
-      var1 <- var2 <- NULL
-      cond.variance <- t(apply(mu.chain,1, function(x) n*(x*(1-x)))) *(1+
-                                        t(apply(theta.chain, 1, function(x) x*(n-1))))
-    } else   if(model.type == "FBB"){
-      p.chain <- as.vector(rstan::extract(posterior, pars="p", permuted=T)[[1]])
-      m.mu.p <- apply(mu.chain, 2, function(x) pmin((x*(1-p.chain))/(p.chain*(1-x)),
-                                                  (p.chain*(1-x))/(x*(1-p.chain))))
-
-      w.chain <- as.vector(rstan::extract(posterior, pars="w", permuted=T)[[1]])
-
-      if(is.null(dim(l1.chain ))) {
+      if(ncol(theta.chain) == 1)  theta.chain <- matrix(rep(theta.chain, length(n)), ncol=length(n))#theta.chain <- as.vector(theta.chain)
+      if(model.type == "BetaBin"){
         var1 <- var2 <- NULL
-      } else {
-        var1 <- t(apply(l1.chain,1, function(x) n*(x*(1-x)))) *(1+t(apply(theta.chain, 1, function(x) x*(n-1))))
-        var2 <- t(apply(l2.chain,1, function(x) n*(x*(1-x)))) *(1+t(apply(theta.chain, 1, function(x) x*(n-1))))
-      }
+        cond.variance <- t(apply(mu.chain,1, function(x) n*(x*(1-x)))) *(1+
+                                                                           t(apply(theta.chain, 1, function(x) x*(n-1))))
+      } else   if(model.type == "FBB"){
+        p.chain <- as.vector(rstan::extract(posterior, pars="p", permuted=T)[[1]])
+        m.mu.p <- apply(mu.chain, 2, function(x) pmin((x*(1-p.chain))/(p.chain*(1-x)),
+                                                      (p.chain*(1-x))/(x*(1-p.chain))))
 
-      cond.variance <- t(apply(mu.chain,1, function(x) n*(x*(1-x))))*
-        (1+t(apply(theta.chain, 1, function(x) x*(n-1)))+t(apply(theta.chain, 1, function(x) x*(n-1)))*w.chain^2*m.mu.p)
+        w.chain <- as.vector(rstan::extract(posterior, pars="w", permuted=T)[[1]])
+
+        if(is.null(dim(l1.chain ))) {
+          var1 <- var2 <- NULL
+        } else {
+          var1 <- t(apply(l1.chain,1, function(x) n*(x*(1-x)))) *(1+t(apply(theta.chain, 1, function(x) x*(n-1))))
+          var2 <- t(apply(l2.chain,1, function(x) n*(x*(1-x)))) *(1+t(apply(theta.chain, 1, function(x) x*(n-1))))
         }
-      }
-    } else {
 
-  #check for collapsing phi.chain, if necessary
-  if(ncol(phi.chain) == 1) phi.chain <- as.vector(phi.chain)
+        cond.variance <- t(apply(mu.chain,1, function(x) n*(x*(1-x))))*
+          (1+t(apply(theta.chain, 1, function(x) x*(n-1)))+t(apply(theta.chain, 1, function(x) x*(n-1)))*w.chain^2*m.mu.p)
+      }
+    }
+  } else {
+
+    #check for collapsing phi.chain, if necessary
+    if(ncol(phi.chain) == 1) phi.chain <- as.vector(phi.chain)
 
     if(model.type == "Beta"){
       var1 <- var2 <- NULL
@@ -334,8 +366,8 @@ var.fun <- function(model.class, model.type, posterior, mu.chain, phi.chain, the
 
       wtilde.chain <- apply(mu.chain, 2, function(x) w.chain*pmin(x/p.chain, (1-x)/(1-p.chain)))
       cond.variance <- (mu.chain*(1-mu.chain)+apply(wtilde.chain^2*phi.chain,2, function(x) x*p.chain*(1-p.chain)))/(1+phi.chain)
-      }
     }
+  }
   q2.chain <- (1-q0.chain-q1.chain)
   variance <- q2.chain*cond.variance+q1.chain+q2.chain*mu.chain^2-(q1.chain+q2.chain*mu.chain)^2
   return(list(variance = variance, cond.variance = cond.variance, var1 = var1, var2 = var2))
@@ -419,15 +451,16 @@ rate_plot <- function(chains, pars, n.warmup = n.warmup){
     data.plot$Chain <- as.factor(rep(1, S))
   }
 
-  plot.out <- lapply(pars, function(g) ggplot(data.plot, aes_string(x="iter", y=as.name(g), color= "Chain"))+
-                       annotate("rect",xmin = 0,xmax = n.warmup,
-                                ymin = -Inf, ymax = Inf, fill =  "grey20", alpha = 0.1)+
-                       geom_line()+ theme(legend.position = 'none',panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                          panel.background = element_blank(),
-                                          axis.title.x = element_blank(),
-                                          axis.title.y=element_text(angle=0,hjust=1),
-                                          axis.line = element_line(colour = "black"))+
-                       ggtitle(paste("Rate plot of ", g, sep=" ")))
+  plot.out <- lapply(pars, function(g)
+    ggplot(data.plot,
+           aes(x=data.plot$iter, y=!!as.name(g), color= data.plot$Chain))+
+      annotate("rect",xmin = 0,xmax = n.warmup,
+               ymin = -Inf, ymax = Inf, fill =  "grey20", alpha = 0.1)+
+      geom_line()+ theme(legend.position = 'none',panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                         panel.background = element_blank(),
+                         axis.title.x = element_blank(),
+                         axis.title.y=element_text(angle=0,hjust=1),
+                         axis.line = element_line(colour = "black"))+
+      ggtitle(paste("Rate plot of ", g, sep=" ")))
   return(plot.out)
 }
-

@@ -24,7 +24,6 @@
 #' @method posterior_predict flexreg
 #' @importFrom rstantools posterior_predict
 #' @export
-#' @export posterior_predict
 #'
 #' @references{
 #' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
@@ -40,7 +39,7 @@
 
 posterior_predict.flexreg <- function(model, newdata = NULL, n.new = NULL)
 {
-  posterior <- model$model
+  posterior <- model$model[[1]]
   model.type <- model$type
   nsim <- dim(posterior)[1]*dim(posterior)[2]
 
@@ -61,78 +60,82 @@ posterior_predict.flexreg <- function(model, newdata = NULL, n.new = NULL)
   if(!is.null(newdata)) newdata <- newdata.adjust(newdata, formula)
   N <- ifelse(is.null(newdata), length(model$response), nrow(newdata))
 
-  mu.chain <- predict_mu.chain(model, posterior, newdata)
-  q.chain <- predict_q.chain(model, posterior, newdata)
-  q0.chain <- q.chain$q0.chain
-  q1.chain <- q.chain$q1.chain
+  mu.chain <- predict_mu.chain(model, newdata)
 
-  if(is.null(dim(q0.chain))) q0.chain <- NULL
-  if(is.null(dim(q1.chain))) q1.chain <- NULL
+  if(length(model$model) >1){
+    q.chain <- predict_q.chain(model, newdata)
+    q0.chain <- q.chain$q0.chain
+    q1.chain <- q.chain$q1.chain
+  } else{
+    q0.chain <- NULL
+    q1.chain <- NULL
+  }
 
   #if bound model is phi, otherwise is a theta, but saved in same object
   if(("flexreg_bound" %in% class(model))){
-  phi.theta.chain <- predict_precision(model, posterior, newdata)[[1]]
+    phi.theta.chain <- predict_precision(model, newdata)[[1]]
   } else  if( model.type != "Bin" & ("flexreg_binom" %in% class(model))){
-    phi.theta.chain <- predict_over(model, posterior, newdata)[[1]]
+    phi.theta.chain <- predict_over(model, newdata)[[1]]
   } else{#if model is binomial
     phi.theta.chain <- matrix(0)
   }
 
   #additional parameters
   if(model.type %in% c("FB", "FBB")){
-      p.chain <- rstan::extract(posterior, pars="p", permuted=T)[[1]]
-      w.chain <- rstan::extract(posterior, pars="w", permuted=T)[[1]]
-    }
+    p.chain <- rstan::extract(posterior, pars="p", permuted=T)[[1]]
+    w.chain <- rstan::extract(posterior, pars="w", permuted=T)[[1]]
+  }
 
   if(model.type == "VIB"){
-      p.chain <- rstan::extract(posterior, pars="p", permuted=T)[[1]]
-      k.chain <- rstan::extract(posterior, pars="k", permuted=T)[[1]]
+    p.chain <- rstan::extract(posterior, pars="p", permuted=T)[[1]]
+    k.chain <- rstan::extract(posterior, pars="k", permuted=T)[[1]]
+  }
+
+  post.pred <- matrix(NA, ncol=N, nrow=nsim)
+  for(l in 1:N){
+    mu.post <- mu.chain[,l]
+    q0.post <- q0.chain[,l]
+    q1.post <- q1.chain[,l]
+
+    if(ncol(phi.theta.chain) == 1){
+      phi.theta.post <- as.vector(phi.theta.chain)
+    } else {
+      phi.theta.post <- phi.theta.chain[,l]
     }
 
-    post.pred <- matrix(NA, ncol=N, nrow=nsim)
-    for(l in 1:N){
-      mu.post <- mu.chain[,l]
-      q0.post <- q0.chain[,l]
-      q1.post <- q1.chain[,l]
 
-      if(ncol(phi.theta.chain) == 1){
-        phi.theta.post <- as.vector(phi.theta.chain)
-      } else {
-        phi.theta.post <- phi.theta.chain[,l]
-      }
-
-
-      if(model.type == "Beta") {
-        param <- as.data.frame(cbind(mu.post, phi.theta.post, q0.post, q1.post))
-        post.pred[,l] <- unlist(lapply(1:nsim, function(z) rBeta(n=1, mu=param$mu.post[z], phi=param$phi.theta.post[z],
-                                                                    q0=param$q0.post[z], q1=param$q1.post[z])))
-      } else if(model.type == "FB") {
-        param <- as.data.frame(cbind(mu.post, phi.theta.post, p.chain, w.chain, q0.post, q1.post))
-                post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rFB(n=1, mu=param$mu.post[z], phi=param$phi.theta.post[z],
-                                                                p=param$p.chain[z], w=param$w.chain[z],
-                                                                q0=param$q0.post[z], q1=param$q1.post[z])))
-      } else if(model.type == "VIB") {
-        param <- as.data.frame(cbind(mu.post, phi.theta.post, p.chain, k.chain, q0.post, q1.post))
-        post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rVIB(n=1, mu=param$mu.post[z], phi=param$phi.theta.post[z],
-                                                                 p=param$p.chain[z], k=param$k.chain[z],
-                                                                 q0=param$q0.post[z], q1=param$q1.post[z])))
-      } else if(model.type == "Bin"){
-        param <- cbind(mu.post)
-        post.pred[,l] <- unlist(lapply(1:nsim, function(z) rbinom(n=1, size=n[l], prob=param[z,1])))
-        post.pred[,l] <- post.pred[,l]/n[l]
-      } else if(model.type == "BetaBin"){
-        param <- cbind(mu.post, phi.theta.post)
-        post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rBetaBin(n=1, size=n[l], mu=param[z,1], theta=param[z,2])))
-        post.pred[,l] <- post.pred[,l]/n[l]
-      } else if(model.type == "FBB"){
-        param <- cbind(mu.post, phi.theta.post, p.chain, w.chain)
-        post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rFBB(n=1, size=n[l], mu=param[z,1], theta=param[z,2], p=param[z,3], w=param[z,4])))
-        post.pred[,l] <- post.pred[,l]/n[l]
-      }
+    if(model.type == "Beta") {
+      param <- as.data.frame(cbind(mu.post, phi.theta.post, q0.post, q1.post))
+      post.pred[,l] <- unlist(lapply(1:nsim, function(z) rBeta(n=1, mu=param$mu.post[z], phi=param$phi.theta.post[z],
+                                                               q0=param$q0.post[z], q1=param$q1.post[z])))
+    } else if(model.type == "FB") {
+      param <- as.data.frame(cbind(mu.post, phi.theta.post, p.chain, w.chain, q0.post, q1.post))
+      post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rFB(n=1, mu=param$mu.post[z], phi=param$phi.theta.post[z],
+                                                              p=param$p.chain[z], w=param$w.chain[z],
+                                                              q0=param$q0.post[z], q1=param$q1.post[z])))
+    } else if(model.type == "VIB") {
+      param <- as.data.frame(cbind(mu.post, phi.theta.post, p.chain, k.chain, q0.post, q1.post))
+      post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rVIB(n=1, mu=param$mu.post[z], phi=param$phi.theta.post[z],
+                                                               p=param$p.chain[z], k=param$k.chain[z],
+                                                               q0=param$q0.post[z], q1=param$q1.post[z])))
+    } else if(model.type == "Bin"){
+      param <- cbind(mu.post)
+      post.pred[,l] <- unlist(lapply(1:nsim, function(z) rbinom(n=1, size=n[l], prob=param[z,1])))
+      post.pred[,l] <- post.pred[,l]/n[l]
+    } else if(model.type == "BetaBin"){
+      param <- cbind(mu.post, phi.theta.post)
+      post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rBetaBin(n=1, size=n[l], mu=param[z,1], theta=param[z,2])))
+      post.pred[,l] <- post.pred[,l]/n[l]
+    } else if(model.type == "FBB"){
+      param <- cbind(mu.post, phi.theta.post, p.chain, w.chain)
+      post.pred[,l] <-  unlist(lapply(1:nsim, function(z) rFBB(n=1, size=n[l], mu=param[z,1], theta=param[z,2], p=param[z,3], w=param[z,4])))
+      post.pred[,l] <- post.pred[,l]/n[l]
     }
+  }
   class(post.pred) <- "flexreg_postpred"
   return(post.pred)
 }
+
 
 #' @title posterior_predict
 #' @export
@@ -142,7 +145,6 @@ posterior_predict <- function(model, newdata = NULL, n.new = NULL)
 {
   UseMethod("posterior_predict")
 }
-
 
 #' Plot Method for \code{`flexreg_postpred`} objects
 #'
@@ -159,7 +161,7 @@ posterior_predict <- function(model, newdata = NULL, n.new = NULL)
 #' @examples
 #' \dontrun{
 #' data("Reading")
-#' FB <- flexreg(accuracy ~ iq, data = Reading)
+#' FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter=1000)
 #' pp <- posterior_predict(FB)
 #' plot(pp)
 #' }
@@ -236,7 +238,7 @@ plot.flexreg_postpred <- function(x, prob=0.9, p_mean=F, response=NULL, ...){
 #' @examples
 #' \dontrun{
 #' data("Reading")
-#' FB <- flexreg(accuracy ~ iq, data = Reading)
+#' FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter=1000)
 #' pp <- posterior_predict(FB)
 #' summary(pp)
 #' }
@@ -256,7 +258,7 @@ summary.flexreg_postpred <- function(object, ...){
   x <- t(object)
   summa <- cbind(apply(x, 1, min),
                  apply(x, 1, quantile, 0.25),
-                apply(x,1,median),
+                 apply(x,1,median),
                  rowMeans(x),
                  apply(x,1, quantile, 0.75),
                  apply(x,1, max))

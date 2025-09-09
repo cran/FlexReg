@@ -24,7 +24,7 @@ Additionally, the mean of the posterior predictives and the values of the observ
 \examples{
 \dontrun{
 data("Reading")
-FB <- flexreg(accuracy ~ iq, data = Reading)
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter=1000)
 pp <- posterior_predict(FB)
 plot(pp)
 }

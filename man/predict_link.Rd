@@ -4,7 +4,7 @@
 \alias{predict_link}
 \title{predict_link}
 \usage{
-predict_link(model, posterior, newdata)
+predict_link(model, newdata)
 }
 \description{
 predict_link

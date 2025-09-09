@@ -21,6 +21,9 @@
 #' @param hyperparam.phi a positive numeric (vector of length 1) specifying the hyperprior parameter for the prior distribution of \code{phi}. If the prior is \code{"gamma"}, the value identifies the gamma's shape and rate parameters (the default is 0.001). If the prior is \code{"uniform"} the hyperparameter must be specified to define the upper limit of the support of \code{phi}.
 #' @param prior.psi a character specifying the prior distribution for the regression coefficients of the precision model \code{psi} (not supported if \code{link.phi = "identity"}). Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.
 #' @param hyperparam.psi a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{psi} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.
+#' @param hyperparam.p a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{p}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.
+#' @param hyperparam.w a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{w}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.
+#' @param hyperparam.k a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{k}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.
 #' @param n.chain a positive integer specifying the number of Markov chains. The default is 1.
 #' @param n.iter 	a positive integer specifying the number of iterations for each chain (including warm-up). The default is 5000.
 #' @param warmup.perc the percentage of iterations per chain to discard.
@@ -35,7 +38,7 @@
 #' \item{\code{aug}}{a character specifing the absence of the augmentation (\code{"No"}) or the presence of augmentation in zero (\code{"0"}), one (\code{"1"}), or both (\code{"01"}).}
 #' \item{\code{link.mu}}{a character specifing the link function in the mean model.}
 #' \item{\code{link.phi}}{a character specifing the link function in the precision model.}
-#' \item{\code{model}}{an object of class \code{`stanfit`} containing the fitted model.}
+#' \item{\code{model}}{a list of objects of class \code{`stanfit`} containing the fitted model(s).}
 #' \item{\code{response}}{the response variable, assuming values in (0, 1).}
 #' \item{\code{design.X}}{the design matrix for the mean model.}
 #' \item{\code{design.Z}}{the design matrix for the precision model (if defined).}
@@ -98,15 +101,39 @@ flexreg <- function(formula, zero.formula=NULL, one.formula=NULL, data,
                     prior.beta = "normal", hyperparam.beta = NULL,
                     prior.omega0 = "normal", hyperparam.omega0 = NULL,
                     prior.omega1 = "normal", hyperparam.omega1 = NULL,
+                    hyperparam.p = NULL,  hyperparam.w = NULL, hyperparam.k = NULL,
                     link.phi = NULL, prior.phi = NULL, hyperparam.phi = NULL,
                     prior.psi = NULL, hyperparam.psi = NULL,
                     n.chain=1, n.iter=5000, warmup.perc=.5, thin=1, verbose=TRUE, ...)
 {
   cl <-   match.call()
 
+
   if(is.na(match(type, c("FB", "Beta", "VIB")))) stop("Please specify the type of model correctly.")
 
   if (missing(data)) data <- environment(formula) else  data <- as.data.frame(data)
+
+  if(type == "Beta" & (!is.null(hyperparam.p)| !is.null(hyperparam.w) | !is.null(hyperparam.k))) {
+    hyperparam.p = NULL;  hyperparam.w = NULL; hyperparam.k = NULL
+    warning("The Beta model does not admit the parameters p, w, and/or k. Thus, the specification of their hyperparameters is ignored.")
+  }
+  if(type == "FB" & (!is.null(hyperparam.k))) {
+    hyperparam.k <- NULL
+    warning("The FB model does not admit the parameter k. Thus, the specification of its hyperparameters is ignored.")
+  }
+  if((type == "FB" | type == "VIB") & (is.null(hyperparam.p))) hyperparam.p <-  c(0.5,2)
+  if(type == "FB" & (is.null(hyperparam.w))) hyperparam.w <-  c(0.5,2)
+  if(type == "VIB" & (!is.null(hyperparam.w))){
+    hyperparam.w <- NULL
+    warning("The VIB model does not admit the parameter w. Thus, the specification of its hyperparameters is ignored.")
+  }
+  if(type == "VIB" & (is.null(hyperparam.k))) hyperparam.k <-  c(0.5,2)
+  if((!is.null(hyperparam.p)| !is.null(hyperparam.w) | !is.null(hyperparam.k))){
+    if(any(c(hyperparam.p[1], hyperparam.w[1], hyperparam.k[1])>=1 | c(hyperparam.p[1], hyperparam.w[1], hyperparam.k[1])<=0)|
+       any(c(hyperparam.p[2], hyperparam.w[2], hyperparam.k[2])<=0)| !all(c(length(hyperparam.p), length(hyperparam.w), length(hyperparam.k))%in%c(0,2)))
+      stop("Error: the vector of hyperparameters for p, w, and/or k must have length 2 - both elements must be positive, and the first element must be less than 1.")
+  }
+
 
   formula <- Formula::as.Formula(formula)
 
@@ -164,7 +191,7 @@ flexreg <- function(formula, zero.formula=NULL, one.formula=NULL, data,
   }
   if(max(y) == 1 & (is.null(one.formula))){
     stop("Presence of ones in the response variable. Specify a model with one augmentation.")
-  }else if(max(y)<1 & !is.null(one.formula)){
+  } else if(max(y)<1 & !is.null(one.formula)){
     stop("A model with one augmentation is specified but there are no ones in the response variable.")
   }
   if(min(y)<0 | max(y)>1){
@@ -196,15 +223,16 @@ flexreg <- function(formula, zero.formula=NULL, one.formula=NULL, data,
     if(prior_code_phi==1) hyper_phi <- ifelse(is.null(hyperparam.phi),0.001, hyperparam.phi) else #add warnings if g grande
       if(prior_code_phi==2) hyper_phi <-ifelse(is.null(hyperparam.phi), stop("Please specify an hyperparameter A>0 for uniform prior for phi"), hyperparam.phi)
       link_prior_psi <- NULL
-  }  else if (link_code_phi != 1) {
+  } else if (link_code_phi != 1) {
     prior_code_phi <- NULL
     hyper_phi <- NULL
     if(is.null(prior.psi)) link_prior_psi <- 1 else
       if (is.character(prior.psi)) link_prior_psi  <- pmatch(prior.psi, c("normal", "cauchy")) else
         stop("Invalid prior for psi parameter.")
 
-    if(is.null(hyperparam.psi)) hyperparam.psi <- ifelse(link_prior_psi==1, 100, 2.5)
-    else {
+    if(is.null(hyperparam.psi)) {
+      hyperparam.psi <- ifelse(link_prior_psi==1, 100, 2.5)
+    } else {
       if(hyperparam.psi < 0) stop("Hyperprior for psi coefficients must be positive")
       if(link_prior_psi == 1 & hyperparam.psi < 10) warning("An hyperprior of at least 10 for normal for psi coefficients is recommended")
       if(link_prior_psi == 2 & hyperparam.psi != 2.5) warning("An hyperprior of 2.5 for cauchy prior for psi coefficients is recommended")
@@ -233,7 +261,7 @@ flexreg <- function(formula, zero.formula=NULL, one.formula=NULL, data,
 
   if(is.null(one.formula) & is.null(zero.formula)){
     aug_code <- "No"
-  }else if(is.null(one.formula)){
+  } else if(is.null(one.formula)){
     aug_code <- "0"
   } else if (is.null(zero.formula)){
     aug_code <- "1"
@@ -252,78 +280,182 @@ flexreg <- function(formula, zero.formula=NULL, one.formula=NULL, data,
 
   ############################################
 
-  model <- fit.model(model.phi = model.phi, type = type, N = N,  y = y,
+  model <- fit.model_2(model.phi = model.phi, type = type, N = N,  y = y,
                      X = X, X0 = X0, X1 = X1, Z = Z, link_code_mu = link_code_mu,
                      aug_code = aug_code,
-                     link_prior_beta, hyperparam.beta,
-                     link_prior_omega0, hyperparam.omega0,
-                     link_prior_omega1, hyperparam.omega1,
+                     link_prior_beta = link_prior_beta, hyperparam.beta = hyperparam.beta,
+                     link_prior_omega0 = link_prior_omega0, hyperparam.omega0 = hyperparam.omega0,
+                     link_prior_omega1 = link_prior_omega1, hyperparam.omega1 = hyperparam.omega1,
+                     hyperparam.p = hyperparam.p, hyperparam.w = hyperparam.w, hyperparam.k = hyperparam.k,
                      link_code_phi = link_code_phi,
                      prior_code_phi = prior_code_phi, hyper_phi = hyper_phi,
-                     link_prior_psi, hyperparam.psi,
-                     n.iter, warmup.perc, n.chain, thin,
-                     verbose, ...)
+                     link_prior_psi = link_prior_psi, hyperparam.psi = hyperparam.psi,
+                     n.iter = n.iter, warmup.perc =  warmup.perc, n.chain = n.chain, thin = thin,
+                     verbose = verbose, ...)
 
   #questa riga serve per summary
   link.phi <- c("identity", "log", "sqrt")[link_code_phi]
-  output <- list(call=cl, type=type, formula=formula, aug = aug_code, link.mu=link.mu, link.phi=link.phi,
-                 model=model, response=y, design.X=X, design.Z=Z, design.X0=X0,design.X1=X1)
+  output <- list(call=cl, type=type, formula=formula,
+                 aug = aug_code,
+                 link.mu=link.mu, link.phi=link.phi,
+                 model=model, response=y, design.X=X,
+                 design.Z=Z, design.X0=X0,design.X1=X1)
   class(output)<- c("flexreg", "flexreg_bound")
-  #invisible(output)
+
   return(output)
 }
 
-fit.model <- function(model.phi = model.phi, type = type, N = N,  y = y, X = X, X0 = X0, X1 = X1, Z = Z,
+
+#' internal function
+#' @keywords internal
+#'
+fit.model_2 <- function(model.phi = model.phi, type = type, N = N,  y = y, X = X, X0 = X0, X1 = X1, Z = Z,
                       link_code_mu = link_code_mu, aug_code,
                       link_prior_beta, hyperparam.beta,
                       link_prior_omega0, hyperparam.omega0,
                       link_prior_omega1, hyperparam.omega1,
+                      hyperparam.p, hyperparam.w, hyperparam.k,
                       link_code_phi = link_code_phi,
                       prior_code_phi = prior_code_phi, hyper_phi = hyper_phi,
                       link_prior_psi, hyperparam.psi,
                       n.iter, warmup.perc, n.chain, thin, verbose, ...){
 
+  ###### Parte continua:
   data.stan <- list(
-    N = N,
-    y = y,
-    X = X,
-    X0 = X0,
-    X1 = X1,
-    Z = Z,
+    N = sum(y <1 & y >0),
+    y = y[y <1 & y >0],
+    X = X[y <1 & y >0,],
+    Z = Z[y <1 & y >0,],
     K = ncol(X),
-    K0 = ncol(X0),
-    K1 = ncol(X1),
     H = ncol(Z),
     link_code_mu = link_code_mu,
     link_prior_beta = link_prior_beta,
     hyperprior_beta = hyperparam.beta,
-    link_prior_omega1 = link_prior_omega1,
-    hyperprior_omega1 = hyperparam.omega1,
-    link_prior_omega0 = link_prior_omega0,
-    hyperprior_omega0 = hyperparam.omega0,
     link_code_phi = link_code_phi,
     prior_code_phi = prior_code_phi,
     hyper_phi = hyper_phi,
     link_prior_psi = link_prior_psi,
-    hyperprior_psi = hyperparam.psi
+    hyperprior_psi = hyperparam.psi,
+    hyperparam_p = hyperparam.p,
+    hyperparam_w = hyperparam.w,
+    hyperparam_k = hyperparam.k
   )
 
+  # TO DO:
+  # 1. Stimare il modello sulla parte (0,1) con o senza regressione su phi
+  #    sulla base di model.phi
+  # 2. Stimare, se necessario, la parte augmented
+  # 3. Riunire il tutto in un unico output che ricordi vagamente un oggetto
+  #    di Stan (difficile.. pensare se modificare i metodi per comportarsi in
+  #    in maniera differente in caso di augmentation)
+
+  # Tolgo riferimento a modello con augmentation.
   if(model.phi){
-    stan.model <- stanmodels[[paste0(type,aug_code, "_phi")]]
-  } else {  stan.model <- stanmodels[[paste0(type,aug_code)]]}
+    stan.model <- stanmodels[[paste0(type, "_phi")]]
+  } else {
+    stan.model <- stanmodels[[paste0(type)]]
+  }
+  cat("\n Fitting the continuous part:")
   fit.stan = rstan::sampling(
-    object = stan.model,#
+    object = stan.model,
     data = data.stan,
     chains = n.chain,
     thin = thin,
-    #init = initl,
     iter = n.iter, warmup = round(n.iter*warmup.perc),
     refresh = verbose*n.iter/10, #show an update @ each %10
-    # seed=1
     ...
   )
 
-  output <- fit.stan
-  return(output)
+  ###### Augmentation in zero
+  if(aug_code == "0"){
+    data.stan_0 <- list(
+      N = N,
+      y = as.numeric(y<=0),
+      n = rep(1, N),
+      X = X0,
+      K = ncol(X0),
+      link_code_mu = link_code_mu,
+      link_prior_beta = link_prior_omega0,
+      hyperprior_beta = hyperparam.omega0
+    )
 
+    cat("\n Fitting the zero augmentation part:")
+    fit.stan_0 = rstan::sampling(
+      object =  stanmodels[[paste0("Bin")]],
+      data = data.stan_0,
+      chains = n.chain,
+      thin = thin,
+      iter = n.iter, warmup = round(n.iter*warmup.perc),
+      refresh = verbose*n.iter/2,
+      ...
+    )
+  } else fit.stan_0 = NULL
+
+  if(aug_code == "1"){
+    data.stan_1 <- list(
+      N = N,
+      y = as.numeric(y>=1),
+      n = rep(1, N),
+      X = X1,
+      K = ncol(X1),
+      link_code_mu = link_code_mu,
+      link_prior_beta = link_prior_omega1,
+      hyperprior_beta = hyperparam.omega1
+    )
+
+    cat("\n Fitting the one augmentation part:")
+    fit.stan_1 = rstan::sampling(
+      object =  stanmodels[[paste0("Bin")]],
+      data = data.stan_1,
+      chains = n.chain,
+      thin = thin,
+      iter = n.iter, warmup = round(n.iter*warmup.perc),
+      refresh = verbose*n.iter/2,
+      ...
+    )
+  } else fit.stan_1 = NULL
+
+  if(aug_code == "01"){
+
+    Y <- matrix(0, ncol = 3, nrow = N)
+
+    Y[which(y == 0),1] <- 1
+    Y[which(y == 1),2] <- 1
+    Y[which(y < 1 & y > 0),3] <- 1
+
+    data.stan_01 <- list(
+      N = N,
+      Y = Y,
+      X0 = X0,
+      X1 = X1,
+      K0 = ncol(X0),
+      K1 = ncol(X1),
+      link_prior_omega1 = link_prior_omega1,
+      link_prior_omega0 = link_prior_omega0,
+      hyperprior_omega1 = hyperparam.omega1,
+      hyperprior_omega0 = hyperparam.omega0
+
+    )
+
+    cat("\n Fitting the zero and one augmentation part:")
+    fit.stan_01 = rstan::sampling(
+      object =  stanmodels[[paste0("Multinomial")]],
+      data = data.stan_01,
+      chains = n.chain,
+      thin = thin,
+      iter = n.iter, warmup = round(n.iter*warmup.perc),
+      refresh = verbose*n.iter/2,
+      ...
+    )
+  } else fit.stan_01 = NULL
+
+  output <- list(fit.stan = fit.stan,
+                 fit.stan_0 = fit.stan_0,
+                 fit.stan_1 = fit.stan_1,
+                 fit.stan_01 = fit.stan_01)
+
+  # Removing the NULL elements
+  output[sapply(output, is.null)] <- NULL
+
+  return(output)
 }

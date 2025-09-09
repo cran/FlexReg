@@ -1,10 +1,11 @@
-#' The `FlexReg' package.
+#' The 'FlexReg' package.
 #'
-#' @description The \pkg{\link{FlexReg}} package provides functions and methods to implement several types of regression models for bounded continuous responses (e.g., proportions and rates) and
+#' @description The FlexReg package provides functions and methods to implement several types of regression models for bounded continuous responses (e.g., proportions and rates) and
 #' bounded discrete responses (e.g., number of successes in n trials).
-#' Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \pkg{rstan} package.
+#' Inferential statistical analysis is dealt with by a Bayesian estimation procedure based on the Hamiltonian Monte Carlo (HMC) algorithm through the \code{rstan} package.
 #'
-#' @docType package
+#' @keywords internal
+"_PACKAGE"
 #' @name FlexReg-package
 #' @aliases FlexReg
 #' @useDynLib FlexReg, .registration = TRUE
@@ -27,3 +28,4 @@
 #' Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org
 #'
 NULL
+

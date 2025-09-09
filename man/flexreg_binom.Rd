@@ -12,8 +12,9 @@ flexreg_binom(
   link.mu = "logit",
   prior.beta = "normal",
   hyperparam.beta = 100,
-  hyper.theta.a = NULL,
-  hyper.theta.b = NULL,
+  hyperparam.theta = NULL,
+  hyperparam.p = NULL,
+  hyperparam.w = NULL,
   link.theta = NULL,
   prior.psi = NULL,
   hyperparam.psi = NULL,
@@ -40,9 +41,11 @@ flexreg_binom(
 
 \item{hyperparam.beta}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{beta} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
-\item{hyper.theta.a}{a numeric (vector of length 1) specifying the first shape parameter for the beta prior distribution of \code{theta}.}
+\item{hyperparam.theta}{a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{theta}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.}
 
-\item{hyper.theta.b}{a numeric (vector of length 1) specifying the second shape parameter for the beta prior distribution of \code{theta}.}
+\item{hyperparam.p}{a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{p}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.}
+
+\item{hyperparam.w}{a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{w}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.}
 
 \item{link.theta}{a character specifying the link function for the overdispersion model. Currently, \code{"identity"} (default), \code{"logit"}, \code{"probit"}, \code{"cloglog"}, and \code{"loglog"} are supported. If \code{link.theta = "identity"}, the prior distribution for \code{theta} is a beta.}
 
@@ -69,7 +72,7 @@ The \code{\link{flexreg_binom}} function returns an object of class \code{`flexr
 \item{\code{formula}}{the original formula.}
 \item{\code{link.mu}}{a character specifing the link function in the mean model.}
 \item{\code{link.theta}}{a character specifing the link function in the overdispersion model.}
-\item{\code{model}}{an object of class \code{`stanfit`} containing the fitted model.}
+\item{\code{model}}{a list containing an object of class \code{`stanfit`} with the fitted model.}
 \item{\code{response}}{the response variable, assuming values in (0, 1).}
 \item{\code{design.X}}{the design matrix for the mean model.}
 \item{\code{design.Z}}{the design matrix for the overdispersion model (if defined).}

@@ -22,7 +22,6 @@
 #' FB <- flexreg(accuracy.adj ~ iq, data = Reading, type = "FB")
 #' convergence.plot(FB, file = "Convergence_plot_Output.pdf", pars = "beta")
 #'}
-
 #'
 #' @references {
 #' Brooks, SP., Gelman, A. (1998). General methods for monitoring convergence of iterative simulations. Journal of Computational and Graphical Statistics, \bold{7}, 434-455. \cr
@@ -45,15 +44,134 @@
 #' @export
 #'
 
+
+
+
 convergence.plot <- function(model, file = "convergence-output.pdf",
                              plotfun = "all", pars = NULL, point_est = "median",
                              prob = 0.5, prob_outer = 0.9, lags = 10, warmup = F,
                              width = 7, height = 7)
 {
 
-  posterior <- model$model
-  if (is.null(pars)) pars <- extract.pars(posterior = posterior)
+  if(is.null(model$aug)) model$aug <- "No"
 
+  if(model$aug %in% c("0", "1")){
+    beta_index <- grep("beta", names(model$model[[2]]))
+    names(model$model[[2]])[beta_index] <-
+      paste0("omega", model$aug, "[", 1:length(beta_index), "]")
+  }
+
+  if(!is.null(pars)){
+    omega_index <- grep("omega", pars)
+
+    if(length(omega_index) == 0){ # if no augmentation
+      pars_1 <- pars
+
+      out1 <- convergence.plot.internal(model$model[[1]], file,
+                                        plotfun, pars_1, point_est,
+                                        prob, prob_outer, lags, warmup,
+                                        width, height)
+      out2 <- NULL
+    } else {
+      pars_1 <- pars[-grep("omega", pars)]
+
+      if(model$aug == "01"){
+        pars_2 <- pars[grep("omega", pars)]
+
+        out2 <- convergence.plot.internal(model$model[[2]], file,
+                                          plotfun, pars_2, point_est,
+                                          prob, prob_outer, lags, warmup,
+                                          width, height)
+      } else {
+        pars_2 <- paste0("omega", model$aug, "[", 1:length(beta_index), "]")
+
+        out2 <- convergence.plot.internal(model$model[[2]], file,
+                                          plotfun, pars_2, point_est,
+                                          prob, prob_outer, lags, warmup,
+                                          width, height)
+      }
+
+      if(length(pars_1) >0){
+        out1 <- convergence.plot.internal(model$model[[1]], file,
+                                          plotfun, pars_1, point_est,
+                                          prob, prob_outer, lags, warmup,
+                                          width, height)
+      } else out1 <- NULL
+
+
+    }
+  } else { # pars == NULL
+    out1 <- convergence.plot.internal(model$model[[1]], file,
+                                      plotfun, pars, point_est,
+                                      prob, prob_outer, lags, warmup,
+                                      width, height)
+    if(model$aug != "No"){
+      out2 <- convergence.plot.internal(model$model[[2]], file,
+                                        plotfun, pars, point_est,
+                                        prob, prob_outer, lags, warmup,
+                                        width, height)
+    } else out2 <- NULL
+  }
+
+  output <- vector(mode = "list", 2)
+  names(output) <- c("MainModel", "AugModel")
+  output$MainModel <- out1
+  output$AugModel <- out2
+  M <- length(out1)+length(out2)
+
+
+  D <- length(pars)
+  file.extension.position <- regexpr("\\.([[:alnum:]]+)$",file)
+  file.extension <- tolower(substr(file, file.extension.position +
+                                     1, nchar(file)))
+  file.name <- substr(file, 1, file.extension.position - 1)
+
+  if(is.null(file)){
+
+    if(!is.null(out1)){
+      for(i in 1:length(out1)){
+        question <- utils::menu(c("Yes", "No", "Exit"), title=paste0("Plot ", i, "/",length(out1), " of the main model", "\nDo you want to see it?"))
+        #grDevices::devAskNewPage(ask = TRUE)
+        if (question == 1)
+          #invisible
+          (utils::capture.output(print(out1[[i]])))
+        else if (question == 2) next()
+        else if (question ==3) break()#oppure next()
+      }
+    }
+
+    if(!is.null(out2)){
+      for(i in 1:length(out2)){
+        question <- utils::menu(c("Yes", "No", "Exit"), title=paste0("Plot ", i, "/",length(out2)," of the augmented model", "\nDo you want to see it?"))
+        #grDevices::devAskNewPage(ask = TRUE)
+        if (question == 1)
+          #invisible
+          (utils::capture.output(print(out2[[i]])))
+        else if (question == 2) next()
+        else if (question ==3) break()#oppure next()
+      }
+    }
+
+  } else if (file.extension == "pdf") {
+    out <- c(out1, out2)
+    grDevices::pdf(file, width = width, height = height)
+    invisible(utils::capture.output(print(out)))#DA QUI
+    garbage <- grDevices::dev.off()
+  } else stop("File extension not supported")
+}
+
+
+#' internal function
+#' @keywords internal
+#'
+convergence.plot.internal <- function(posterior, file,
+                                      plotfun, pars, point_est,
+                                      prob, prob_outer, lags, warmup,
+                                      width, height)
+{
+
+  if (is.null(pars)) pars <- extract.pars(posterior = posterior)
+  D <- length(pars)
   chains <- rstan::extract(posterior, pars, inc_warmup = warmup, permuted=F)#ottengo degli array
   n.iter <- dim(posterior)[1]
   n.warmup <- dim(chains)[1]-n.iter
@@ -76,12 +194,6 @@ convergence.plot <- function(model, file = "convergence-output.pdf",
     pars <- c(pars.full[grep("omega1",pars.full)], pars)
     pars <- pars[-which(pars=="omega1")]
   }
-
-  D <- length(pars)
-  file.extension.position <- regexpr("\\.([[:alnum:]]+)$",file)
-  file.extension <- tolower(substr(file, file.extension.position +
-                                     1, nchar(file)))
-  file.name <- substr(file, 1, file.extension.position - 1)
 
   ppp <- c()
   #density plot
@@ -127,68 +239,10 @@ convergence.plot <- function(model, file = "convergence-output.pdf",
     ppp <- c(ppp, list(pp))
   }
 
-  if (is.null(file)){
-    for(i in 1:length(ppp)){
-      question <- utils::menu(c("Yes", "No", "Exit"), title=paste0("Plot ", i, "/",length(ppp), "\nDo you want to see it?"))
-      #grDevices::devAskNewPage(ask = TRUE)
-      if (question == 1)
-        #invisible
-        (utils::capture.output(print(ppp[[i]])))
-      else if (question == 2) next()
-      else if (question ==3) break()#oppure next()
-    }
-    #grDevices::devAskNewPage(ask = FALSE)
-  } else if (file.extension == "pdf") {
-    grDevices::pdf(file, width = width, height = height)
-    invisible(utils::capture.output(print(ppp)))
-    garbage <- grDevices::dev.off()
-  } else stop("File extension not supported")
+  return(ppp)
+
 }
 
-extract.pars <- function(posterior){
-  pars.full <- names(posterior)
-  pars <- c()
-  pars <- c(pars, pars.full[grep("beta",pars.full)])
-  pars <- c(pars, pars.full[grep("psi",pars.full)])#if model.phi is TRUE or if model.theta is TRUE
-  pars <- c(pars, pars.full[which(pars.full=="phi")])#if model.phi or model.theta is FALSE
-  pars <- c(pars, pars.full[grep("omega0",pars.full)])#for 0 augmentation
-  pars <- c(pars, pars.full[grep("omega1",pars.full)])#for 1 augmentation
-  pars <- c(pars, pars.full[which(pars.full=="theta")])#if model.theta is FALSE
-  pars <- c(pars, pars.full[which(pars.full=="p")])#if type is FB, VIB, or FBB
-  pars <- c(pars, pars.full[which(pars.full=="w")])#if type is FB or FBB
-  pars <- c(pars, pars.full[which(pars.full=="k")])#if type is VIB
-  return(pars)
-}
-
-#plot for rate of convergence
-rate_plot <- function(chains, pars, n.warmup = n.warmup){
-  S <- dim(chains)[1]#n.iter
-  n.chain <- dim(chains)[2]#n.chain
-  sum.parz <- apply(chains, c(2,3), cumsum)
-  #dim(sum.parz) <- dim(chains)
-  mean.parz <- apply(sum.parz, 3, function(x) x/(1:S))
-  data.plot <- as.data.frame(mean.parz)
-  names(data.plot) <- pars
-
-  if (n.chain > 1) {
-    data.plot$Chain <- as.factor(rep(1:n.chain, each=S))
-    data.plot$iter  <- rep( 1:S, n.chain)
-  } else  {
-    data.plot$iter  <- 1:S
-    data.plot$Chain <- as.factor(rep(1, S))
-  }
-
-  plot.out <- lapply(pars, function(g) ggplot(data.plot, aes_string(x="iter", y=as.name(g), color= "Chain"))+
-                       annotate("rect",xmin = 0,xmax = n.warmup,
-                                ymin = -Inf, ymax = Inf, fill =  "grey20", alpha = 0.1)+
-                       geom_line()+ theme(legend.position = 'none',panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                                          panel.background = element_blank(),
-                                          axis.title.x = element_blank(),
-                                          axis.title.y=element_text(angle=0,hjust=1),
-                                          axis.line = element_line(colour = "black"))+
-                       ggtitle(paste("Rate plot of ", g, sep=" ")))
-  return(plot.out)
-}
 
 
 #' Convergence diagnostics
@@ -241,10 +295,69 @@ rate_plot <- function(chains, pars, n.warmup = n.warmup){
 
 convergence.diag <- function(model, diagnostics = "all", pars = NULL, additional.args=list())
 {
-  posterior <- model$model
+  n.chain <- model$call$n.chain
+  if(is.null(model$aug)) model$aug <- "No"
+
+  if(model$aug %in% c("0", "1")){
+    beta_index <- grep("beta", names(model$model[[2]]))
+    names(model$model[[2]])[beta_index] <-
+      paste0("omega", model$aug, "[", 1:length(beta_index), "]")
+  }
+  if(!is.null(pars)){
+    omega_index <- grep("omega", pars)
+
+    if(length(omega_index) == 0){ # if no augmentation
+      pars_1 <- pars
+
+      out1 <- convergence.diag.internal(model$model[[1]], pars = pars_1, additional.args = additional.args, aug = NA, n.chain = n.chain)
+      out2 <- NULL
+    } else {
+      pars_1 <- pars[-grep("omega", pars)]
+
+      if(model$aug == "01"){
+        pars_2 <- pars[grep("omega", pars)]
+
+        out2 <- convergence.diag.internal(model$model[[2]], pars = pars_2, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
+      } else {
+        pars_2 <- paste0("omega", model$aug, "[", 1:length(beta_index), "]")
+
+        out2 <- convergence.diag.internal(model$model[[2]], pars = pars_2, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
+      }
+
+      if(length(pars_1) >0){
+        out1 <- convergence.diag.internal(model$model[[1]], pars = pars_1, additional.args = additional.args, aug = NA, n.chain = n.chain)
+      } else out1 <- NULL
+
+
+    }
+  } else { # pars == NULL
+    out1 <- convergence.diag.internal(model$model[[1]], pars = pars, additional.args = additional.args,aug = NA, n.chain = n.chain)
+    if(model$aug != "No"){
+      out2 <- convergence.diag.internal(model$model[[2]], pars = pars, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
+    } else out2 = NULL
+  }
+
+  output <- vector(mode = "list", 2)
+  names(output) <- c("MainModel", "AugModel")
+  output$MainModel <- out1
+  output$AugModel <- out2
+
+
+
+  class(output) <- c("convergence.diag.flexreg", class(model)[2])
+
+  return(output)
+}
+
+#' internal function
+#' @keywords internal
+
+convergence.diag.internal <- function(posterior, diagnostics = "all", pars = NULL, additional.args=list(), aug = NULL, n.chain)
+{
+  #posterior <- model
   hmc.diag <- rstan::check_hmc_diagnostics(posterior)
 
-  if (is.null(pars)) pars <- extract.pars(posterior = posterior)
+  if(is.null(pars)) pars <- extract.pars(posterior = posterior)
   mcmc <- rstan::extract(posterior, pars=pars, permuted=F)
 
   if(any(diagnostics == "all")) diagnostics  <- c("Rhat", "geweke", "raftery", "heidel", "gelman")
@@ -255,6 +368,12 @@ convergence.diag <- function(model, diagnostics = "all", pars = NULL, additional
   } else rhat <- NULL
 
   mcmc <- rstan::As.mcmc.list(posterior, pars=pars)
+
+  if(aug %in% c("0", "1")){
+    beta_index <- grep("beta", colnames(mcmc[[1]]))
+    colnames(mcmc[[1]])[beta_index] <-
+      paste0("omega", aug, "[", 1:length(beta_index), "]")
+  }
 
   #gestiamo gli argomenti aggiuntivi
   arg.coda <- lapply(diagnostics, function(x)
@@ -271,8 +390,8 @@ convergence.diag <- function(model, diagnostics = "all", pars = NULL, additional
   out <- within(as.list(arg.coda),{
 
     if (any(diagnostics %in%  "gelman")){
-      if(is.null(model$call$n.chain)) model$call$n.chain <- 1
-      if (model$call$n.chain < 2){
+      if(is.null(n.chain)) n.chain <- 1
+      if (n.chain < 2){
         diagnostics <- diagnostics[-which(diagnostics=="gelman")]
         warning("You need at least two chains to compute Gelman and Rubin's convergence diagnostic")}
     }
@@ -286,7 +405,36 @@ convergence.diag <- function(model, diagnostics = "all", pars = NULL, additional
 
   if(!is.null(rhat))  out$other.diag$Rhat <- rhat
 
-    return(list(out$other.diag))
+  return(list(out$other.diag))
 
 }
 
+
+
+
+#' Print Methods for convergence.diag.flexreg Objects
+#'
+#' @param x an object of class \code{`convergence.diag.flexreg`}.
+#' @param ... additional arguments. Currently not used.
+#'
+#' @rdname convergence.diag
+#' @export
+#'
+
+print.convergence.diag.flexreg <- function(x, ...){
+
+  if(!is.null(x$MainModel)){
+    if("flexreg_bound" %in% class(x)){
+      cat("Convergence Diagnostics for the continuous part of the model: \n \n")
+      print(x$MainModel)
+    } else {
+      cat("Convergence Diagnostics: \n \n")
+      print(x$MainModel)
+    }
+  }
+
+  if(!is.null(x$AugModel)){
+    cat("Convergence Diagnostics for the augmented part of the model: \n \n")
+    print(x$AugModel)
+  }
+}

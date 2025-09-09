@@ -41,9 +41,9 @@ Values \eqn{y} and \eqn{y/n} are  the observed
 responses which are specified on the left-hand side of \code{formula} in the
 \code{\link{flexreg}} and \code{\link{flexreg_binom}} functions, respectively.
 Moreover,  \eqn{\hat{\mu}}  is the predicted value, the result of
-  the \code{\link{predict}} function with \code{type = "response"}.
+the \code{\link{predict}} function with \code{type = "response"}.
 Standardized residuals are defined as \eqn{\frac{r}{\sqrt{\widehat{Var}(y)}}} where
- \eqn{\widehat{Var}(y)}
+\eqn{\widehat{Var}(y)}
 is the variance of the response evaluated at the posterior means
 --by default, otherwise evaluated at the posterior quantiles of order \code{q}-- of the parameters.
 If the model is \code{"FB"} or \code{"FBB"}, \code{type = "raw"}, and \code{cluster = TRUE}, the cluster raw residuals are computed as

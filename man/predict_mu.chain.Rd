@@ -4,7 +4,7 @@
 \alias{predict_mu.chain}
 \title{predict_mu.chain}
 \usage{
-predict_mu.chain(model, posterior, newdata)
+predict_mu.chain(model, newdata)
 }
 \description{
 predict_mu.chain

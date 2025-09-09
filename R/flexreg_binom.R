@@ -12,10 +12,11 @@
 #' @param prior.beta a character specifying the prior distribution for the  regression coefficients of the mean model, \code{beta}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.
 #' @param hyperparam.beta a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{beta} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.
 #' @param link.theta a character specifying the link function for the overdispersion model. Currently, \code{"identity"} (default), \code{"logit"}, \code{"probit"}, \code{"cloglog"}, and \code{"loglog"} are supported. If \code{link.theta = "identity"}, the prior distribution for \code{theta} is a beta.
-#' @param hyper.theta.a a numeric (vector of length 1) specifying the first shape parameter for the beta prior distribution of \code{theta}.
-#' @param hyper.theta.b a numeric (vector of length 1) specifying the second shape parameter for the beta prior distribution of \code{theta}.
+#' @param hyperparam.theta a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{theta}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.
 #' @param prior.psi a character specifying the prior distribution for the regression coefficients of the overdispersion model,\code{psi}. Not supported if \code{link.theta="identity"}. Currently, \code{"normal"} (default) and \code{"cauchy"} are supported.
 #' @param hyperparam.psi a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{psi} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.
+#' @param hyperparam.p a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{p}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.
+#' @param hyperparam.w a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{w}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.
 #' @param n.chain a positive integer specifying the number of Markov chains. The default is 1.
 #' @param n.iter 	a positive integer specifying the number of iterations for each chain (including warm-up). The default is 5000.
 #' @param warmup.perc the percentage of iterations per chain to discard.
@@ -29,7 +30,7 @@
 #' \item{\code{formula}}{the original formula.}
 #' \item{\code{link.mu}}{a character specifing the link function in the mean model.}
 #' \item{\code{link.theta}}{a character specifing the link function in the overdispersion model.}
-#' \item{\code{model}}{an object of class \code{`stanfit`} containing the fitted model.}
+#' \item{\code{model}}{a list containing an object of class \code{`stanfit`} with the fitted model.}
 #' \item{\code{response}}{the response variable, assuming values in (0, 1).}
 #' \item{\code{design.X}}{the design matrix for the mean model.}
 #' \item{\code{design.Z}}{the design matrix for the overdispersion model (if defined).}
@@ -66,7 +67,8 @@
 
 flexreg_binom <- function(formula, data, type="FBB", n,
                      link.mu="logit", prior.beta = "normal", hyperparam.beta = 100,
-                     hyper.theta.a=NULL, hyper.theta.b=NULL,
+                     hyperparam.theta = NULL,
+                     hyperparam.p = NULL,  hyperparam.w = NULL,
                      link.theta=NULL, prior.psi = NULL, hyperparam.psi = NULL,
                      n.chain=1, n.iter=5000, warmup.perc=.5, thin=1, verbose=TRUE, ...)
 {
@@ -77,8 +79,18 @@ flexreg_binom <- function(formula, data, type="FBB", n,
 
   if (missing(data)) data <- environment(formula) else  data <- as.data.frame(data)
 
-  ###############################################
-  ###############################################
+  if(type == "BetaBin" & (!is.null(hyperparam.p)| !is.null(hyperparam.w))) {
+    hyperparam.p = NULL;  hyperparam.w = NULL
+    warning("The BetaBin model does not admit the parameters p and/or w. Thus, the specification of their hyperparameters is ignored.")
+  }
+  if(type == "FBB" & (is.null(hyperparam.p))) hyperparam.p <-  c(0.5,2)
+  if(type == "FBB" & (is.null(hyperparam.w))) hyperparam.w <-  c(0.5,2)
+  if((!is.null(hyperparam.p)| !is.null(hyperparam.w))){
+    if(any(c(hyperparam.p[1], hyperparam.w[1])>=1 | c(hyperparam.p[1], hyperparam.w[1])<=0)|
+       any(c(hyperparam.p[2], hyperparam.w[2])<=0)| !all(c(length(hyperparam.p), length(hyperparam.w))%in%c(0,2)))
+      stop("Error: the vector of hyperparameters for p and w must have length 2 - both elements must be positive, and the first element must be less than 1.")
+  }
+
 
   formula <- Formula::as.Formula(formula)
 
@@ -95,7 +107,7 @@ flexreg_binom <- function(formula, data, type="FBB", n,
     # Check on link functions for theta:
     if(is.null(link.theta)) link_code_theta <- 2
     if(link_code_theta <2) stop("invalid link function for regression model for theta")
-    if(!is.null(hyper.theta.a) | !is.null(hyper.theta.b)) stop("hyperparameters chosen for theta but regression model for theta in formula. Please define priors for coefficients psi instead.")
+    if(!is.null(hyperparam.theta)) stop("hyperparameters chosen for theta but regression model for theta in formula. Please define priors for coefficients psi instead.")
     if(length(formula)[2] > 2)  warning("formula must not have more than two RHS parts")
 
     } else if(length(formula)[2] < 2){
@@ -109,13 +121,8 @@ flexreg_binom <- function(formula, data, type="FBB", n,
       if(link_code_theta >=2) stop("a link function has been selected for theta but no covariates appear on the RHS part. Please specify covariates for a regression model on theta in the RHS part.")
 
       # Check on hyperparameters:
-      if(is.null(hyper.theta.a) & is.null(hyper.theta.b)) {
-        hyper.theta.a <- 1
-        hyper.theta.b <- 1
-      } else if(is.null(hyper.theta.a) & !is.null(hyper.theta.b)){
-        hyper.theta.a <- hyper.theta.b
-      } else if(!is.null(hyper.theta.a) & is.null(hyper.theta.b)){
-        hyper.theta.b <- hyper.theta.a
+      if(is.null(hyperparam.theta)) {
+        hyperparam.theta <- c(0.5,2)
       }
 
       if(!is.null(prior.psi) | !is.null(hyperparam.psi)) stop("Error: prior for psi coefficients defined but no regression model for phi. Please define covariates for regression model for theta")
@@ -184,10 +191,9 @@ flexreg_binom <- function(formula, data, type="FBB", n,
 
   # If no regression is specified for theta....
   if(model.theta == F){
-    if(hyper.theta.a <= 0 | hyper.theta.b <= 0) stop("Hyperprior for theta must be positive")
+    if(hyperparam.theta[1]<=0 | hyperparam.theta[1]>=1 | hyperparam.theta[2]<=0 | length(hyperparam.theta)!=2) stop("Error: the vector of hyperparameters for theta must have length 2 - both elements must be positive, and the first element must be less than 1.")
   } else { # else, if a regression model is specified for theta...
-    hyper.theta.a <- NULL
-    hyper.theta.b <- NULL
+    hyperparam.theta <- NULL #CONTROLLARE SE SERVE
 
     if(is.null(prior.psi)) {
       link_prior_psi <- 1
@@ -212,9 +218,9 @@ flexreg_binom <- function(formula, data, type="FBB", n,
                      hyperparam.beta = hyperparam.beta,
 
                      link_code_theta = link_code_theta,
-                     hyper.theta.a = hyper.theta.a,
-                     hyper.theta.b = hyper.theta.b,
-
+                     hyper.theta.a = hyperparam.theta[1]*hyperparam.theta[2],
+                     hyper.theta.b = (1-hyperparam.theta[1])*hyperparam.theta[2],
+                     hyperparam.p = hyperparam.p,  hyperparam.w = hyperparam.w,
                      link_prior_psi = link_prior_psi,
                      hyperparam.psi = hyperparam.psi,
 
@@ -231,6 +237,9 @@ link.theta <- c("identity", "logit", "probit", "cloglog", "loglog")[link_code_th
 }
 
 
+#' internal function
+#' @keywords internal
+
 fit.model_binom <- function(model.theta = model.theta, type = type, N = N, n=n, y = y, X = X, Z = Z,
                       link_code_mu = link_code_mu,
                       link_prior_beta = link_prior_beta,
@@ -239,6 +248,7 @@ fit.model_binom <- function(model.theta = model.theta, type = type, N = N, n=n, 
                       link_code_theta = link_code_theta,
                       hyper.theta.a = hyper.theta.a,
                       hyper.theta.b = hyper.theta.b,
+                      hyperparam.p = hyperparam.p,  hyperparam.w = hyperparam.w,
 
                       link_prior_psi = link_prior_psi,
                       hyperparam.psi = hyperparam.psi,
@@ -261,11 +271,14 @@ fit.model_binom <- function(model.theta = model.theta, type = type, N = N, n=n, 
       hyper_theta_b = hyper.theta.b,
 
       link_prior_psi = link_prior_psi,
-      hyperprior_psi = hyperparam.psi
+      hyperprior_psi = hyperparam.psi,
+      hyperparam_p = hyperparam.p,
+      hyperparam_w = hyperparam.w
   )
 
-  if(model.theta) stan.model <- stanmodels[[paste(type, "_theta", sep="")]]
-  else stan.model <- stanmodels[[type]]
+  if(model.theta) {
+    stan.model <- stanmodels[[paste(type, "_theta", sep="")]]
+  } else stan.model <- stanmodels[[type]]
 
   fit.stan = rstan::sampling(
     object = stan.model,
@@ -279,28 +292,9 @@ fit.model_binom <- function(model.theta = model.theta, type = type, N = N, n=n, 
     ...
   )
 
-  output <- fit.stan
+  output <- list(fit.stan)
   return(output)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

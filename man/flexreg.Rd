@@ -17,6 +17,9 @@ flexreg(
   hyperparam.omega0 = NULL,
   prior.omega1 = "normal",
   hyperparam.omega1 = NULL,
+  hyperparam.p = NULL,
+  hyperparam.w = NULL,
+  hyperparam.k = NULL,
   link.phi = NULL,
   prior.phi = NULL,
   hyperparam.phi = NULL,
@@ -55,6 +58,12 @@ flexreg(
 
 \item{hyperparam.omega1}{a positive numeric (vector of length 1) specifying the hyperprior scale parameter for the prior distribution of \code{omega1} regression coefficients. The default is 100 if the prior is \code{"normal"}, 2.5 if it is \code{"cauchy"}.}
 
+\item{hyperparam.p}{a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{p}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.}
+
+\item{hyperparam.w}{a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{w}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.}
+
+\item{hyperparam.k}{a vector of length 2 with positive elements specifying the hyperparameters for the beta prior distribution of \code{k}. The default is \code{c(0.5,2)}, which corresponds to the uniform prior distribution.}
+
 \item{link.phi}{a character specifying the link function for the precision model (phi). Currently, \code{"identity"} (default), \code{"log"}, and \code{"sqrt"} are supported.}
 
 \item{prior.phi}{a character specifying the prior distribution for precision parameter \code{phi} if \cr \code{link.phi = "identity"}. Currently, \code{"gamma"} (default) and \code{"unif"} are supported.}
@@ -85,7 +94,7 @@ The \code{\link{flexreg}} function returns an object of class \code{`flexreg`}, 
 \item{\code{aug}}{a character specifing the absence of the augmentation (\code{"No"}) or the presence of augmentation in zero (\code{"0"}), one (\code{"1"}), or both (\code{"01"}).}
 \item{\code{link.mu}}{a character specifing the link function in the mean model.}
 \item{\code{link.phi}}{a character specifing the link function in the precision model.}
-\item{\code{model}}{an object of class \code{`stanfit`} containing the fitted model.}
+\item{\code{model}}{a list of objects of class \code{`stanfit`} containing the fitted model(s).}
 \item{\code{response}}{the response variable, assuming values in (0, 1).}
 \item{\code{design.X}}{the design matrix for the mean model.}
 \item{\code{design.Z}}{the design matrix for the precision model (if defined).}
@@ -140,7 +149,7 @@ Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for c
 \cr
 Di Brisco, A. M., Migliorati, S., Ongaro, A. (2020). Robustness against outliers: A new variance inflated regression model for proportions. Statistical Modelling, \bold{20}(3), 274--309. doi:10.1177/1471082X18821213 \cr
 \cr
- Ferrari, S.L.P., Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501 \cr
+Ferrari, S.L.P., Cribari-Neto, F. (2004). Beta Regression for Modeling Rates and Proportions. Journal of Applied Statistics, \bold{31}(7), 799--815. doi:10.1080/0266476042000214501 \cr
 \cr
 Migliorati, S., Di Brisco, A. M., Ongaro, A. (2018) A New Regression Model for Bounded Responses. Bayesian Analysis, \bold{13}(3), 845--872. doi:10.1214/17-BA1079 \cr
 }

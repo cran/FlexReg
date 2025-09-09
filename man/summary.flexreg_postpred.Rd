@@ -21,7 +21,7 @@ Summary method for an object of class \code{`flexreg_postpred`}, containing the 
 \examples{
 \dontrun{
 data("Reading")
-FB <- flexreg(accuracy ~ iq, data = Reading)
+FB <- flexreg(accuracy.adj ~ iq, data = Reading, n.iter=1000)
 pp <- posterior_predict(FB)
 summary(pp)
 }

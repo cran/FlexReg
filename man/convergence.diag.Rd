@@ -2,6 +2,7 @@
 % Please edit documentation in R/convergence.plot.R
 \name{convergence.diag}
 \alias{convergence.diag}
+\alias{print.convergence.diag.flexreg}
 \title{Convergence diagnostics}
 \usage{
 convergence.diag(
@@ -10,6 +11,8 @@ convergence.diag(
   pars = NULL,
   additional.args = list()
 )
+
+\method{print}{convergence.diag.flexreg}(x, ...)
 }
 \arguments{
 \item{model}{an object of class \code{`flexreg`}.}
@@ -19,6 +22,10 @@ convergence.diag(
 \item{pars}{an optional character vector of parameter names. If \code{pars} is not specified, all parameters in the regression models are evaluated.}
 
 \item{additional.args}{a list containing additional arguments (see details)}
+
+\item{x}{an object of class \code{`convergence.diag.flexreg`}.}
+
+\item{...}{additional arguments. Currently not used.}
 }
 \value{
 A print from \code{\link[rstan]{check_hmc_diagnostics}} function and a list of convergence diagnostics.
@@ -30,7 +37,7 @@ Moreover, it prints the number (and percentage) of iterations that ended with a 
 \details{
 \itemize{
 \item \code{"Rhat"} returns the potential scale reduction factor on split chains. An R-hat greater than 1 is indicative of a bad mix of the chains. At convergence R-hat has to be less than 1.05. See \code{rstan::Rhat} for further details.
-\item \code{"geweke"} returns the z-scores, one for each parameter, for a test of equality between the means of the first 10\% and last 50\% of the chain. The fraction to use from the first and last part of the chain can be edited through the additional arguments \code{frac1} and \code{frac2}. The sum of \code{frac1} and \code{frac2} has to be strictly less than 1. See \code{coda::geweke.diag} for further details.
+\item \code{"geweke"} returns the z-scores, one for each parameter, for a test of equality between the means of the first 10\\% and last 50\\% of the chain. The fraction to use from the first and last part of the chain can be edited through the additional arguments \code{frac1} and \code{frac2}. The sum of \code{frac1} and \code{frac2} has to be strictly less than 1. See \code{coda::geweke.diag} for further details.
 \item \code{"raftery"} returns the estimate of the "dependence factor" \eqn{I}. Values of \eqn{I} greater than 5 may indicate a strong autocorrelation.
 Additional parameters such as the quantile to be estimated (\code{q}), the desired margin of error of the estimate (\code{r}), and the probability (\code{s}) of obtaining an estimate between \eqn{q-r} and \eqn{q+r}  can be passed as a list in the \code{additional.args} argument. See \code{coda::raftery.diag} for further details.
 \item \code{"heidel"} returns the p-values, one for each parameter, referred to a convergence test where the null hypothesis is that the sampled values come from a stationary distribution. It is possible to set the target value for ratio of halfwidth to sample mean (\code{eps}) and the significance level of the test (\code{pvalue})  into the \code{additional.args} argument. See \code{coda::heidel.diag} for further details.

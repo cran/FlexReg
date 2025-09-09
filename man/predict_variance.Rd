@@ -6,7 +6,6 @@
 \usage{
 predict_variance(
   model,
-  posterior,
   newdata,
   cluster,
   cluster.var = T,

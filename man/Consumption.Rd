@@ -26,5 +26,5 @@ A  \code{data.frame} containing 568 observations on the following 8 variables:
 This dataset is a subset from the 2016 Survey on Household Income and Wealth data, a statistical survey conducted by the Bank of Italy. The statistical units are the households and the head of the household is conventionally selected as the major income earner.
 }
 \details{
-Full data are available on the website of the Bank of Italy. \code{Consumption} is computed as the ratio between the amount of `consumption' over the `net disposable income'.
+Full data are available on the website of the Bank of Italy. \code{Consumption} is computed as the ratio between the amount of \verb{consumption' over the }net disposable income'.
 }
