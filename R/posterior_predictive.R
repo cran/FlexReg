@@ -66,6 +66,12 @@ posterior_predict.flexreg <- function(model, newdata = NULL, n.new = NULL)
     q.chain <- predict_q.chain(model, newdata)
     q0.chain <- q.chain$q0.chain
     q1.chain <- q.chain$q1.chain
+    if(model$aug %in% c("0")){
+      q1.chain <- NULL
+    }
+    if(model$aug %in% c("1")){
+      q0.chain <- NULL
+    }
   } else{
     q0.chain <- NULL
     q1.chain <- NULL

@@ -1,4 +1,4 @@
-0b66345e10e368076b6ad9adeead2484 *DESCRIPTION
+48804c781df77052a759a028830c3a69 *DESCRIPTION
 420f26acdc70ca7c651df48b7f61e624 *NAMESPACE
 bb56dcc1ad602c29dfa3a29680187224 *R/BetaBin_functions.R
 3316811f5f94b7186628809eb8b89e43 *R/Beta_functions.R
@@ -13,11 +13,11 @@ cf43fc2d46da5545d90fd42bf4202b31 *R/Summaries.R
 1c4515c186e864dbbb76a787af04a74e *R/VIB_functions.R
 6177359233dc4022b589b7dff65e9cc0 *R/WAIC.R
 c7ad01845ab80a28c477f93b0d8bdbc5 *R/coefficients.R
-e5293092b86992c364c211dd9496fd0d *R/convergence.plot.R
+d1329ae227b32dd456a02c1d934f2a6f *R/convergence.plot.R
 e537993be490fd9a27896594b3bba4f6 *R/curve.density.R
 ee13b6a30689938677570381468fe92a *R/flexreg_Augmentation.R
 bd5102c58878e2f683e9758005cc7f42 *R/flexreg_binom.R
-e117d97e6b4575fed1f6a12fcf34bb4a *R/posterior_predictive.R
+be7d95557c862d986e1073a24b5e28c0 *R/posterior_predictive.R
 433c1f6db01470c4c2d8ae90a7d8c9f9 *R/predicted_residuals.R
 e52307624c8d8728e410c4a414f3f038 *R/stanmodels.R
 7e297a31e37e77c201a2bacff2f979eb *configure

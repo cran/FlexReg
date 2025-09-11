@@ -309,7 +309,7 @@ convergence.diag <- function(model, diagnostics = "all", pars = NULL, additional
     if(length(omega_index) == 0){ # if no augmentation
       pars_1 <- pars
 
-      out1 <- convergence.diag.internal(model$model[[1]], pars = pars_1, additional.args = additional.args, aug = NA, n.chain = n.chain)
+      out1 <- convergence.diag.internal(model$model[[1]], diagnostics = diagnostics, pars = pars_1, additional.args = additional.args, aug = NA, n.chain = n.chain)
       out2 <- NULL
     } else {
       pars_1 <- pars[-grep("omega", pars)]
@@ -317,23 +317,23 @@ convergence.diag <- function(model, diagnostics = "all", pars = NULL, additional
       if(model$aug == "01"){
         pars_2 <- pars[grep("omega", pars)]
 
-        out2 <- convergence.diag.internal(model$model[[2]], pars = pars_2, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
+        out2 <- convergence.diag.internal(model$model[[2]], diagnostics = diagnostics, pars = pars_2, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
       } else {
         pars_2 <- paste0("omega", model$aug, "[", 1:length(beta_index), "]")
 
-        out2 <- convergence.diag.internal(model$model[[2]], pars = pars_2, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
+        out2 <- convergence.diag.internal(model$model[[2]], diagnostics = diagnostics, pars = pars_2, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
       }
 
       if(length(pars_1) >0){
-        out1 <- convergence.diag.internal(model$model[[1]], pars = pars_1, additional.args = additional.args, aug = NA, n.chain = n.chain)
+        out1 <- convergence.diag.internal(model$model[[1]], diagnostics = diagnostics, pars = pars_1, additional.args = additional.args, aug = NA, n.chain = n.chain)
       } else out1 <- NULL
 
 
     }
   } else { # pars == NULL
-    out1 <- convergence.diag.internal(model$model[[1]], pars = pars, additional.args = additional.args,aug = NA, n.chain = n.chain)
+    out1 <- convergence.diag.internal(model$model[[1]], diagnostics = diagnostics, pars = pars, additional.args = additional.args,aug = NA, n.chain = n.chain)
     if(model$aug != "No"){
-      out2 <- convergence.diag.internal(model$model[[2]], pars = pars, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
+      out2 <- convergence.diag.internal(model$model[[2]], diagnostics = diagnostics, pars = pars, additional.args = additional.args, aug = model$aug, n.chain = n.chain)
     } else out2 = NULL
   }
 
