@@ -17,6 +17,8 @@
 #' @references
 #' Ascari, R., Migliorati, S. (2021). A new regression model for overdispersed binomial data accounting for outliers and an excess of zeros. Statistics in Medicine, \bold{40}(17), 3895--3914. doi:10.1002/sim.9005 \cr
 #' \cr
+#' Ascari, R., Di Brisco, A. M., Migliorati, S., Ongaro, A. (2026). {FlexReg}: An {R} package for fitting a general class of mixture regression models with bounded responses in a {B}ayesian framework. Computational Statistics. doi:10.1007/s00180-026-01720-y \cr
+#' \cr
 #' Di Brisco, A. M., Migliorati, S. (2020). A new mixed-effects mixture model for constrained longitudinal data. Statistics in Medicine, \bold{39}(2), 129--145. doi:10.1002/sim.8406 \cr
 #' \cr
 #' Di Brisco, A. M., Migliorati, S., Ongaro, A. (2020). Robustness against outliers: A new variance inflated regression model for proportions. Statistical Modelling, \bold{20}(3), 274--309. doi:10.1177/1471082X18821213 \cr

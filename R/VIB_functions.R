@@ -1,5 +1,3 @@
-
-
 #' The Variance-Inflated Beta Distribution
 #'
 #' @description Density function, distribution function, quantile function, and random generation
@@ -61,9 +59,10 @@ dVIB <- Vectorize(function(x, mu, phi, p, k, q0 = NULL, q1 = NULL, log = FALSE){
   if (any(k < 0 | k > 1)) stop("Parameter k has to be between 0 and 1")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
-  fun <- (1-q0-q1)*(p*dBeta(x,mu,phi*k) + (1-p)*dBeta(x,mu,phi))
+  fun <- (1-q0-q1)*(exp(log(p) + dBeta(x, mu, phi*k, log = T)) +
+                      exp(log(1-p) + dBeta(x, mu, phi, log = T)))
   fun[which(x==0)] <- q0
   fun[which(x==1)] <- q1
 
@@ -98,7 +97,7 @@ qVIB <- Vectorize(function(prob, mu, phi, p, k, q0 = NULL, q1 = NULL, log.prob =
   if (any(k < 0 | k > 1)) stop("Parameter k has to be between 0 and 1")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   if(log.prob) prob <- exp(prob)
 
@@ -135,9 +134,9 @@ pVIB <- Vectorize(function(q, mu, phi, p, k, q0 = NULL, q1 = NULL, log.prob = FA
   if (any(k < 0 | k > 1)) stop("Parameter k has to be between 0 and 1")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
-  fun <- q0*(q > 0) +
+  fun <- q0*(q >= 0) +
     (1-q0-q1)*(p*pBeta(q,mu,phi*k) +
                  (1-p)*pBeta(q,mu,phi)) +
     q1*(q >= 1)
@@ -163,8 +162,13 @@ pVIB <- Vectorize(function(q, mu, phi, p, k, q0 = NULL, q1 = NULL, log.prob = FA
 #' @export
 
 rVIB <- function(n, mu, phi, p, k, q0 = NULL, q1 = NULL){
-  q0 <- ifelse(is.null(q0),0,q0)
-  q1 <- ifelse(is.null(q1),0,q1)
+  if(is.null(q0)){
+    q0 <- 0
+  }
+  if(is.null(q1)){
+    q1 <- 0
+  }
+
   if (length(n)>1) n <- length(n)
   if (any(mu < 0 | mu > 1)) stop("Parameter mu has to be between 0 and 1")
   if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
@@ -173,17 +177,52 @@ rVIB <- function(n, mu, phi, p, k, q0 = NULL, q1 = NULL){
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
 
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   n <- floor(n)
-  x <- vector(mode="numeric", length = n)
 
-  v.aug <- sample(c(0,1,2), n, replace=T, prob=c(1-q0-q1,q0,q1))
-  x[v.aug==1] <- 0
-  x[v.aug==2] <- 1
-  v <- rbinom(length(which(v.aug==0)),1,prob=p)
-  x[v.aug==0][v==1] <- rBeta(length(which(v==1)),mu,phi*k)
-  x[v.aug==0][v==0] <- rBeta(length(which(v==0)),mu,phi)
+  l.mu <- length(mu)
+  l.phi <- length(phi)
+  l.p <- length(p)
+  l.k <- length(k)
+  l.q0 <- length(q0)
+  l.q1 <- length(q1)
 
-  return(x)
+  L.max <- max(l.mu, l.phi, l.p, l.k, l.q0, l.q1)
+  ## recycling check
+  if (L.max %% l.mu != 0 | L.max %% l.phi != 0 |
+      L.max %% l.p != 0 | L.max %% l.k != 0 |
+      L.max %% l.q0 != 0 | L.max %% l.q1 != 0)
+    warning("longer object length is not a multiple of shorter object length")
+
+  mu <- rep(mu, length.out = n)
+  phi <- rep(phi, length.out = n)
+  p <- rep(p, length.out = n)
+  k <- rep(k, length.out = n)
+  q0 <- rep(q0, length.out = n)
+  q1 <- rep(q1, length.out = n)
+
+
+  out <- vector(mode="numeric", length = n)
+
+  v.aug <- unlist(lapply(1:n, function(l) sample(c(0,1,2),1,replace = T, prob = c(1-q0[l]-q1[l],q0[l], q1[l]))))
+
+  out[v.aug==1] <- 0
+  out[v.aug==2] <- 1
+
+  if(sum(v.aug == 0) > 0){
+    mu_v0 <- mu[v.aug==0]
+    k_v0 <- k[v.aug==0]
+    phi_v0 <- phi[v.aug==0]
+
+    for(i in 1:sum(v.aug == 0)){
+      v.mixt <- rbinom(1, 1, prob=p)
+
+      if(v.mixt == 1){
+        out[v.aug==0][i] <- rBeta(1, mu_v0[i], k_v0[i]*phi_v0[i])
+      } else out[v.aug==0][i] <- rBeta(1, mu_v0[i], phi_v0[i])
+    }
+  }
+
+  return(out)
 }

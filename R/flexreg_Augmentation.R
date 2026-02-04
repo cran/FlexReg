@@ -324,8 +324,8 @@ fit.model_2 <- function(model.phi = model.phi, type = type, N = N,  y = y, X = X
   data.stan <- list(
     N = sum(y <1 & y >0),
     y = y[y <1 & y >0],
-    X = X[y <1 & y >0,],
-    Z = Z[y <1 & y >0,],
+    X = X[y <1 & y >0, ,drop = FALSE],
+    Z = Z[y <1 & y >0, ,drop = FALSE],
     K = ncol(X),
     H = ncol(Z),
     link_code_mu = link_code_mu,

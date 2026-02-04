@@ -180,6 +180,23 @@ rBetaBin <- function(n, size=NULL, mu=NULL, theta=NULL, phi=NULL){
     phi <- (1-theta)/theta
   }
 
+  n <- floor(n)
+
+  l.size <- length(size)
+  l.mu <- length(mu)
+  l.phi <- length(phi)
+
+  L.max <- max(l.size, l.mu, l.phi)
+
+  ## recycling check
+  if (L.max %% l.mu != 0 | L.max %% l.size != 0 | L.max %% l.phi != 0)
+    warning("longer object length is not a multiple of shorter object length")
+
+
+  size <- rep(size, length.out = n)
+  mu <- rep(mu, length.out = n)
+  phi <- rep(phi, length.out = n)
+
   probs <- rBeta(n, mu = mu, phi = phi)
   return(as.numeric(rbinom(n, size=size, prob = probs)))
 }

@@ -64,10 +64,10 @@ dFBB <- Vectorize(function(x, size, mu, theta = NULL, phi = NULL, p, w, log = FA
   lambda1 <- mu + (1-p)*wtilde
   lambda2 <- mu-p*wtilde
 
-  fun <-
-    ifelse((x < 0 | x > size), 0,
-           ifelse(!(x == as.integer(x)), 0,
-                  p*dBetaBin(x=x, size=size, mu=lambda1, phi=phi) + (1-p)*dBetaBin(x=x, size=size, mu=lambda2, phi=phi)))
+  fun <- ifelse((x < 0 | x > size), 0,
+                ifelse(!(x == as.integer(x)), 0,
+                       exp(log(p)+dBetaBin(x=x, size=size, mu=lambda1, phi=phi, log = T)) +
+                         exp(log(1-p)+dBetaBin(x=x, size=size, mu=lambda2, phi=phi, log=T))))
 
   if(log) fun <- log(fun)
   return(fun)
@@ -198,7 +198,27 @@ rFBB <- function(n, size=NULL, mu, theta=NULL, phi=NULL, p, w){
   }
 
   n <- floor(n)
-  wtilde <- w*min(mu/p, (1-mu)/(1-p))
+
+  l.size <- length(size)
+  l.mu <- length(mu)
+  l.phi <- length(phi)
+  l.p <- length(p)
+  l.w <- length(w)
+
+
+  L.max <- max(l.size, l.mu, l.phi, l.p, l.w)
+  ## recycling check
+  if (L.max %% l.mu != 0 | L.max %% l.size != 0 | L.max %% l.phi != 0 |
+      L.max %% l.p != 0 | L.max %% l.w != 0 )
+    warning("longer object length is not a multiple of shorter object length")
+
+  size <- rep(size, length.out = n)
+  mu <- rep(mu, length.out = n)
+  phi <- rep(phi, length.out = n)
+  p <- rep(p, length.out = n)
+  w <- rep(w, length.out = n)
+
+  wtilde <- w*pmin(mu/p, (1-mu)/(1-p))
   lambda1 <- mu + (1-p)*wtilde
   lambda2 <- mu-p*wtilde
 

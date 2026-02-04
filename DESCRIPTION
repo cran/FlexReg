@@ -1,6 +1,6 @@
 Package: FlexReg
 Title: Regression Models for Bounded Continuous and Discrete Responses
-Version: 1.4.1
+Version: 1.4.2
 Authors@R: c(person(given = "Roberto",
                       family = "Ascari",
                       role = c("aut", "cre"),
@@ -28,11 +28,11 @@ LinkingTo: BH (>= 1.66.0), Rcpp (>= 0.12.0), RcppEigen (>= 0.3.3.3.0),
         2.18.0)
 SystemRequirements: GNU make
 NeedsCompilation: yes
-Packaged: 2025-09-11 08:37:10 UTC; nened
+Packaged: 2026-02-04 14:05:45 UTC; roberto.ascari
 Author: Roberto Ascari [aut, cre],
   Agnese M. Di Brisco [aut],
   Sonia Migliorati [aut],
   Andrea Ongaro [aut]
 Maintainer: Roberto Ascari <roberto.ascari@unimib.it>
 Repository: CRAN
-Date/Publication: 2025-09-11 10:00:28 UTC
+Date/Publication: 2026-02-04 15:50:02 UTC

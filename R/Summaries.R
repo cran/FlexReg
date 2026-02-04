@@ -101,6 +101,7 @@ summary.flexreg <- function(object, ..., digits=4){
     } else {
       summ.phi <- summa.mat[grep("psi",rownames(summa.mat)),]
       if(is.null(dim(summ.phi)))  dim(summ.phi) <- c(1,5)
+      colnames(summ.phi) <- c("Post. Mean", "Post. SD", "2.5%", "Post. Median",  "97.5%")
       rownames(summ.phi) <- covariate.names.phi
     }
 

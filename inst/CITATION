@@ -1,0 +1,16 @@
+bibentry(bibtype = "Article",
+  title    = "FlexReg: An R Package for Fitting a General Class of Mixture Regression Models with Bounded Responses in a Bayesian Framework",
+  author   = c(person(given = "Roberto",
+                      family = "Ascari"),
+               person(given = c("Agnese", "M."),
+                      family = "Di Brisco"),
+               person(given = "Sonia",
+                      family = "Migliorati"),
+               person(given = "Andrea",
+                      family = "Ongaro")),
+  journal  = "Computational Statistics",
+  year     = "2026",
+  doi      = "10.1007/s00180-026-01720-y",
+  header   = "To cite FlexReg in publications use:"
+)
+

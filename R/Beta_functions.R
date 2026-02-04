@@ -55,7 +55,7 @@ dBeta <- Vectorize(function(x, mu, phi, q0 = NULL, q1 = NULL, log = FALSE){
   if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   alpha1 <- mu*phi
   alpha2 <- (1-mu)*phi
@@ -95,7 +95,7 @@ qBeta <- Vectorize(function(prob, mu, phi, q0 = NULL, q1 = NULL, log.prob = FALS
   if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   alpha1 <- mu*phi
   alpha2 <- (1-mu)*phi
@@ -132,12 +132,12 @@ pBeta <- Vectorize(function(q, mu, phi, q0 = NULL, q1 = NULL, log.prob = FALSE){
   if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   alpha1 <- mu*phi
   alpha2 <- (1-mu)*phi
 
-  fun <- q0*(q > 0) + (1-q0-q1)*pbeta(q, alpha1, alpha2) + q1*(q>=1)
+  fun <- q0*(q >= 0) + (1-q0-q1)*pbeta(q, alpha1, alpha2) + q1*(q>=1)
 
   if(log.prob) fun <- log(fun)
 
@@ -161,25 +161,55 @@ pBeta <- Vectorize(function(q, mu, phi, q0 = NULL, q1 = NULL, log.prob = FALSE){
 #'
 
 rBeta <- function(n, mu, phi, q0 = NULL, q1 = NULL){
-  q0 <- ifelse(is.null(q0),0,q0)
-  q1 <- ifelse(is.null(q1),0,q1)
+
+  if(is.null(q0)){
+    q0 <- 0
+  }
+  if(is.null(q1)){
+    q1 <- 0
+  }
+
   if (length(n)>1) n <- length(n)
   if (any(mu < 0 | mu > 1)) stop("Parameter mu has to be between 0 and 1")
   if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
 
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   n <- floor(n)
 
-  v <- sample(c(0,1,2), n, replace=T, prob=c(1-q0-q1,q0,q1))
+  l.mu <- length(mu)
+  l.phi <- length(phi)
+  l.q0 <- length(q0)
+  l.q1 <- length(q1)
+
+  L.max <- max(l.mu, l.phi, l.q0, l.q1)
+  ## recycling check
+  if (L.max %% l.mu != 0 | L.max %% l.phi != 0 |
+      L.max %% l.q0 != 0 | L.max %% l.q1 != 0)
+    warning("longer object length is not a multiple of shorter object length")
+
+  mu <- rep(mu, length.out = n)
+  phi <- rep(phi, length.out = n)
+  q0 <- rep(q0, length.out = n)
+  q1 <- rep(q1, length.out = n)
+
   alpha1 <- mu*phi
   alpha2 <- (1-mu)*phi
 
-  x <- vector(mode="numeric", length = n)
-  x[v==0] <- rbeta(length(which(v==0)),alpha1,alpha2)
-  x[v==1] <- 0
-  x[v==2] <- 1
-  return(x)
+  v.aug <- unlist(lapply(1:n, function(l) sample(c(0,1,2),1,replace = T, prob = c(1-q0[l]-q1[l],q0[l], q1[l]))))
+
+  out <- vector(mode="numeric", length = n)
+
+  if(sum(v.aug == 0)>0){
+    out[v.aug==0] <- rbeta(sum(v.aug==0),
+                           alpha1[which(v.aug==0)],
+                           alpha2[which(v.aug==0)])
+  }
+
+  out[v.aug==1] <- 0
+  out[v.aug==2] <- 1
+  return(out)
 }
+

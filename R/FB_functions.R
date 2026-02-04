@@ -63,13 +63,14 @@ dFB <- Vectorize(function(x, mu, phi, p, w, q0 = NULL, q1 = NULL, log = FALSE){
   if (any(w < 0 | w > 1)) stop("Parameter w has to be between 0 and 1")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   wtilde <- w*min(mu/p, (1-mu)/(1-p))
   lambda1 <- mu + (1-p)*wtilde
   lambda2 <- mu-p*wtilde
 
-  fun <- (1-q0-q1)*(p*dBeta(x,lambda1,phi) + (1-p)*dBeta(x,lambda2,phi))
+  fun <- (1-q0-q1)*(exp(log(p) + dBeta(x, lambda1, phi, log = T)) +
+    exp(log(1-p) + dBeta(x, lambda2, phi, log = T)))
   fun[which(x==0)] <- q0
   fun[which(x==1)] <- q1
 
@@ -108,7 +109,7 @@ qFB <- Vectorize(function(prob, mu, phi, p, w, q0 = NULL, q1 = NULL, log.prob = 
   if (any(w < 0 | w > 1)) stop("Parameter w has to be between 0 and 1")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   wtilde <- w*min(mu/p, (1-mu)/(1-p))
   lambda1 <- mu + (1-p)*wtilde
@@ -151,13 +152,13 @@ pFB <- Vectorize(function(q, mu, phi, p, w, q0 = NULL, q1 = NULL, log.prob = FAL
   if (any(w < 0 | w > 1)) stop("Parameter w has to be between 0 and 1")
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   wtilde <- w*min(mu/p, (1-mu)/(1-p))
   lambda1 <- mu + (1-p)*wtilde
   lambda2 <- mu-p*wtilde
 
-  fun <- q0*(q > 0) +
+  fun <- q0*(q >= 0) +
     (1-q0-q1)*(p*pBeta(q,lambda1,phi) +
                  (1-p)*pBeta(q,lambda2,phi)) +
     q1*(q >= 1)
@@ -179,8 +180,13 @@ pFB <- Vectorize(function(q, mu, phi, p, w, q0 = NULL, q1 = NULL, log.prob = FAL
 #' @export
 
 rFB <- function(n, mu, phi, p, w, q0 = NULL, q1 = NULL){
-  q0 <- ifelse(is.null(q0),0,q0)
-  q1 <- ifelse(is.null(q1),0,q1)
+  if(is.null(q0)){
+    q0 <- 0
+  }
+  if(is.null(q1)){
+    q1 <- 0
+  }
+
   if (length(n)>1) n <- length(n)
   if (any(mu < 0 | mu > 1)) stop("Parameter mu has to be between 0 and 1")
   if (any(phi < 0)) stop("Parameter phi has to be greater than 0")
@@ -189,18 +195,56 @@ rFB <- function(n, mu, phi, p, w, q0 = NULL, q1 = NULL){
   if (any(q0 < 0 | q0 > 1)) stop("Parameter q0 has to be between 0 and 1")
   if (any(q1 < 0 | q1 > 1)) stop("Parameter q1 has to be between 0 and 1")
 
-  if (any(q0+q1>1)) stop("The sum of q0 and q1 must be less than 1")
+  if (any(q0+q1>=1)) stop("The sum of q0 and q1 must be less than 1")
 
   n <- floor(n)
-  wtilde <- w*min(mu/p, (1-mu)/(1-p))
+
+  l.mu <- length(mu)
+  l.phi <- length(phi)
+  l.p <- length(p)
+  l.w <- length(w)
+  l.q0 <- length(q0)
+  l.q1 <- length(q1)
+
+  L.max <- max(l.mu, l.phi, l.p, l.w, l.q0, l.q1)
+  ## recycling check
+  if (L.max %% l.mu != 0 | L.max %% l.phi != 0 |
+      L.max %% l.p != 0 | L.max %% l.w != 0 |
+      L.max %% l.q0 != 0 | L.max %% l.q1 != 0)
+    warning("longer object length is not a multiple of shorter object length")
+
+  mu <- rep(mu, length.out = n)
+  phi <- rep(phi, length.out = n)
+  p <- rep(p, length.out = n)
+  w <- rep(w, length.out = n)
+  q0 <- rep(q0, length.out = n)
+  q1 <- rep(q1, length.out = n)
+
+
+  wtilde <- w*pmin(mu/p, (1-mu)/(1-p))
   lambda1 <- mu + (1-p)*wtilde
   lambda2 <- mu-p*wtilde
-  x <- vector(mode="numeric", length = n)
-  v.aug <- sample(c(0,1,2), n, replace=T, prob=c(1-q0-q1,q0,q1))
-  x[v.aug==1] <- 0
-  x[v.aug==2] <- 1
-  v <- rbinom(length(which(v.aug==0)),1,prob=p)
-  x[v.aug==0][v==1] <- rBeta(length(which(v==1)),lambda1,phi)
-  x[v.aug==0][v==0] <- rBeta(length(which(v==0)),lambda2,phi)
-  return(x)
+
+  out <- vector(mode="numeric", length = n)
+
+  v.aug <- unlist(lapply(1:n, function(l) sample(c(0,1,2),1,replace = T, prob = c(1-q0[l]-q1[l],q0[l], q1[l]))))
+
+  out[v.aug==1] <- 0
+  out[v.aug==2] <- 1
+
+  if(sum(v.aug == 0) > 0){
+    lambda1_v0 <- lambda1[v.aug==0]
+    lambda2_v0 <- lambda2[v.aug==0]
+    phi_v0 <- phi[v.aug==0]
+
+    for(i in 1:sum(v.aug == 0)){
+      v.mixt <- rbinom(1, 1, prob=p)
+
+      if(v.mixt == 1){
+        out[v.aug==0][i] <- rBeta(1, lambda1_v0[i], phi_v0[i])
+      } else out[v.aug==0][i] <- rBeta(1, lambda2_v0[i], phi_v0[i])
+    }
+  }
+
+  return(out)
 }
